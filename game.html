@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>game</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+  }
+  body {
+    width: 100vw;
+    height: 100vh;
+    image-rendering: pixelated;
+  }
+  main {
+    width: 100%;
+    height: 100%;
+  }
+  .hotbar {
+    padding: 4px;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .slot {
+    margin: 4px;
+    padding: 8px;
+    position: relative;
+    --size: 80px;
+    width: var(--size);
+    height: var(--size);
+    background: url("slot.png") no-repeat;
+    background-size: cover;
+  }
+  .slot.active::after {
+    content: "";
+    margin: -12px;
+    position: absolute;
+    --size: 88px;
+    width: var(--size);
+    height: var(--size);
+    background: url("slot_active.png") no-repeat;
+    background-size: cover;
+  }
+  .item {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    background: var(--item-sprite) no-repeat;
+    background-size: cover;
+  }
+  .item.spearsword {
+    --item-sprite: url("spearsword.png");
+  }
+  .item.pickmatic {
+    --item-sprite: url("pickmatic.png");
+  }
+  .item.hatchet {
+    --item-sprite: url("hatchet.png");
+  }
+  .item.spade {
+    --item-sprite: url("spade.png");
+  }
+  .playScreen {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: lightblue;
+  }
+  .player {
+    position: relative;
+    transform: rotateY(var(--direction)) translateY(var(--jump-height));
+    --jump-height: 0px;
+  }
+  .player.left {
+    --direction: 180deg;
+  }
+  .player.right {
+    --direction: 0deg;
+  }
+  .player.jump {
+    animation: jump 0.5s;
+  }
+  @keyframes jump {
+    0%, 100% {
+      --jump-height: 0px;
+    }
+    50% {
+      --jump-height: -64px;
+    }
+  }
+  .player .item {
+    position: absolute;
+    left: 36px;
+    top: 16px;
+    z-index: -1;
+    transform: rotateY(180deg) rotateZ(-90deg);
+  }
+  .player .character {
+    width: 64px;
+    height: 128px;
+    display: block;
+    background: var(--item-sprite) no-repeat;
+    background-size: cover;
+  }
+  .player .character.guy {
+    --item-sprite: url("player_guy.png");
+  }
+</style>
+
+</head>
+
+<body>
+
+<main>
+  <div class="hotbar">
+    <div class="slot" data-slot="1">
+      <span class="item spearsword"></span>
+    </div>
+    <div class="slot" data-slot="2">
+      <span class="item pickmatic"></span>
+    </div>
+    <div class="slot active" data-slot="3">
+      <span class="item hatchet"></span>
+    </div>
+    <div class="slot" data-slot="4">
+      <span class="item spade"></span>
+    </div>
+    <div class="slot" data-slot="5">
+      <span class="item"></span>
+    </div>
+    <div class="slot" data-slot="6">
+      <span class="item"></span>
+    </div>
+  </div>
+  <div class="playScreen">
+    <div class="player left">
+      <span class="item hatchet"></span>
+      <span class="character guy"></span>
+    </div>
+  </div>
+</main>
+
+<script>
+  var player = document.getElementsByClassName("player")[0];
+  window.addEventListener("keydown",function(event){
+    if (["1","2","3","4","5","6"].includes(event.key)){
+      event.preventDefault();
+      changeSlot(event);
+    }
+    if (["a","ArrowLeft"].includes(event.key)){
+      event.preventDefault();
+      changeDirection("left");
+    }
+    if (["d","ArrowRight"].includes(event.key)){
+      event.preventDefault();
+      changeDirection("right");
+    }
+    if (event.key == " "){
+      event.preventDefault();
+      player.classList.add("jump");
+    }
+  });
+  player.addEventListener("animationend",function(){
+    player.classList.remove("jump");
+  });
+  function changeSlot(event){
+    var slots = document.getElementsByClassName("slot");
+    Array.from(slots).forEach(function(item){
+      item.classList.remove("active");
+    });
+    var active = document.querySelector("[data-slot='" + event.key + "']");
+    active.classList.add("active");
+    var heldItem = player.getElementsByClassName("item")[0].classList;
+    var slotItem = active.getElementsByClassName("item")[0].classList;
+    heldItem.remove(Array.from(heldItem)[1]);
+    if (Array.from(heldItem)[1] == undefined){
+      heldItem.add(Array.from(slotItem)[1]);
+    }
+  }
+  function changeDirection(input){
+    if (input == "left"){
+      player.classList.remove("right");
+      player.classList.add("left");
+    }
+    if (input == "right"){
+      player.classList.remove("left");
+      player.classList.add("right");
+    }
+  }
+</script>
+
+</body>
+
+</html>
