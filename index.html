@@ -101,7 +101,7 @@ class Player {
     this.y = 0;
     this.width = 64;
     this.height = 128;
-    this.speed = 10;
+    this.speed = 12;
   }
   update(){
     if (key.left) this.x += this.speed;
@@ -131,15 +131,15 @@ class Tree {
       this.y = canvas.height - player.y;
       if (explored.bottom < this.y) explored.bottom = this.y;
     }
-    this.width = 384;
-    this.height = 601;
+    this.width = 192;
+    this.height = 300;
   }
   draw(){
     ctx.drawImage(treeSprite,this.x + player.x,this.y + player.y,this.width,this.height);
   }
 }
 function handleTrees(){
-  if (gameFrame % 40 == 0){
+  if (gameFrame % 20 == 0){
     if (canvas.height / -2 - player.y < explored.top || canvas.height - player.y > explored.bottom){
       if (key.up) treesArray.unshift(new Tree());
       if (key.down) treesArray.push(new Tree());
@@ -169,8 +169,8 @@ function setCoordinateLabel(){
 // Animation loop
 function animate(recursive = true){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  if (grassPattern) grassPattern.setTransform(new DOMMatrix([0.125,0,0,0.125,Math.round(canvas.width / 2) + player.x,Math.round(canvas.height / 2) + player.y]));
-  ctx.fillStyle = (grassPattern) ? grassPattern : "#7e892a";
+  if (grassPattern) grassPattern.setTransform(new DOMMatrix([0.0625,0,0,0.0625,Math.round(canvas.width / 2) + player.x,Math.round(canvas.height / 2) + player.y]));
+  ctx.fillStyle = (grassPattern) ? grassPattern : "#406e28";
   //ctx.fillStyle = "green";
   ctx.fillRect(0,0,canvas.width,canvas.height);
   handleTrees();
