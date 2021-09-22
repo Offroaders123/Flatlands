@@ -34,6 +34,15 @@
     height: 100%;
     image-rendering: pixelated;
   }
+  #coordinates {
+    margin: 12px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    font-size: 20px;
+    font-family: monospace;
+    line-height: 1;
+  }
 </style>
 
 </head>
@@ -41,25 +50,26 @@
 <body>
 
 <canvas id="canvas"></canvas>
+<span id="coordinates"></span>
 
 <script>
-// Canvas setup
+// Canvas
 const canvas = document.querySelector("#canvas");
-const ctx = canvas.getContext("2d");
-canvas.width = canvas.offsetWidth;
-canvas.height = canvas.offsetHeight;
-
 const bounds = canvas.getBoundingClientRect();
+const ctx = canvas.getContext("2d",{ alpha: false });
+
+let scaling = 4;
 
 new ResizeObserver(() => {
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
-  animate(false);
+  canvas.width = canvas.offsetWidth / scaling;
+  canvas.height = canvas.offsetHeight / scaling;
+  ctx.imageSmoothingEnabled = false;
+  animate({ recursive: false });
 }).observe(canvas);
 
-let gameFrame = 0;
+let tick = 0;
 
-// Interactivity
+// Input
 const key = {
   left: false,
   right: false,
@@ -67,13 +77,14 @@ const key = {
   down: false
 };
 document.addEventListener("keydown",event => {
-  if (event.repeat) return;
+  if (event.repeat || document.activeElement != document.body) return;
   if (["ArrowLeft","a"].includes(event.key)) key.left = true;
   if (["ArrowRight","d"].includes(event.key)) key.right = true;
   if (["ArrowUp","w"].includes(event.key)) key.up = true;
   if (["ArrowDown","s"].includes(event.key)) key.down = true;
 });
 document.addEventListener("keyup",event => {
+  if (document.activeElement != document.body) return;
   if (["ArrowLeft","a"].includes(event.key)) key.left = false;
   if (["ArrowRight","d"].includes(event.key)) key.right = false;
   if (["ArrowUp","w"].includes(event.key)) key.up = false;
@@ -101,20 +112,41 @@ class Player {
   constructor(){
     this.x = 0;
     this.y = 0;
-    this.width = 64;
-    this.height = 128;
+    this.width = 16;
+    this.height = 32;
     this.offsetX = () => Math.round(canvas.width / 2);
     this.offsetY = () => Math.round(canvas.height / 2);
-    this.speed = 12;
+    this.speed = 2;
+    this.tick = 0;
+    this.ticks = 24;
+    this.frame = 0;
+    this.frames = 2;
+    this.column = 0;
+    this.columns = 4;
   }
   update(){
     if (key.left) this.x += this.speed;
     if (key.right) this.x -= this.speed;
     if (key.up) this.y += this.speed;
     if (key.down) this.y -= this.speed;
+
+    this.tick++;
+    if (this.tick > this.ticks - 1){
+      this.tick = 0;
+      if (this.frame < this.frames - 1){
+        this.frame++;
+      } else {
+        this.frame = 0;
+        if (this.column < this.columns - 1){
+          this.column++;
+        } else {
+          this.column = 0;
+        }
+      }
+    }
   }
   draw(){
-    ctx.drawImage(playerSprite,0,0,16,32,this.offsetX() - this.width / 2,this.offsetY() - this.height / 2,this.width,this.height);
+    ctx.drawImage(playerSprite,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,this.offsetX() - this.width / 2,this.offsetY() - this.height / 2,this.width,this.height);
   }
 }
 const player = new Player();
@@ -125,24 +157,24 @@ const treeSprite = new Image();
 treeSprite.src = "tree.png";
 class Tree {
   constructor(){
-    this.x = Math.floor(Math.random() * canvas.width) - player.x - 192 / 2;
+    this.x = Math.floor(Math.random() * canvas.width) - player.x - 96 / 2;
     if (key.up){
-      this.y = canvas.height / -2 - player.y;
+      this.y = canvas.height / -2 - player.y - 96 / 2;
       if (explored.top > this.y) explored.top = this.y;
     }
     if (key.down){
       this.y = canvas.height - player.y;
       if (explored.bottom < this.y) explored.bottom = this.y;
     }
-    this.width = 192;
-    this.height = 300;
+    this.width = 96;
+    this.height = 150;
   }
   draw(){
     ctx.drawImage(treeSprite,this.x + player.x,this.y + player.y,this.width,this.height);
   }
 }
 function handleTrees(){
-  if (gameFrame % 20 == 0){
+  if (tick % 20 == 0){
     if (canvas.height / -2 - player.y < explored.top || canvas.height - player.y > explored.bottom){
       if (key.up) treesArray.unshift(new Tree());
       if (key.down) treesArray.push(new Tree());
@@ -153,25 +185,23 @@ function handleTrees(){
   });
 }
 
-// Set coordinate label
+// Coordinates
+const coordinates = document.querySelector("#coordinates");
 function setCoordinateLabel(){
-  ctx.fillStyle = "black";
-  ctx.font = "20px monospace";
-  ctx.fillText(`x: ${Math.round(player.x / 10) * -1}, y: ${Math.round(player.y / 10)}`,12,canvas.height - 16);
+  coordinates.textContent = `(${Math.round(player.x / 16) * -1}, ${Math.round(player.y / 16)})`;
 }
 
-// Animation loop
-function animate(recursive = true){
+// Rendering
+function animate({ recursive = true } = {}){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.imageSmoothingEnabled = false;
-  if (grassPattern) grassPattern.setTransform(new DOMMatrix([4,0,0,4,player.offsetX() + player.x,player.offsetY() + player.y]));
+  if (grassPattern) grassPattern.setTransform(new DOMMatrix([1,0,0,1,player.offsetX() + player.x,player.offsetY() + player.y]));
   ctx.fillStyle = (grassPattern) ? grassPattern : "#779c43";
   ctx.fillRect(0,0,canvas.width,canvas.height);
   handleTrees();
   player.update();
   player.draw();
   setCoordinateLabel();
-  gameFrame++;
+  tick++;
   if (recursive) window.requestAnimationFrame(animate);
 }
 animate();
