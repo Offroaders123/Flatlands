@@ -49,7 +49,7 @@ const ctx = canvas.getContext("2d");
 canvas.width = canvas.offsetWidth;
 canvas.height = canvas.offsetHeight;
 
-const baseDimensions = canvas.getBoundingClientRect();
+const bounds = canvas.getBoundingClientRect();
 
 new ResizeObserver(() => {
   canvas.width = canvas.offsetWidth;
@@ -101,6 +101,8 @@ class Player {
     this.y = 0;
     this.width = 64;
     this.height = 128;
+    this.offsetX = () => Math.round(canvas.width / 2);
+    this.offsetY = () => Math.round(canvas.height / 2);
     this.speed = 12;
   }
   update(){
@@ -111,18 +113,18 @@ class Player {
   }
   draw(){
     ctx.fillStyle = "red";
-    ctx.fillRect(Math.round(canvas.width / 2) - this.width / 2,Math.round(canvas.height / 2) - this.height / 2,this.width,this.height);
+    ctx.fillRect(this.offsetX() - this.width / 2,this.offsetY() - this.height / 2,this.width,this.height);
   }
 }
 const player = new Player();
-const treeSprite = new Image();
-treeSprite.src = "https://lh4.googleusercontent.com/proxy/heqSe15hCuq21HaL40Gu-y2jUH_ib8Wxg1TKyOqqBpM47u39sCuBSYmpWzzfb2goHr-l7GwiItUuo3LUjaB7RsWws48n-Juf_QM=w1200-h630-p-k-no-nu";
 
 // Trees
 const treesArray = [];
+const treeSprite = new Image();
+treeSprite.src = "https://lh4.googleusercontent.com/proxy/heqSe15hCuq21HaL40Gu-y2jUH_ib8Wxg1TKyOqqBpM47u39sCuBSYmpWzzfb2goHr-l7GwiItUuo3LUjaB7RsWws48n-Juf_QM=w1200-h630-p-k-no-nu";
 class Tree {
   constructor(){
-    this.x = Math.floor(Math.random() * canvas.width) - player.x;
+    this.x = Math.floor(Math.random() * canvas.width) - player.x - 192 / 2;
     if (key.up){
       this.y = canvas.height / -2 - player.y;
       if (explored.top > this.y) explored.top = this.y;
@@ -150,15 +152,6 @@ function handleTrees(){
   });
 }
 
-// Set random label
-let randomLabel;
-function setRandomLabel(){
-  if (gameFrame % 10 == 0) randomLabel = Math.floor(Math.random() * 10);
-  ctx.fillStyle = "black";
-  ctx.font = "40px sans-serif";
-  ctx.fillText(`random: ${randomLabel}`,Math.round(canvas.width / 2) - Math.round(baseDimensions.width / 2) + player.x + 20,Math.round(canvas.height / 2) - Math.round(baseDimensions.height / 2) + player.y + 50);
-}
-
 // Set coordinate label
 function setCoordinateLabel(){
   ctx.fillStyle = "black";
@@ -169,14 +162,12 @@ function setCoordinateLabel(){
 // Animation loop
 function animate(recursive = true){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  if (grassPattern) grassPattern.setTransform(new DOMMatrix([0.0625,0,0,0.0625,Math.round(canvas.width / 2) + player.x,Math.round(canvas.height / 2) + player.y]));
+  if (grassPattern) grassPattern.setTransform(new DOMMatrix([0.0625,0,0,0.0625,player.offsetX() + player.x,player.offsetY() + player.y]));
   ctx.fillStyle = (grassPattern) ? grassPattern : "#406e28";
-  //ctx.fillStyle = "green";
   ctx.fillRect(0,0,canvas.width,canvas.height);
   handleTrees();
   player.update();
   player.draw();
-  setRandomLabel();
   setCoordinateLabel();
   gameFrame++;
   if (recursive) window.requestAnimationFrame(animate);
