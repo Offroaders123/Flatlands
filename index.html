@@ -83,7 +83,7 @@ document.addEventListener("contextmenu",event => event.preventDefault());
 
 // Environment
 const grassSprite = new Image();
-grassSprite.src = "https://i.stack.imgur.com/A8BXP.png";
+grassSprite.src = "ground.png";
 let grassPattern;
 grassSprite.addEventListener("load",() => grassPattern = ctx.createPattern(grassSprite,"repeat"));
 
@@ -95,6 +95,8 @@ const explored = {
 };
 
 // Player
+const playerSprite = new Image();
+playerSprite.src = "player_guy.png";
 class Player {
   constructor(){
     this.x = 0;
@@ -112,8 +114,7 @@ class Player {
     if (key.down) this.y -= this.speed;
   }
   draw(){
-    ctx.fillStyle = "red";
-    ctx.fillRect(this.offsetX() - this.width / 2,this.offsetY() - this.height / 2,this.width,this.height);
+    ctx.drawImage(playerSprite,0,0,16,32,this.offsetX() - this.width / 2,this.offsetY() - this.height / 2,this.width,this.height);
   }
 }
 const player = new Player();
@@ -162,8 +163,9 @@ function setCoordinateLabel(){
 // Animation loop
 function animate(recursive = true){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  if (grassPattern) grassPattern.setTransform(new DOMMatrix([0.0625,0,0,0.0625,player.offsetX() + player.x,player.offsetY() + player.y]));
-  ctx.fillStyle = (grassPattern) ? grassPattern : "#406e28";
+  ctx.imageSmoothingEnabled = false;
+  if (grassPattern) grassPattern.setTransform(new DOMMatrix([4,0,0,4,player.offsetX() + player.x,player.offsetY() + player.y]));
+  ctx.fillStyle = (grassPattern) ? grassPattern : "#779c43";
   ctx.fillRect(0,0,canvas.width,canvas.height);
   handleTrees();
   player.update();
