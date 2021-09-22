@@ -87,6 +87,13 @@ grassSprite.src = "ground1.jpg";
 let grassPattern;
 grassSprite.addEventListener("load",() => grassPattern = ctx.createPattern(grassSprite,"repeat"));
 
+const explored = {
+  left: 0,
+  right: canvas.width,
+  top: 0,
+  bottom: canvas.height
+};
+
 // Player
 class Player {
   constructor(){
@@ -114,7 +121,14 @@ const treesArray = [];
 class Tree {
   constructor(){
     this.x = Math.floor(Math.random() * canvas.width) - player.x;
-    this.y = Math.floor(Math.random() * canvas.height) - player.y;
+    if (key.up){
+      this.y = canvas.height / -2 - player.y;
+      if (explored.top > this.y){ explored.top = this.y;console.log(explored.top)}
+    }
+    if (key.down){
+      this.y = canvas.height - player.y;
+      if (explored.bottom < this.y){ explored.bottom = this.y;console.log(explored.bottom)}
+    }
     this.width = 128;
     this.height = 256;
   }
@@ -124,6 +138,11 @@ class Tree {
   }
 }
 function handleTrees(){
+  if (gameFrame % 20 == 0){
+    if (canvas.height / -2 - player.y < explored.top || canvas.height - player.y > explored.bottom){
+      treesArray.push(new Tree());
+    }
+  }
   treesArray.forEach(tree => {
     tree.draw();
   });
@@ -152,7 +171,6 @@ function animate(recursive = true){
   ctx.fillStyle = (grassPattern) ? grassPattern : "#7e892a";
   //ctx.fillStyle = "green";
   ctx.fillRect(0,0,canvas.width,canvas.height);
-  if (gameFrame % 20 == 0) treesArray.push(new Tree());
   handleTrees();
   player.update();
   player.draw();
