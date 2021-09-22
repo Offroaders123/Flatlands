@@ -1,169 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
 
 <head>
 
 <title>Flatlands</title>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-  * {
+  *, *::before, *::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: sans-serif;
+  }
+  html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
   }
   body {
-    width: 100vw;
-    height: 100vh;
-    image-rendering: pixelated;
-  }
-  main {
-    width: 100%;
-    height: 100%;
-  }
-  .hotbar {
-    padding: 4px;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1;
-  }
-  .slot {
-    margin: 4px;
-    padding: 8px;
-    position: relative;
-    --size: 80px;
-    width: var(--size);
-    height: var(--size);
-    background: url("slot.png") no-repeat;
-    background-size: cover;
-  }
-  .slot.active::after {
-    content: "";
-    margin: -12px;
-    position: absolute;
-    --size: 88px;
-    width: var(--size);
-    height: var(--size);
-    background: url("slot_active.png") no-repeat;
-    background-size: cover;
-  }
-  .item {
-    position: absolute;
-    width: 64px;
-    height: 64px;
-    background: var(--item-sprite) no-repeat;
-    background-size: cover;
-  }
-  .item.spearsword {
-    --item-sprite: url("spearsword.png");
-  }
-  .item.pickmatic {
-    --item-sprite: url("pickmatic.png");
-  }
-  .item.hatchet {
-    --item-sprite: url("hatchet.png");
-  }
-  .item.spade {
-    --item-sprite: url("spade.png");
-  }
-  .item.pizza {
-    --item-sprite: url("pizza.png");
-  }
-  .playScreen {
-    width: 100%;
-    height: 100%;
-    background: url("ground.png") center;
-    background-size: 64px;
-  }
-  .player {
     position: fixed;
-    display: inline-block;
-    transform: rotateY(var(--direction));
-    transform-origin: bottom center;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    font-family: sans-serif;
+    overflow: auto;
+    -webkit-user-select: none;
+    user-select: none;
   }
-  .player.left {
-    --direction: 180deg;
-  }
-  .player.right {
-    --direction: 0deg;
-  }
-  .player.jump {
-    animation: jump 0.5s cubic-bezier(0,0.75,0.25,1);
-  }
-  @keyframes jump {
-    0%, 100% {
-      transform: rotateY(var(--direction)) translateY(0px);
-    }
-    25%, 75% {
-      transform: rotateY(var(--direction)) translateY(0px) scaleY(0.8);
-    }
-    50% {
-      transform: rotateY(var(--direction)) translateY(-64px) scaleY(1.1);
-    }
-  }
-  .player .item {
-    position: absolute;
-    left: 36px;
-    top: 16px;
-    z-index: -1;
-    transform: rotateY(180deg) rotateZ(-90deg);
-  }
-  .player.up .item, .player.down .item {
-    left: 44px;
-    top: 20px;
-    transform: rotateY(180deg) rotateZ(-90deg) scaleY(0.5);
-    transform-origin: bottom left;
-  }
-  .player.down .item {
-    z-index: 0;
-  }
-  .player .character {
-    width: 64px;
-    height: 128px;
-    display: block;
-    background: var(--character-sprite) no-repeat;
-    background-size: cover;
-  }
-  .player .character.walk {
-    animation: walk 0.75s infinite;
-    animation-timing-function: steps(1,end);
-  }
-  @keyframes walk {
-    0%, 100% {
-      background-image: var(--character-walk-0);
-    }
-    50% {
-      background-image: var(--character-walk-1);
-    }
-  }
-  .player .character.guy {
-    --character-sprite: url("player_guy.png");
-  }
-  .player .character.guy.walk {
-    --character-walk-0: url("player_guy_walk_0.png");
-    --character-walk-1: url("player_guy_walk_1.png");
-  }
-  .player.up .character.guy.walk {
-    --character-walk-0: url("player_guy_walk_up_0.png");
-    --character-walk-1: url("player_guy_walk_up_1.png");
-  }
-  .player.down .character.guy.walk {
-    --character-walk-0: url("player_guy_walk_down_0.png");
-    --character-walk-1: url("player_guy_walk_down_1.png");
-  }
-  .player .character.gal {
-    --character-sprite: url("player_gal.png");
-  }
-  .player .character.gal.walk {
-    --character-walk-0: url("player_gal_walk_0.png");
-    --character-walk-1: url("player_gal_walk_1.png");
+  #canvas {
+    margin: auto;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
   }
 </style>
 
@@ -171,122 +40,85 @@
 
 <body>
 
-<main>
-  <div class="hotbar">
-    <div class="slot" data-slot="1">
-      <span class="item spearsword"></span>
-    </div>
-    <div class="slot" data-slot="2">
-      <span class="item pickmatic"></span>
-    </div>
-    <div class="slot active" data-slot="3">
-      <span class="item hatchet"></span>
-    </div>
-    <div class="slot" data-slot="4">
-      <span class="item spade"></span>
-    </div>
-    <div class="slot" data-slot="5">
-      <span class="item"></span>
-    </div>
-    <div class="slot" data-slot="6">
-      <span class="item pizza"></span>
-    </div>
-  </div>
-  <div class="playScreen">
-    <div class="player right" style="left: 232px; top: 232px;">
-      <span class="item hatchet"></span>
-      <span class="character guy"></span>
-    </div>
-    <div class="player left" style="right: 232px; top: 232px;">
-      <span class="item pizza"></span>
-      <span class="character gal"></span>
-    </div>
-  </div>
-</main>
+<canvas id="canvas"></canvas>
 
 <script>
-  var player = document.getElementsByClassName("player")[0];
-  var character = player.getElementsByClassName("character")[0];
-  window.addEventListener("keydown",function(event){
-    if (["1","2","3","4","5","6"].includes(event.key)){
-      event.preventDefault();
-      changeSlot(event);
-    }
-    if (["a","ArrowLeft"].includes(event.key)){
-      event.preventDefault();
-      changeDirection("left");
-    }
-    if (["d","ArrowRight"].includes(event.key)){
-      event.preventDefault();
-      changeDirection("right");
-    }
-    if (["w","ArrowUp"].includes(event.key)){
-      event.preventDefault();
-      changeDirection("up");
-    }
-    if (["s","ArrowDown"].includes(event.key)){
-      event.preventDefault();
-      changeDirection("down");
-    }
-    if (event.key == " "){
-      event.preventDefault();
-      player.classList.add("jump");
-    }
-  });
-  window.addEventListener("keyup",function(event){
-    if (["a","d","w","s","ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(event.key)){
-      event.preventDefault();
-      player.classList.remove("up");
-      player.classList.remove("down");
-      toggleWalk(false);
-    }
-  });
-  player.addEventListener("animationend",function(){
-    player.classList.remove("jump");
-  });
-  function changeSlot(event){
-    var slots = document.getElementsByClassName("slot");
-    Array.from(slots).forEach(function(item){
-      item.classList.remove("active");
-    });
-    var active = document.querySelector("[data-slot='" + event.key + "']");
-    active.classList.add("active");
-    var heldItem = player.getElementsByClassName("item")[0].classList;
-    var slotItem = active.getElementsByClassName("item")[0].classList;
-    heldItem.remove(Array.from(heldItem)[1]);
-    if (Array.from(heldItem)[1] == undefined){
-      heldItem.add(Array.from(slotItem)[1]);
-    }
+// Canvas setup
+const canvas = document.querySelector("#canvas");
+const ctx = canvas.getContext("2d");
+canvas.width = canvas.offsetWidth;
+canvas.height = canvas.offsetHeight;
+
+new ResizeObserver(() => {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  animate(false);
+}).observe(canvas);
+
+let gameFrame = 0;
+
+// Interactivity
+const key = {
+  left: false,
+  right: false,
+  up: false,
+  down: false
+};
+document.addEventListener("keydown",event => {
+  if (event.repeat) return;
+  if (["ArrowLeft","a"].includes(event.key)) key.left = true;
+  if (["ArrowRight","d"].includes(event.key)) key.right = true;
+  if (["ArrowUp","w"].includes(event.key)) key.up = true;
+  if (["ArrowDown","s"].includes(event.key)) key.down = true;
+});
+document.addEventListener("keyup",event => {
+  if (["ArrowLeft","a"].includes(event.key)) key.left = false;
+  if (["ArrowRight","d"].includes(event.key)) key.right = false;
+  if (["ArrowUp","w"].includes(event.key)) key.up = false;
+  if (["ArrowDown","s"].includes(event.key)) key.down = false;
+});
+document.addEventListener("contextmenu",event => event.preventDefault());
+
+// Player
+class Player {
+  constructor(){
+    this.x = 0;
+    this.y = 0;
+    this.width = 16;
+    this.height = 32;
   }
-  function changeDirection(input){
-    if (input == "left"){
-      player.classList.remove("right");
-      player.classList.add("left");
-      player.style.left = parseInt(player.style.left.replace("px","")) - 8 + "px";
-    }
-    if (input == "right"){
-      player.classList.remove("left");
-      player.classList.add("right");
-      player.style.left = parseInt(player.style.left.replace("px","")) + 8 + "px";
-    }
-    if (input == "up"){
-      player.classList.add("up");
-      player.style.top = parseInt(player.style.top.replace("px","")) - 8 + "px";
-    }
-    if (input == "down"){
-      player.classList.add("down");
-      player.style.top = parseInt(player.style.top.replace("px","")) + 8 + "px";
-    }
-    toggleWalk(true);
+  update(){
+    if (key.left) this.x += 5;
+    if (key.right) this.x -= 5;
+    if (key.up) this.y += 5;
+    if (key.down) this.y -= 5;
   }
-  function toggleWalk(input){
-    if (input == true){
-      character.classList.add("walk");
-    }
-    if (input == false){
-      character.classList.remove("walk");
-    }
+  draw(){
+    ctx.fillStyle = "red";
+    ctx.fillRect(Math.round(canvas.width / 2),Math.round(canvas.height / 2),this.width,this.height);
   }
+}
+const player = new Player();
+
+// Set random label
+let randomLabel;
+function setRandomLabel(){
+  if (gameFrame % 10 == 0) randomLabel = Math.floor(Math.random() * 10);
+  ctx.fillStyle = "black";
+  ctx.font = "40px sans-serif";
+  ctx.fillText(`random: ${randomLabel}`,player.x + 20,player.y + 50);
+}
+
+// Animation loop
+function animate(recursive = true){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  player.update();
+  player.draw();
+  setRandomLabel();
+  gameFrame++;
+  if (recursive) window.requestAnimationFrame(animate);
+}
+animate();
 </script>
 
 </body>
