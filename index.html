@@ -79,13 +79,17 @@ document.addEventListener("keyup",event => {
 });
 document.addEventListener("contextmenu",event => event.preventDefault());
 
+// Environment
+const grassSprite = new Image();
+grassSprite.src = "ground1.jpg";
+
 // Player
 class Player {
   constructor(){
     this.x = 0;
     this.y = 0;
-    this.width = 16;
-    this.height = 32;
+    this.width = 64;
+    this.height = 128;
   }
   update(){
     if (key.left) this.x += 5;
@@ -95,7 +99,7 @@ class Player {
   }
   draw(){
     ctx.fillStyle = "red";
-    ctx.fillRect(Math.round(canvas.width / 2),Math.round(canvas.height / 2),this.width,this.height);
+    ctx.fillRect(Math.round(canvas.width / 2) - this.width / 2,Math.round(canvas.height / 2) - this.height / 2,this.width,this.height);
   }
 }
 const player = new Player();
@@ -109,12 +113,22 @@ function setRandomLabel(){
   ctx.fillText(`random: ${randomLabel}`,player.x + 20,player.y + 50);
 }
 
+// Set coordinate label
+function setCoordinateLabel(){
+  ctx.fillStyle = "black";
+  ctx.font = "20px monospace";
+  ctx.fillText(`x: ${Math.round(player.x / 10) * -1}, y: ${Math.round(player.y / 10)}`,12,canvas.height - 16);
+}
+
 // Animation loop
 function animate(recursive = true){
   ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "green";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
   player.update();
   player.draw();
   setRandomLabel();
+  setCoordinateLabel();
   gameFrame++;
   if (recursive) window.requestAnimationFrame(animate);
 }
