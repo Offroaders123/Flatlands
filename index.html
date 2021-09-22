@@ -49,6 +49,8 @@ const ctx = canvas.getContext("2d");
 canvas.width = canvas.offsetWidth;
 canvas.height = canvas.offsetHeight;
 
+const baseDimensions = canvas.getBoundingClientRect();
+
 new ResizeObserver(() => {
   canvas.width = canvas.offsetWidth;
   canvas.height = canvas.offsetHeight;
@@ -82,6 +84,8 @@ document.addEventListener("contextmenu",event => event.preventDefault());
 // Environment
 const grassSprite = new Image();
 grassSprite.src = "ground1.jpg";
+let grassPattern;
+grassSprite.addEventListener("load",() => grassPattern = ctx.createPattern(grassSprite,"repeat"));
 
 // Player
 class Player {
@@ -90,12 +94,13 @@ class Player {
     this.y = 0;
     this.width = 64;
     this.height = 128;
+    this.speed = 10;
   }
   update(){
-    if (key.left) this.x += 5;
-    if (key.right) this.x -= 5;
-    if (key.up) this.y += 5;
-    if (key.down) this.y -= 5;
+    if (key.left) this.x += this.speed;
+    if (key.right) this.x -= this.speed;
+    if (key.up) this.y += this.speed;
+    if (key.down) this.y -= this.speed;
   }
   draw(){
     ctx.fillStyle = "red";
@@ -104,13 +109,33 @@ class Player {
 }
 const player = new Player();
 
+// Trees
+const treesArray = [];
+class Tree {
+  constructor(){
+    this.x = Math.floor(Math.random() * canvas.width) - player.x;
+    this.y = Math.floor(Math.random() * canvas.height) - player.y;
+    this.width = 128;
+    this.height = 256;
+  }
+  draw(){
+    ctx.fillStyle = "green";
+    ctx.fillRect(this.x + player.x,this.y + player.y,this.width,this.height);
+  }
+}
+function handleTrees(){
+  treesArray.forEach(tree => {
+    tree.draw();
+  });
+}
+
 // Set random label
 let randomLabel;
 function setRandomLabel(){
   if (gameFrame % 10 == 0) randomLabel = Math.floor(Math.random() * 10);
   ctx.fillStyle = "black";
   ctx.font = "40px sans-serif";
-  ctx.fillText(`random: ${randomLabel}`,player.x + 20,player.y + 50);
+  ctx.fillText(`random: ${randomLabel}`,Math.round(canvas.width / 2) - Math.round(baseDimensions.width / 2) + player.x + 20,Math.round(canvas.height / 2) - Math.round(baseDimensions.height / 2) + player.y + 50);
 }
 
 // Set coordinate label
@@ -123,8 +148,12 @@ function setCoordinateLabel(){
 // Animation loop
 function animate(recursive = true){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle = "green";
+  if (grassPattern) grassPattern.setTransform(new DOMMatrix([1,0,0,1,Math.round(canvas.width / 2) + player.x,Math.round(canvas.height / 2) + player.y]));
+  ctx.fillStyle = (grassPattern) ? grassPattern : "#7e892a";
+  //ctx.fillStyle = "green";
   ctx.fillRect(0,0,canvas.width,canvas.height);
+  if (gameFrame % 20 == 0) treesArray.push(new Tree());
+  handleTrees();
   player.update();
   player.draw();
   setRandomLabel();
