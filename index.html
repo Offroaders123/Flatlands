@@ -83,7 +83,7 @@ document.addEventListener("contextmenu",event => event.preventDefault());
 
 // Environment
 const grassSprite = new Image();
-grassSprite.src = "ground1.jpg";
+grassSprite.src = "ground2.png";
 let grassPattern;
 grassSprite.addEventListener("load",() => grassPattern = ctx.createPattern(grassSprite,"repeat"));
 
@@ -115,6 +115,8 @@ class Player {
   }
 }
 const player = new Player();
+const treeSprite = new Image();
+treeSprite.src = "tree.png";
 
 // Trees
 const treesArray = [];
@@ -123,24 +125,24 @@ class Tree {
     this.x = Math.floor(Math.random() * canvas.width) - player.x;
     if (key.up){
       this.y = canvas.height / -2 - player.y;
-      if (explored.top > this.y){ explored.top = this.y;console.log(explored.top)}
+      if (explored.top > this.y) explored.top = this.y;
     }
     if (key.down){
       this.y = canvas.height - player.y;
-      if (explored.bottom < this.y){ explored.bottom = this.y;console.log(explored.bottom)}
+      if (explored.bottom < this.y) explored.bottom = this.y;
     }
-    this.width = 128;
-    this.height = 256;
+    this.width = 384;
+    this.height = 601;
   }
   draw(){
-    ctx.fillStyle = "green";
-    ctx.fillRect(this.x + player.x,this.y + player.y,this.width,this.height);
+    ctx.drawImage(treeSprite,this.x + player.x,this.y + player.y,this.width,this.height);
   }
 }
 function handleTrees(){
-  if (gameFrame % 20 == 0){
+  if (gameFrame % 40 == 0){
     if (canvas.height / -2 - player.y < explored.top || canvas.height - player.y > explored.bottom){
-      treesArray.push(new Tree());
+      if (key.up) treesArray.unshift(new Tree());
+      if (key.down) treesArray.push(new Tree());
     }
   }
   treesArray.forEach(tree => {
@@ -167,7 +169,7 @@ function setCoordinateLabel(){
 // Animation loop
 function animate(recursive = true){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  if (grassPattern) grassPattern.setTransform(new DOMMatrix([1,0,0,1,Math.round(canvas.width / 2) + player.x,Math.round(canvas.height / 2) + player.y]));
+  if (grassPattern) grassPattern.setTransform(new DOMMatrix([0.125,0,0,0.125,Math.round(canvas.width / 2) + player.x,Math.round(canvas.height / 2) + player.y]));
   ctx.fillStyle = (grassPattern) ? grassPattern : "#7e892a";
   //ctx.fillStyle = "green";
   ctx.fillRect(0,0,canvas.width,canvas.height);
