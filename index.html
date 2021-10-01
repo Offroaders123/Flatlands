@@ -5,7 +5,39 @@
 
 <title>Flatlands</title>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="author" content="Brandon Bennett">
+<meta name="description" content="Flatlands is a cross platform 2D game built in the browser!">
+<meta property="og:title" content="Flatlands">
+<meta property="og:description" content="Flatlands is a cross platform 2D game built in the browser!">
+<meta property="og:image" content="https://offroaders123.github.io/Flatlands/Flatlands.png">
+<meta property="og:url" content="https://offroaders123.github.io/Flatlands/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#779c43">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Flatlands">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<base href="https://offroaders123.github.io/Flatlands/">
+<link rel="canonical" href="https://offroaders123.github.io/Flatlands/">
+<!--link rel="manifest">
+<link rel="icon" type="image/svg+xml" href="resources/icon.svg"-->
+<link rel="alternate icon" type="image/png" sizes="16x16" href="spearsword.png">
+<!--link rel="alternate icon" type="image/png" sizes="32x32" href="resources/icon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="resources/app-apple-touch-180.png">
+<link rel="apple-touch-icon" sizes="1024x1024" href="resources/app-apple-touch-1024.png"-->
+
+<script>
+  window.Flatlands = {
+    appearance: () => ({
+      apple_home_screen: (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform) && "standalone" in navigator && navigator.standalone)
+    }),
+    environment: () => ({
+      touch_device: ("ontouchstart" in window)
+    })
+  };
+  if (Flatlands.appearance().apple_home_screen) document.documentElement.classList.add("apple-home-screen");
+  if (Flatlands.environment().touch_device) document.documentElement.classList.add("touch-device");
+</script>
 <link rel="stylesheet" href="./lib/styles/global.css">
 
 </head>
