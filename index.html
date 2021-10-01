@@ -5,7 +5,39 @@
 
 <title>Flatlands</title>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="author" content="Brandon Bennett">
+<meta name="description" content="Flatlands is a cross platform 2D game built in the browser!">
+<meta property="og:title" content="Flatlands">
+<meta property="og:description" content="Flatlands is a cross platform 2D game built in the browser!">
+<meta property="og:image" content="https://offroaders123.github.io/Flatlands/Flatlands.png">
+<meta property="og:url" content="https://offroaders123.github.io/Flatlands/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#779c43">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Flatlands">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<base href="https://offroaders123.github.io/Flatlands/">
+<link rel="canonical" href="https://offroaders123.github.io/Flatlands/">
+<!--link rel="manifest">
+<link rel="icon" type="image/svg+xml" href="resources/icon.svg"-->
+<link rel="alternate icon" type="image/png" sizes="16x16" href="spearsword.png">
+<!--link rel="alternate icon" type="image/png" sizes="32x32" href="resources/icon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="resources/app-apple-touch-180.png">
+<link rel="apple-touch-icon" sizes="1024x1024" href="resources/app-apple-touch-1024.png"-->
+
+<script>
+  window.Flatlands = {
+    appearance: () => ({
+      apple_home_screen: (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform) && "standalone" in navigator && navigator.standalone)
+    }),
+    environment: () => ({
+      touch_device: ("ontouchstart" in window)
+    })
+  };
+  if (Flatlands.appearance().apple_home_screen) document.documentElement.classList.add("apple-home-screen");
+  if (Flatlands.environment().touch_device) document.documentElement.classList.add("touch-device");
+</script>
 
 <style>
   *, *::before, *::after {
@@ -13,10 +45,20 @@
     padding: 0;
     box-sizing: border-box;
   }
+  :root {
+    --safe-area-inset-left: env(safe-area-inset-left,0px);
+    --safe-area-inset-right: env(safe-area-inset-right,0px);
+    --safe-area-inset-top: env(safe-area-inset-top,0px);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom,0px);
+  }
   html {
     width: 100%;
     height: 100%;
     overflow: hidden;
+  }
+  html.apple-home-screen {
+    width: 100vw;
+    height: 100vh;
   }
   body {
     position: fixed;
@@ -30,6 +72,8 @@
     overflow: auto;
     -webkit-user-select: none;
     user-select: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   #canvas {
     margin: auto;
@@ -39,16 +83,18 @@
   #coordinates {
     margin: 12px;
     position: fixed;
-    left: 0;
-    top: 0;
+    left: var(--safe-area-inset-left);
+    top: var(--safe-area-inset-top);
+    color: #ffffff;
     font-size: 20px;
     font-family: monospace;
     line-height: 1;
+    text-shadow: 2px 2px 0 #000000;
   }
   #hotbar {
     padding: 4px;
     position: fixed;
-    bottom: 0;
+    bottom: calc(var(--safe-area-inset-bottom));
     display: flex;
     list-style: none;
   }
@@ -60,8 +106,39 @@
     background-size: cover;
   }
   #hotbar .item {
-    width: 64px;
-    height: 64px;
+    width: min(min(12vh,8vw),64px);
+    height: min(min(12vh,8vw),64px);
+  }
+  #dpad {
+    margin: 16px;
+    position: fixed;
+    left: calc(var(--safe-area-inset-left));
+    bottom: calc(var(--safe-area-inset-bottom));
+    display: grid;
+    grid-template-areas:
+      ". up ."
+      "left . right"
+      ". down ."
+    ;
+  }
+  :root:not(.touch-device) #dpad {
+    display: none;
+  }
+  #dpad button {
+    width: 48px;
+    height: 48px;
+  }
+  #dpad [data-left] {
+    grid-area: left;
+  }
+  #dpad [data-right] {
+    grid-area: right;
+  }
+  #dpad [data-up] {
+    grid-area: up;
+  }
+  #dpad [data-down] {
+    grid-area: down;
   }
 </style>
 
@@ -91,6 +168,12 @@
     <span class="item pizza"></span>
   </li>
 </ul>
+<div id="dpad">
+  <button data-left>Left</button>
+  <button data-right>Right</button>
+  <button data-up>Up</button>
+  <button data-down>Down</button>
+</div>
 
 <script>
 // Canvas
@@ -131,6 +214,20 @@ document.addEventListener("keyup",event => {
   if (["ArrowDown","s"].includes(event.key)) key.down = false;
 });
 document.addEventListener("contextmenu",event => event.preventDefault());
+
+dpad.addEventListener("touchstart",event => {
+  event.preventDefault();
+  if (event.target.matches("[data-left]")) key.left = true;
+  if (event.target.matches("[data-right]")) key.right = true;
+  if (event.target.matches("[data-up]")) key.up = true;
+  if (event.target.matches("[data-down]")) key.down = true;
+});
+dpad.addEventListener("touchend",event => {
+  if (event.target.matches("[data-left]")) key.left = false;
+  if (event.target.matches("[data-right]")) key.right = false;
+  if (event.target.matches("[data-up]")) key.up = false;
+  if (event.target.matches("[data-down]")) key.down = false;
+});
 
 // Environment
 const grassSprite = new Image();
