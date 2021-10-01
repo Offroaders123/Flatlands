@@ -5,40 +5,7 @@
 
 <title>Flatlands</title>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="author" content="Brandon Bennett">
-<meta name="description" content="Flatlands is a cross platform 2D game built in the browser!">
-<meta property="og:title" content="Flatlands">
-<meta property="og:description" content="Flatlands is a cross platform 2D game built in the browser!">
-<meta property="og:image" content="https://offroaders123.github.io/Flatlands/Flatlands.png">
-<meta property="og:url" content="https://offroaders123.github.io/Flatlands/">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#779c43">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Flatlands">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<base href="https://offroaders123.github.io/Flatlands/">
-<link rel="canonical" href="https://offroaders123.github.io/Flatlands/">
-<!--link rel="manifest">
-<link rel="icon" type="image/svg+xml" href="resources/icon.svg"-->
-<link rel="alternate icon" type="image/png" sizes="16x16" href="spearsword.png">
-<!--link rel="alternate icon" type="image/png" sizes="32x32" href="resources/icon-32.png">
-<link rel="apple-touch-icon" sizes="180x180" href="resources/app-apple-touch-180.png">
-<link rel="apple-touch-icon" sizes="1024x1024" href="resources/app-apple-touch-1024.png"-->
-
-<script>
-  window.Flatlands = {
-    appearance: () => ({
-      apple_home_screen: (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform) && "standalone" in navigator && navigator.standalone)
-    }),
-    environment: () => ({
-      touch_device: ("ontouchstart" in window)
-    })
-  };
-  if (Flatlands.appearance().apple_home_screen) document.documentElement.classList.add("apple-home-screen");
-  if (Flatlands.environment().touch_device) document.documentElement.classList.add("touch-device");
-</script>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
   *, *::before, *::after {
@@ -46,20 +13,10 @@
     padding: 0;
     box-sizing: border-box;
   }
-  :root {
-    --safe-area-inset-left: env(safe-area-inset-left,0px);
-    --safe-area-inset-right: env(safe-area-inset-right,0px);
-    --safe-area-inset-top: env(safe-area-inset-top,0px);
-    --safe-area-inset-bottom: env(safe-area-inset-bottom,0px);
-  }
   html {
     width: 100%;
     height: 100%;
     overflow: hidden;
-  }
-  html.apple-home-screen {
-    width: 100vw;
-    height: 100vh;
   }
   body {
     position: fixed;
@@ -68,18 +25,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", system-ui, sans-serif;
+    font-family: sans-serif;
     image-rendering: pixelated;
     overflow: auto;
     -webkit-user-select: none;
     user-select: none;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-  }
-  button {
-    color: inherit;
-    font: inherit;
-    border-radius: 0;
   }
   #canvas {
     margin: auto;
@@ -89,18 +39,16 @@
   #coordinates {
     margin: 12px;
     position: fixed;
-    left: var(--safe-area-inset-left);
-    top: var(--safe-area-inset-top);
-    color: #ffffff;
+    left: 0;
+    top: 0;
     font-size: 20px;
-    font-family: ui-monospace, "Noto Sans Mono", "Cousine", monospace;
+    font-family: monospace;
     line-height: 1;
-    text-shadow: 0.175ch 0.175ch 0 #000000;
   }
   #hotbar {
     padding: 4px;
     position: fixed;
-    bottom: calc(var(--safe-area-inset-bottom));
+    bottom: 0;
     display: flex;
     list-style: none;
   }
@@ -112,58 +60,14 @@
     background-size: cover;
   }
   #hotbar .item {
-    width: min(min(12vh,8vw),64px);
-    height: min(min(12vh,8vw),64px);
-  }
-  #dpad {
-    margin: 8px;
-    position: fixed;
-    left: calc(var(--safe-area-inset-left));
-    bottom: calc(var(--safe-area-inset-bottom));
-    display: grid;
-    grid-template-areas:
-      ". up ."
-      "left . right"
-      ". down .";
-  }
-  :root:not(.touch-device) #dpad {
-    display: none;
-  }
-  #dpad button {
-    width: 56px;
-    height: 56px;
-    background: #cccccc;
-    border: 2px solid #000000cc;
-    transition: opacity 250ms;
-  }
-  #dpad button:active {
-    opacity: 0.6;
-  }
-  #dpad [data-left] {
-    margin-right: -2px;
-    grid-area: left;
-    border-radius: 8px 0 0 8px;
-  }
-  #dpad [data-right] {
-    margin-left: -2px;
-    grid-area: right;
-    border-radius: 0 8px 8px 0;
-  }
-  #dpad [data-up] {
-    margin-bottom: -2px;
-    grid-area: up;
-    border-radius: 8px 8px 0 0;
-  }
-  #dpad [data-down] {
-    margin-top: -2px;
-    grid-area: down;
-    border-radius: 0 0 8px 8px;
+    width: 64px;
+    height: 64px;
   }
 </style>
 
 </head>
 
-<body ontouchstart>
+<body>
 
 <canvas id="canvas"></canvas>
 <span id="coordinates"></span>
@@ -187,12 +91,6 @@
     <span class="item pizza"></span>
   </li>
 </ul>
-<div id="dpad">
-  <button data-left>◀</button>
-  <button data-right>▶</button>
-  <button data-up>▲</button>
-  <button data-down>▼</button>
-</div>
 
 <script>
 // Canvas
@@ -234,23 +132,9 @@ document.addEventListener("keyup",event => {
 });
 document.addEventListener("contextmenu",event => event.preventDefault());
 
-dpad.addEventListener("touchstart",event => {
-  event.preventDefault();
-  if (event.target.matches("[data-left]")) key.left = true;
-  if (event.target.matches("[data-right]")) key.right = true;
-  if (event.target.matches("[data-up]")) key.up = true;
-  if (event.target.matches("[data-down]")) key.down = true;
-});
-dpad.addEventListener("touchend",event => {
-  if (event.target.matches("[data-left]")) key.left = false;
-  if (event.target.matches("[data-right]")) key.right = false;
-  if (event.target.matches("[data-up]")) key.up = false;
-  if (event.target.matches("[data-down]")) key.down = false;
-});
-
 // Environment
 const grassSprite = new Image();
-grassSprite.src = "ground.png";
+grassSprite.src = "./lib/sprites/ground.png";
 let grassPattern;
 grassSprite.addEventListener("load",() => grassPattern = ctx.createPattern(grassSprite,"repeat"));
 
@@ -263,7 +147,7 @@ const explored = {
 
 // Player
 const playerSprite = new Image();
-playerSprite.src = "player_guy.png";
+playerSprite.src = "./lib/sprites/player_guy.png";
 class Player {
   constructor(){
     this.x = 0;
@@ -274,11 +158,12 @@ class Player {
     this.offsetY = () => Math.round(canvas.height / 2);
     this.speed = 2;
     this.tick = 0;
-    this.ticks = 24;
+    this.ticks = 36;
     this.frame = 0;
     this.frames = 2;
     this.column = 0;
     this.columns = 4;
+		this.facing = 1;
   }
   update(){
     if (key.left) this.x += this.speed;
@@ -287,30 +172,53 @@ class Player {
     if (key.down) this.y -= this.speed;
 
     this.tick++;
+			if ((key.left || key.right)) {
+				if(this.column !== 1) this.column = 1;
+      	if (this.frame < this.frames - 1 && this.tick > this.ticks - 1){
+        	this.frame++;
+      	} else if (this.tick > this.ticks/2) {
+      	  this.frame = 0;
+      	}
+			} else if (key.up) {
+					if(this.column !== 3) this.column = 3;
+      	if (this.frame < this.frames - 1 && this.tick > this.ticks - 1){
+        	this.frame++;
+      	} else if (this.tick > this.ticks/2) {
+      	  this.frame = 0;
+      	}
+			} else if (key.down) {
+					if(this.column !== 2) this.column = 2;
+      	if (this.frame < this.frames - 1 && this.tick > this.ticks - 1){
+        	this.frame++;
+      	} else if (this.tick > this.ticks/2) {
+      	  this.frame = 0;
+      	}
+			} else {
+					this.frame = 0;
+					this.column = 0;
+			}
     if (this.tick > this.ticks - 1){
       this.tick = 0;
-      if (this.frame < this.frames - 1){
-        this.frame++;
-      } else {
-        this.frame = 0;
-        if (this.column < this.columns - 1){
-          this.column++;
-        } else {
-          this.column = 0;
-        }
-      }
-    }
+		}
   }
   draw(){
-    ctx.drawImage(playerSprite,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,this.offsetX() - this.width / 2,this.offsetY() - this.height / 2,this.width,this.height);
-  }
+		ctx.save();
+		if (key.right) this.facing = 1;
+		if (key.left || this.facing === 0) {
+			this.facing = 0;
+			ctx.save();  // save the current canvas state
+	    ctx.setTransform(-1, 0, 0, 1, canvas.width, 0);
+		}
+    ctx.drawImage(playerSprite,this.width * ((key.left || key.right || key.up || key.down) ? this.frame : 0),(key.left || key.right || key.up || key.down) ? this.height * this.column : 0,this.width,this.height,this.offsetX() - this.width / 2,this.offsetY() - this.height / 2,this.width,this.height);
+  	ctx.restore();
+	}
 }
 const player = new Player();
 
 // Trees
 const treesArray = [];
 const treeSprite = new Image();
-treeSprite.src = "https://lh4.googleusercontent.com/proxy/heqSe15hCuq21HaL40Gu-y2jUH_ib8Wxg1TKyOqqBpM47u39sCuBSYmpWzzfb2goHr-l7GwiItUuo3LUjaB7RsWws48n-Juf_QM=w1200-h630-p-k-no-nu";
+treeSprite.src = "./lib/sprites/treeFull.png";
 class Tree {
   constructor(){
     this.x = Math.floor(Math.random() * canvas.width) - player.x - 96 / 2;
@@ -336,9 +244,6 @@ function handleTrees(){
       if (key.down) treesArray.push(new Tree());
     }
   }
-  treesArray.forEach(tree => {
-    tree.draw();
-  });
 }
 
 // Coordinates
@@ -349,13 +254,22 @@ function setCoordinateLabel(){
 
 // Rendering
 function animate({ recursive = true } = {}){
+
   ctx.clearRect(0,0,canvas.width,canvas.height);
   if (grassPattern) grassPattern.setTransform(new DOMMatrix([1,0,0,1,player.offsetX() + player.x,player.offsetY() + player.y]));
   ctx.fillStyle = (grassPattern) ? grassPattern : "#779c43";
   ctx.fillRect(0,0,canvas.width,canvas.height);
-  handleTrees();
   player.update();
+	handleTrees();
+	var inFront = treesArray.filter((val) => -val.y <= player.y + 8);
+	var inBack = treesArray.filter((val) => !(-val.y <= player.y + 8));
+	inBack.forEach((tree) => {
+		tree.draw();
+	});
   player.draw();
+	inFront.forEach((tree) => {
+		tree.draw();
+	});
   setCoordinateLabel();
   tick++;
   if (recursive) window.requestAnimationFrame(animate);
