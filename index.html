@@ -68,13 +68,18 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-family: sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", system-ui, sans-serif;
     image-rendering: pixelated;
     overflow: auto;
     -webkit-user-select: none;
     user-select: none;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+  }
+  button {
+    color: inherit;
+    font: inherit;
+    border-radius: 0;
   }
   #canvas {
     margin: auto;
@@ -88,9 +93,9 @@
     top: var(--safe-area-inset-top);
     color: #ffffff;
     font-size: 20px;
-    font-family: monospace;
+    font-family: ui-monospace, "Noto Sans Mono", "Cousine", monospace;
     line-height: 1;
-    text-shadow: 2px 2px 0 #000000;
+    text-shadow: 0.175ch 0.175ch 0 #000000;
   }
   #hotbar {
     padding: 4px;
@@ -111,7 +116,7 @@
     height: min(min(12vh,8vw),64px);
   }
   #dpad {
-    margin: 16px;
+    margin: 8px;
     position: fixed;
     left: calc(var(--safe-area-inset-left));
     bottom: calc(var(--safe-area-inset-bottom));
@@ -119,33 +124,46 @@
     grid-template-areas:
       ". up ."
       "left . right"
-      ". down ."
-    ;
+      ". down .";
   }
   :root:not(.touch-device) #dpad {
     display: none;
   }
   #dpad button {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
+    background: #cccccc;
+    border: 2px solid #000000cc;
+    transition: opacity 250ms;
+  }
+  #dpad button:active {
+    opacity: 0.6;
   }
   #dpad [data-left] {
+    margin-right: -2px;
     grid-area: left;
+    border-radius: 8px 0 0 8px;
   }
   #dpad [data-right] {
+    margin-left: -2px;
     grid-area: right;
+    border-radius: 0 8px 8px 0;
   }
   #dpad [data-up] {
+    margin-bottom: -2px;
     grid-area: up;
+    border-radius: 8px 8px 0 0;
   }
   #dpad [data-down] {
+    margin-top: -2px;
     grid-area: down;
+    border-radius: 0 0 8px 8px;
   }
 </style>
 
 </head>
 
-<body>
+<body ontouchstart>
 
 <canvas id="canvas"></canvas>
 <span id="coordinates"></span>
@@ -170,10 +188,10 @@
   </li>
 </ul>
 <div id="dpad">
-  <button data-left>Left</button>
-  <button data-right>Right</button>
-  <button data-up>Up</button>
-  <button data-down>Down</button>
+  <button data-left>◀</button>
+  <button data-right>▶</button>
+  <button data-up>▲</button>
+  <button data-down>▼</button>
 </div>
 
 <script>
