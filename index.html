@@ -95,6 +95,7 @@
     font-family: ui-monospace, "Noto Sans Mono", "Cousine", monospace;
     line-height: 1;
     text-shadow: 0.175ch 0.175ch 0 #000000;
+    white-space: pre;
   }
   #hotbar {
     padding: 4px;
@@ -312,25 +313,26 @@ const treeSprite = new Image();
 treeSprite.src = "tree.png";
 class Tree {
   constructor(){
-    this.x = Math.floor(Math.random() * canvas.width) - player.x - 96 / 2;
+    this.x = Math.floor(Math.random() * canvas.width) - canvas.width / 2 - player.x - 96 / 2;
+    //this.y = Math.floor(Math.random() * canvas.height) - canvas.height / 2 - player.y - 150 / 2;
     if (key.up){
-      this.y = canvas.height / -2 - player.y - 96 / 2;
+      this.y = - player.y - player.offsetY() - 150;
       if (explored.top > this.y) explored.top = this.y;
     }
     if (key.down){
-      this.y = canvas.height - player.y;
+      this.y = canvas.height - player.y - player.offsetY();
       if (explored.bottom < this.y) explored.bottom = this.y;
     }
     this.width = 96;
     this.height = 150;
   }
   draw(){
-    ctx.drawImage(treeSprite,this.x + player.x,this.y + player.y,this.width,this.height);
+    ctx.drawImage(treeSprite,this.x + player.x + player.offsetX(),this.y + player.y + player.offsetY(),this.width,this.height);
   }
 }
 function handleTrees(){
   if (tick % 20 == 0){
-    if (canvas.height / -2 - player.y < explored.top || canvas.height - player.y > explored.bottom){
+    if (canvas.height / -2 - player.y - player.offsetX() < explored.top || canvas.height - player.y - player.offsetY() > explored.bottom){
       if (key.up) treesArray.unshift(new Tree());
       if (key.down) treesArray.push(new Tree());
     }
@@ -346,12 +348,17 @@ function setCoordinateLabel(){
   coordinates.textContent = `(${Math.round(player.x / 16) * -1}, ${Math.round(player.y / 16)})`;
 }
 
+//for (let i = 0; i < 4; i++) treesArray.push(new Tree());
+
 // Rendering
 function animate({ recursive = true } = {}){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  if (grassPattern) grassPattern.setTransform(new DOMMatrix([1,0,0,1,player.offsetX() + player.x,player.offsetY() + player.y]));
   ctx.fillStyle = (grassPattern) ? grassPattern : "#779c43";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.beginPath();
+  ctx.rect(0,0,canvas.width,canvas.height);
+  if (grassPattern) ctx.setTransform(1,0,0,1,player.offsetX() + player.x,player.offsetY() + player.y);
+  ctx.fill();
+  ctx.setTransform(1,0,0,1,0,0);
   handleTrees();
   player.update();
   player.draw();
