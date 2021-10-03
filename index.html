@@ -249,6 +249,9 @@ dpad.addEventListener("touchend",event => {
 });
 
 // Environment
+const missingSprite = new Image();
+missingSprite.src = "missing_texture.png";
+
 const grassSprite = new Image();
 grassSprite.src = "ground.png";
 let grassPattern;
@@ -302,7 +305,7 @@ class Player {
     }
   }
   draw(){
-    ctx.drawImage(playerSprite,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,this.offsetX() - this.width / 2,this.offsetY() - this.height / 2,this.width,this.height);
+    ctx.drawImage((playerSprite.naturalWidth) ? playerSprite : missingSprite,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,this.offsetX() - this.width / 2,this.offsetY() - this.height / 2,this.width,this.height);
   }
 }
 const player = new Player();
@@ -327,7 +330,7 @@ class Tree {
     this.height = 150;
   }
   draw(){
-    ctx.drawImage(treeSprite,this.x + player.x + player.offsetX(),this.y + player.y + player.offsetY(),this.width,this.height);
+    ctx.drawImage((treeSprite.naturalWidth) ? treeSprite : missingSprite,this.x + player.x + player.offsetX(),this.y + player.y + player.offsetY(),this.width,this.height);
   }
 }
 function handleTrees(){
