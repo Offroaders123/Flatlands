@@ -136,7 +136,7 @@
     border: 2px solid #000000cc;
     transition: opacity 250ms;
   }
-  #dpad button:active {
+  #dpad button.active {
     opacity: 0.6;
   }
   #dpad [data-left] {
@@ -236,12 +236,14 @@ document.addEventListener("contextmenu",event => event.preventDefault());
 
 dpad.addEventListener("touchstart",event => {
   event.preventDefault();
+  if (event.target.matches("button")) event.target.classList.add("active");
   if (event.target.matches("[data-left]")) key.left = true;
   if (event.target.matches("[data-right]")) key.right = true;
   if (event.target.matches("[data-up]")) key.up = true;
   if (event.target.matches("[data-down]")) key.down = true;
 });
 dpad.addEventListener("touchend",event => {
+  if (event.target.matches("button")) event.target.classList.remove("active");
   if (event.target.matches("[data-left]")) key.left = false;
   if (event.target.matches("[data-right]")) key.right = false;
   if (event.target.matches("[data-up]")) key.up = false;
@@ -282,6 +284,8 @@ class Player {
     this.frames = 2;
     this.column = 0;
     this.columns = 4;
+    this.directionX = "right";
+    this.directionY = false;
   }
   update(){
     if (key.left) this.x += this.speed;
@@ -289,23 +293,31 @@ class Player {
     if (key.up) this.y += this.speed;
     if (key.down) this.y -= this.speed;
 
-    this.tick++;
+    if (key.left && !key.right) this.directionX = "left";
+    if (key.right && !key.left) this.directionX = "right";
+
+    if (key.down && !key.up && !key.left && !key.right) this.directionY = "up";
+    if (key.up && !key.down && !key.left && !key.right) this.directionY = "down";
+    if (!key.up && !key.down || key.left || key.right) this.directionY = false;
+
+    if (this.directionY == "up") this.column = 2;
+    if (this.directionY == "down") this.column = 3;
+    if (!this.directionY) this.column = 1;
+
+    if (key.left || key.right || key.up || key.down){
+      this.tick++;
+    } else {
+      this.column = 0;
+    }
     if (this.tick > this.ticks - 1){
       this.tick = 0;
-      if (this.frame < this.frames - 1){
-        this.frame++;
-      } else {
-        this.frame = 0;
-        if (this.column < this.columns - 1){
-          this.column++;
-        } else {
-          this.column = 0;
-        }
-      }
+      (this.frame < this.frames - 1) ? this.frame++ : this.frame = 0;
     }
   }
   draw(){
-    ctx.drawImage((playerSprite.naturalWidth) ? playerSprite : missingSprite,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,this.offsetX() - this.width / 2,this.offsetY() - this.height / 2,this.width,this.height);
+    ctx.setTransform((player.directionX == "left" && !this.directionY) ? -1 : 1,0,0,1,(player.directionX == "left" && !this.directionY) ? canvas.width : 0,0);
+    ctx.drawImage((playerSprite.naturalWidth) ? playerSprite : missingSprite,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,this.offsetX() - this.width / 2 + 1,this.offsetY() - this.height / 2,this.width,this.height);
+    ctx.setTransform(1,0,0,1,0,0);
   }
 }
 const player = new Player();
@@ -316,7 +328,7 @@ const treeSprite = new Image();
 treeSprite.src = "tree.png";
 class Tree {
   constructor(){
-    this.x = Math.floor(Math.random() * canvas.width) - canvas.width / 2 - player.x - 96 / 2;
+    this.x = Math.floor(Math.random() * canvas.width) - Math.floor(canvas.width / 2) - player.x - 96 / 2;
     //this.y = Math.floor(Math.random() * canvas.height) - canvas.height / 2 - player.y - 150 / 2;
     if (key.up){
       this.y = - player.y - player.offsetY() - 150;
