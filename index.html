@@ -28,6 +28,7 @@
 
 <script>
   window.Flatlands = {
+    version: 0.31,
     appearance: () => ({
       apple_home_screen: (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform) && "standalone" in navigator && navigator.standalone)
     }),
@@ -50,6 +51,13 @@
     --safe-area-inset-right: env(safe-area-inset-right,0px);
     --safe-area-inset-top: env(safe-area-inset-top,0px);
     --safe-area-inset-bottom: env(safe-area-inset-bottom,0px);
+  }
+  :root {
+    --item-spearsword: url("spearsword.png");
+    --item-pickmatic: url("pickmatic.png");
+    --item-hatchet: url("hatchet.png");
+    --item-spade: url("spade.png");
+    --item-pizza: url("pizza.png");
   }
   html {
     width: 100%;
@@ -103,17 +111,28 @@
     bottom: calc(var(--safe-area-inset-bottom));
     display: flex;
     list-style: none;
+    /*--hotbar-scale: min(min(12vh,8vw),64px);*/
+    /* Note for later: https://stackoverflow.com/questions/52467896/transform-scale-using-viewport-units */
   }
   #hotbar .slot {
-    margin: 4px;
-    padding: 8px;
+    padding: 12px;
+    position: relative;
     display: flex;
-    background: url("slot.png") no-repeat;
+    background: url("slot.png") no-repeat 50%;
+    background-size: calc(100% - 8px);
+  }
+  #hotbar .slot.active::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("slot_active.png") no-repeat;
     background-size: cover;
   }
   #hotbar .item {
-    width: min(min(12vh,8vw),64px);
-    height: min(min(12vh,8vw),64px);
+    width: 64px;
+    height: 64px;
+    background: var(--item-sprite) no-repeat;
+    background-size: cover;
   }
   #dpad {
     margin: 8px;
@@ -132,9 +151,17 @@
   #dpad button {
     width: 56px;
     height: 56px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background: #cccccc;
     border: 2px solid #000000cc;
+    border-radius: 12px;
     transition: opacity 250ms;
+  }
+  #dpad button::before {
+    content: "";
+    border: 10px solid transparent;
   }
   #dpad button.active {
     opacity: 0.6;
@@ -142,22 +169,57 @@
   #dpad [data-left] {
     margin-right: -2px;
     grid-area: left;
-    border-radius: 8px 0 0 8px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  #dpad [data-left]::before {
+    border-left: none;
+    border-right-color: currentColor;
   }
   #dpad [data-right] {
     margin-left: -2px;
     grid-area: right;
-    border-radius: 0 8px 8px 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  #dpad [data-right]::before {
+    border-left-color: currentColor;
+    border-right: none;
   }
   #dpad [data-up] {
     margin-bottom: -2px;
     grid-area: up;
-    border-radius: 8px 8px 0 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  #dpad [data-up]::before {
+    border-top: none;
+    border-bottom-color: currentColor;
   }
   #dpad [data-down] {
     margin-top: -2px;
     grid-area: down;
-    border-radius: 0 0 8px 8px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+  #dpad [data-down]::before {
+    border-top-color: currentColor;
+    border-bottom: none;
+  }
+  .spearsword {
+    --item-sprite: var(--item-spearsword);
+  }
+  .pickmatic {
+    --item-sprite: var(--item-pickmatic);
+  }
+  .hatchet {
+    --item-sprite: var(--item-hatchet);
+  }
+  .spade {
+    --item-sprite: var(--item-spade);
+  }
+  .pizza {
+    --item-sprite: var(--item-pizza);
   }
 </style>
 
@@ -166,6 +228,7 @@
 <body ontouchstart>
 
 <canvas id="canvas"></canvas>
+<span id="version"></span>
 <span id="coordinates"></span>
 <ul id="hotbar">
   <li class="slot" data-slot="1">
@@ -188,10 +251,10 @@
   </li>
 </ul>
 <div id="dpad">
-  <button data-left>◀</button>
-  <button data-right>▶</button>
-  <button data-up>▲</button>
-  <button data-down>▼</button>
+  <button data-left tabindex="-1"></button>
+  <button data-right tabindex="-1"></button>
+  <button data-up tabindex="-1"></button>
+  <button data-down tabindex="-1"></button>
 </div>
 
 <script>
@@ -233,6 +296,8 @@ window.addEventListener("gamepaddisconnected",event => {
 
 document.addEventListener("keydown",event => {
   if (event.repeat || document.activeElement != document.body) return;
+  document.documentElement.classList.remove("touch-device");
+  if (["1","2","3","4","5","6"].includes(event.key)) setSlot(event.key);
   if (["ArrowLeft","a"].includes(event.key)) key.left = true;
   if (["ArrowRight","d"].includes(event.key)) key.right = true;
   if (["ArrowUp","w"].includes(event.key)) key.up = true;
@@ -245,23 +310,34 @@ document.addEventListener("keyup",event => {
   if (["ArrowUp","w"].includes(event.key)) key.up = false;
   if (["ArrowDown","s"].includes(event.key)) key.down = false;
 });
+document.addEventListener("touchstart",() => document.documentElement.classList.add("touch-device"));
 document.addEventListener("contextmenu",event => event.preventDefault());
 
-dpad.addEventListener("touchstart",event => {
+dpad.down = event => {
   event.preventDefault();
   if (event.target.matches("button")) event.target.classList.add("active");
   if (event.target.matches("[data-left]")) key.left = true;
   if (event.target.matches("[data-right]")) key.right = true;
   if (event.target.matches("[data-up]")) key.up = true;
   if (event.target.matches("[data-down]")) key.down = true;
-});
-dpad.addEventListener("touchend",event => {
+};
+dpad.up = event => {
   if (event.target.matches("button")) event.target.classList.remove("active");
   if (event.target.matches("[data-left]")) key.left = false;
   if (event.target.matches("[data-right]")) key.right = false;
   if (event.target.matches("[data-up]")) key.up = false;
   if (event.target.matches("[data-down]")) key.down = false;
-});
+};
+dpad.addEventListener("touchstart",event => dpad.down(event));
+dpad.addEventListener("touchend",event => dpad.up(event));
+dpad.addEventListener("pointerdown",event => dpad.down(event));
+dpad.addEventListener("pointerup",event => dpad.up(event));
+
+function setSlot(index){
+  const active = hotbar.querySelector(`.slot[data-slot="${index}"]`);
+  hotbar.querySelectorAll(".slot.active").forEach(slot => slot.classList.remove("active"));
+  active.classList.add("active");
+}
 
 // Environment
 const missingSprite = new Image();
@@ -336,8 +412,11 @@ class Player {
     }
   }
   draw(){
+    const slot = hotbar.querySelector(".slot.active .item"), itemSprite = new Image();
+    itemSprite.src = window.getComputedStyle(slot).getPropertyValue("--item-sprite").split('"')[1];
     ctx.setTransform((player.directionX == "left" && !this.directionY) ? -1 : 1,0,0,1,(player.directionX == "left" && !this.directionY) ? canvas.width : 0,0);
-    ctx.drawImage((playerSprite.naturalWidth) ? playerSprite : missingSprite,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,this.offsetX() - this.width / 2 + 1,this.offsetY() - this.height / 2,this.width,this.height);
+    ctx.drawImage((itemSprite.naturalWidth) ? itemSprite : missingSprite,this.offsetX() + 1,this.offsetY() - this.height / 2 + 5,16,16);
+    ctx.drawImage((playerSprite.naturalWidth) ? playerSprite : missingSprite,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,this.offsetX() - this.width / 2,this.offsetY() - this.height / 2,this.width,this.height);
     ctx.setTransform(1,0,0,1,0,0);
   }
 }
