@@ -218,6 +218,19 @@ const key = {
   up: false,
   down: false
 };
+const gamepads = [];
+
+window.addEventListener("gamepadconnected",event => {
+  if (!event.gamepad.mapping) return;
+  gamepads.push(event.gamepad.index);
+  console.log("Connected!\n",navigator.getGamepads()[event.gamepad.index]);
+});
+window.addEventListener("gamepaddisconnected",event => {
+  if (!event.gamepad.mapping) return;
+  console.log("Disconnected.\n",event.gamepad.index);
+  gamepads.splice(gamepads.indexOf(event.gamepad.index));
+});
+
 document.addEventListener("keydown",event => {
   if (event.repeat || document.activeElement != document.body) return;
   if (["ArrowLeft","a"].includes(event.key)) key.left = true;
@@ -288,10 +301,18 @@ class Player {
     this.directionY = false;
   }
   update(){
-    if (key.left) this.x += this.speed;
-    if (key.right) this.x -= this.speed;
-    if (key.up) this.y += this.speed;
-    if (key.down) this.y -= this.speed;
+    const gamepad = navigator.getGamepads()[gamepads[0]];
+    let [axisX,axisY] = (gamepad) ? gamepad.axes : [null,null,null,null];
+    if (gamepad){
+      key.left = (axisX < 0);
+      key.right = (axisX > 0);
+      key.up = (axisY < 0);
+      key.down = (axisY > 0);
+    }
+    if (key.left) this.x += this.speed * (-axisX || 1);
+    if (key.right) this.x -= this.speed * (axisX || 1);
+    if (key.up) this.y += this.speed * (-axisY || 1);
+    if (key.down) this.y -= this.speed * (axisY || 1);
 
     if (key.left && !key.right) this.directionX = "left";
     if (key.right && !key.left) this.directionX = "right";
