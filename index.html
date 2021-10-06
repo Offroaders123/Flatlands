@@ -28,7 +28,7 @@
 
 <script>
   window.Flatlands = {
-    version: 0.31,
+    version: 0.32,
     appearance: () => ({
       apple_home_screen: (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform) && "standalone" in navigator && navigator.standalone)
     }),
@@ -137,18 +137,16 @@
   #dpad {
     margin: 8px;
     position: fixed;
-    left: calc(var(--safe-area-inset-left));
-    bottom: calc(var(--safe-area-inset-bottom));
-    display: grid;
-    grid-template-areas:
-      ". up ."
-      "left . right"
-      ". down .";
+    left: calc(var(--safe-area-inset-left) + 54px);
+    bottom: calc(var(--safe-area-inset-bottom) + 54px);
+    width: 56px;
+    height: 56px;
   }
   :root:not(.touch-device) #dpad {
     display: none;
   }
   #dpad button {
+    position: absolute;
     width: 56px;
     height: 56px;
     display: flex;
@@ -168,7 +166,7 @@
   }
   #dpad [data-left] {
     margin-right: -2px;
-    grid-area: left;
+    right: 100%;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
@@ -178,7 +176,7 @@
   }
   #dpad [data-right] {
     margin-left: -2px;
-    grid-area: right;
+    left: 100%;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
@@ -188,7 +186,7 @@
   }
   #dpad [data-up] {
     margin-bottom: -2px;
-    grid-area: up;
+    bottom: 100%;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }
@@ -198,7 +196,7 @@
   }
   #dpad [data-down] {
     margin-top: -2px;
-    grid-area: down;
+    top: 100%;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
   }
@@ -313,6 +311,11 @@ document.addEventListener("keyup",event => {
 document.addEventListener("touchstart",() => document.documentElement.classList.add("touch-device"));
 document.addEventListener("contextmenu",event => event.preventDefault());
 
+hotbar.addEventListener("touchstart",event => {
+  event.preventDefault();
+  if (event.target.closest(".slot")) setSlot(event.target.closest(".slot").getAttribute("data-slot"));
+});
+
 dpad.down = event => {
   event.preventDefault();
   if (event.target.matches("button")) event.target.classList.add("active");
@@ -393,12 +396,12 @@ class Player {
     if (key.left && !key.right) this.directionX = "left";
     if (key.right && !key.left) this.directionX = "right";
 
-    if (key.down && !key.up && !key.left && !key.right) this.directionY = "up";
-    if (key.up && !key.down && !key.left && !key.right) this.directionY = "down";
+    if (key.down && !key.up && !key.left && !key.right) this.directionY = "down";
+    if (key.up && !key.down && !key.left && !key.right) this.directionY = "up";
     if (!key.up && !key.down || key.left || key.right) this.directionY = false;
 
-    if (this.directionY == "up") this.column = 2;
-    if (this.directionY == "down") this.column = 3;
+    if (this.directionY == "down") this.column = 2;
+    if (this.directionY == "up") this.column = 3;
     if (!this.directionY) this.column = 1;
 
     if (key.left || key.right || key.up || key.down){
@@ -413,10 +416,17 @@ class Player {
   }
   draw(){
     const slot = hotbar.querySelector(".slot.active .item"), itemSprite = new Image();
-    itemSprite.src = window.getComputedStyle(slot).getPropertyValue("--item-sprite").split('"')[1];
-    ctx.setTransform((player.directionX == "left" && !this.directionY) ? -1 : 1,0,0,1,(player.directionX == "left" && !this.directionY) ? canvas.width : 0,0);
-    ctx.drawImage((itemSprite.naturalWidth) ? itemSprite : missingSprite,this.offsetX() + 1,this.offsetY() - this.height / 2 + 5,16,16);
-    ctx.drawImage((playerSprite.naturalWidth) ? playerSprite : missingSprite,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,this.offsetX() - this.width / 2,this.offsetY() - this.height / 2,this.width,this.height);
+    itemSprite.src = window.getComputedStyle(slot).getPropertyValue("--item-sprite").split('"')[1] || "";
+    ctx.setTransform((player.directionX == "left" && !this.directionY) ? -1 : 1,0,0,1,this.offsetX(),this.offsetY());
+    ctx.transform(1,0,0,1,this.width / -2 + 1,this.height / -2);
+    ctx.drawImage(playerSprite,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,0,0,this.width,this.height);
+    ctx.transform(1,0,0,1,9,5);
+    //ctx.fillStyle = "#00ff0030";
+    //ctx.fillRect(0,0,itemSprite.naturalWidth,itemSprite.naturalHeight);
+    ctx.scale(-1,1);
+    ctx.transform(1,0,0,1,-itemSprite.naturalWidth,itemSprite.naturalHeight);
+    ctx.rotate(Math.PI * -1 / 2);
+    ctx.drawImage(itemSprite,0,0,itemSprite.naturalWidth,itemSprite.naturalHeight);
     ctx.setTransform(1,0,0,1,0,0);
   }
 }
