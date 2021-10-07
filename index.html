@@ -28,7 +28,7 @@
 
 <script>
   window.Flatlands = {
-    version: 0.32,
+    version: 0.33,
     appearance: () => ({
       apple_home_screen: (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform) && "standalone" in navigator && navigator.standalone)
     }),
@@ -417,17 +417,47 @@ class Player {
   draw(){
     const slot = hotbar.querySelector(".slot.active .item"), itemSprite = new Image();
     itemSprite.src = window.getComputedStyle(slot).getPropertyValue("--item-sprite").split('"')[1] || "";
-    ctx.setTransform((player.directionX == "left" && !this.directionY) ? -1 : 1,0,0,1,this.offsetX(),this.offsetY());
+
+    let scale = 1, offset = 1, itemScale = 1;
+
+    if (this.directionX == "left" && this.directionY != "up"){
+      scale = -1;
+    }
+    if (this.directionX == "right" && this.directionY == "up"){
+      scale = -1;
+    }
+    if (this.directionX == "right" && this.directionY){
+      offset = 0;
+    }
+    if (this.directionY){
+      itemScale = 2/3;
+    }
+
+    if (this.directionY == "down"){
+      this.drawCharacter(scale,offset);
+      this.drawItem(itemSprite,scale,itemScale);
+    } else {
+      this.drawItem(itemSprite,scale,itemScale);
+      this.drawCharacter(scale,offset);
+    }
+
+    ctx.setTransform(1,0,0,1,0,0);
+  }
+  drawItem(itemSprite,scale,itemScale){
+    ctx.setTransform(scale,0,0,1,this.offsetX(),this.offsetY());
     ctx.transform(1,0,0,1,this.width / -2 + 1,this.height / -2);
-    ctx.drawImage(playerSprite,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,0,0,this.width,this.height);
-    ctx.transform(1,0,0,1,9,5);
-    //ctx.fillStyle = "#00ff0030";
-    //ctx.fillRect(0,0,itemSprite.naturalWidth,itemSprite.naturalHeight);
-    ctx.scale(-1,1);
+    ctx.transform(1,0,0,1,10,5);
+    ctx.scale(-1 * itemScale,1);
     ctx.transform(1,0,0,1,-itemSprite.naturalWidth,itemSprite.naturalHeight);
     ctx.rotate(Math.PI * -1 / 2);
-    ctx.drawImage(itemSprite,0,0,itemSprite.naturalWidth,itemSprite.naturalHeight);
-    ctx.setTransform(1,0,0,1,0,0);
+    //ctx.fillStyle = "#00ff0030";
+    //ctx.fillRect((this.directionY) ? (this.directionY == "up") ? -2 : -1 : 0,1,itemSprite.naturalWidth,itemSprite.naturalHeight);
+    ctx.drawImage(itemSprite,(this.directionY) ? (this.directionY == "up") ? -2 : -1 : 0,1,itemSprite.naturalWidth,itemSprite.naturalHeight);
+  }
+  drawCharacter(scale,offset){
+    ctx.setTransform((this.directionX == "left" && !this.directionY) ? -1 : 1,0,0,1,this.offsetX(),this.offsetY());
+    ctx.transform(1,0,0,1,this.width / -2 + offset,this.height / -2);
+    ctx.drawImage(playerSprite,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,0,0,this.width,this.height);
   }
 }
 const player = new Player();
