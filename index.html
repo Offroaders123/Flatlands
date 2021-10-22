@@ -295,11 +295,26 @@ window.addEventListener("gamepaddisconnected",event => {
 document.addEventListener("keydown",event => {
   if (event.repeat || document.activeElement != document.body) return;
   document.documentElement.classList.remove("touch-device");
-  if (["1","2","3","4","5","6"].includes(event.key)) setSlot(event.key);
-  if (["ArrowLeft","a"].includes(event.key)) key.left = true;
-  if (["ArrowRight","d"].includes(event.key)) key.right = true;
-  if (["ArrowUp","w"].includes(event.key)) key.up = true;
-  if (["ArrowDown","s"].includes(event.key)) key.down = true;
+  if (["1","2","3","4","5","6"].includes(event.key)){
+    event.preventDefault();
+    setSlot(event.key);
+  }
+  if (["ArrowLeft","a"].includes(event.key)){
+    event.preventDefault();
+    key.left = true;
+  }
+  if (["ArrowRight","d"].includes(event.key)){
+    event.preventDefault();
+    key.right = true;
+  }
+  if (["ArrowUp","w"].includes(event.key)){
+    event.preventDefault();
+    key.up = true;
+  }
+  if (["ArrowDown","s"].includes(event.key)){
+    event.preventDefault();
+    key.down = true;
+  }
 });
 document.addEventListener("keyup",event => {
   if (document.activeElement != document.body) return;
@@ -381,17 +396,20 @@ class Player {
   }
   update(){
     const gamepad = navigator.getGamepads()[gamepads[0]];
-    let [axisX,axisY] = (gamepad) ? gamepad.axes : [null,null,null,null];
+    let [axisX,axisY] = (gamepad) ? gamepad.axes : [null,null,null,null], [left1,right1] = (gamepad) ? [gamepad.buttons[4].value,gamepad.buttons[5].value] : [null,null];
     if (gamepad){
-      key.left = (axisX < 0);
-      key.right = (axisX > 0);
-      key.up = (axisY < 0);
-      key.down = (axisY > 0);
+      key.left = (Math.round(axisX * 1000) < 0);
+      key.right = (Math.round(axisX * 1000) > 0);
+      key.up = (Math.round(axisY * 1000) < 0);
+      key.down = (Math.round(axisY * 1000) > 0);
+      let active = parseInt(hotbar.querySelector(".slot.active").getAttribute("data-slot"));
+      if (left1 && !right1 && tick % 10 == 0) setSlot((active - 1 > 0) ? active - 1 : 6);
+      if (right1 && !left1 && tick % 10 == 0) setSlot((active + 1 < 7) ? active + 1 : 1);
     }
-    if (key.left) this.x += this.speed * (-axisX || 1);
-    if (key.right) this.x -= this.speed * (axisX || 1);
-    if (key.up) this.y += this.speed * (-axisY || 1);
-    if (key.down) this.y -= this.speed * (axisY || 1);
+    if (key.left && !key.right) this.x += this.speed * (-axisX || 1);
+    if (key.right && !key.left) this.x -= this.speed * (axisX || 1);
+    if (key.up && !key.down) this.y += this.speed * (-axisY || 1);
+    if (key.down && !key.up) this.y -= this.speed * (axisY || 1);
 
     if (key.left && !key.right) this.directionX = "left";
     if (key.right && !key.left) this.directionX = "right";
@@ -404,10 +422,11 @@ class Player {
     if (this.directionY == "up") this.column = 3;
     if (!this.directionY) this.column = 1;
 
-    if (key.left || key.right || key.up || key.down){
+    if ((key.left && !key.right) || (key.right && !key.left) || (key.up && !key.down) || (key.down && !key.up)){
       this.tick++;
     } else {
       this.column = 0;
+      this.directionY = false;
     }
     if (this.tick > this.ticks - 1){
       this.tick = 0;
@@ -469,12 +488,12 @@ treeSprite.src = "tree.png";
 class Tree {
   constructor(){
     this.x = Math.floor(Math.random() * canvas.width) - Math.floor(canvas.width / 2) - player.x - 96 / 2;
-    //this.y = Math.floor(Math.random() * canvas.height) - canvas.height / 2 - player.y - 150 / 2;
-    if (key.up){
-      this.y = - player.y - player.offsetY() - 150;
+    //this.y = Math.floor(Math.random() * canvas.height) - canvas.height / 2 - player.y - 192 / 2;
+    if (key.up && !key.down){
+      this.y = - player.y - player.offsetY() - 192;
       if (explored.top > this.y) explored.top = this.y;
     }
-    if (key.down){
+    if (key.down && !key.up){
       this.y = canvas.height - player.y - player.offsetY();
       if (explored.bottom < this.y) explored.bottom = this.y;
     }
@@ -488,8 +507,8 @@ class Tree {
 function handleTrees(){
   if (tick % 20 == 0){
     if (canvas.height / -2 - player.y - player.offsetX() < explored.top || canvas.height - player.y - player.offsetY() > explored.bottom){
-      if (key.up) treesArray.unshift(new Tree());
-      if (key.down) treesArray.push(new Tree());
+      if (key.up && !key.down) treesArray.unshift(new Tree());
+      if (key.down && !key.up) treesArray.push(new Tree());
     }
   }
   treesArray.forEach(tree => {
