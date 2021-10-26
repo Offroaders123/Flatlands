@@ -498,7 +498,7 @@ class Tree {
       if (explored.bottom < this.y) explored.bottom = this.y;
     }
     this.width = 96;
-    this.height = 150;
+    this.height = 192;
   }
   draw(){
     ctx.drawImage((treeSprite.naturalWidth) ? treeSprite : missingSprite,this.x + player.x + player.offsetX(),this.y + player.y + player.offsetY(),this.width,this.height);
