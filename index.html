@@ -10,25 +10,23 @@
 <meta name="description" content="Flatlands is a cross platform 2D game built in the browser!">
 <meta property="og:title" content="Flatlands">
 <meta property="og:description" content="Flatlands is a cross platform 2D game built in the browser!">
-<meta property="og:image" content="https://offroaders123.github.io/Flatlands/Flatlands.png">
+<meta property="og:image" content="https://offroaders123.github.io/Flatlands/textures/Flatlands.png">
 <meta property="og:url" content="https://offroaders123.github.io/Flatlands/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#779c43">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Flatlands">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<base href="https://offroaders123.github.io/Flatlands/">
+<base href="." target="_blank">
 <link rel="canonical" href="https://offroaders123.github.io/Flatlands/">
-<!--link rel="manifest">
-<link rel="icon" type="image/svg+xml" href="resources/icon.svg"-->
-<link rel="alternate icon" type="image/png" sizes="16x16" href="spearsword.png">
-<!--link rel="alternate icon" type="image/png" sizes="32x32" href="resources/icon-32.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="alternate icon" type="image/png" sizes="16x16" href="resources/icon-16.png">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="resources/icon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="resources/app-apple-touch-180.png">
-<link rel="apple-touch-icon" sizes="1024x1024" href="resources/app-apple-touch-1024.png"-->
 
 <script>
   window.Flatlands = {
-    version: 0.33,
+    version: 0.34,
     appearance: () => ({
       apple_home_screen: (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform) && "standalone" in navigator && navigator.standalone)
     }),
@@ -53,11 +51,11 @@
     --safe-area-inset-bottom: env(safe-area-inset-bottom,0px);
   }
   :root {
-    --item-spearsword: url("spearsword.png");
-    --item-pickmatic: url("pickmatic.png");
-    --item-hatchet: url("hatchet.png");
-    --item-spade: url("spade.png");
-    --item-pizza: url("pizza.png");
+    --item-spearsword: url("textures/spearsword.png");
+    --item-pickmatic: url("textures/pickmatic.png");
+    --item-hatchet: url("textures/hatchet.png");
+    --item-spade: url("textures/spade.png");
+    --item-pizza: url("textures/pizza.png");
   }
   html {
     width: 100%;
@@ -118,14 +116,14 @@
     padding: 12px;
     position: relative;
     display: flex;
-    background: url("slot.png") no-repeat 50%;
+    background: url("textures/slot.png") no-repeat 50%;
     background-size: calc(100% - 8px);
   }
   #hotbar .slot.active::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: url("slot_active.png") no-repeat;
+    background: url("textures/slot_active.png") no-repeat;
     background-size: cover;
   }
   #hotbar .item {
@@ -256,6 +254,9 @@
 </div>
 
 <script>
+// Service Worker
+//navigator.serviceWorker.register("service-worker.js");
+
 // Canvas
 const canvas = document.querySelector("#canvas");
 const bounds = canvas.getBoundingClientRect();
@@ -359,10 +360,10 @@ function setSlot(index){
 
 // Environment
 const missingSprite = new Image();
-missingSprite.src = "missing_texture.png";
+missingSprite.src = "textures/missing_texture.png";
 
 const grassSprite = new Image();
-grassSprite.src = "ground.png";
+grassSprite.src = "textures/ground.png";
 let grassPattern;
 grassSprite.addEventListener("load",() => grassPattern = ctx.createPattern(grassSprite,"repeat"));
 
@@ -375,7 +376,7 @@ const explored = {
 
 // Player
 const playerSprite = new Image();
-playerSprite.src = "player_guy.png";
+playerSprite.src = "textures/player_guy.png";
 class Player {
   constructor(){
     this.x = 0;
@@ -484,7 +485,7 @@ const player = new Player();
 // Trees
 const treesArray = [];
 const treeSprite = new Image();
-treeSprite.src = "tree.png";
+treeSprite.src = "textures/tree.png";
 class Tree {
   constructor(){
     this.x = Math.floor(Math.random() * canvas.width) - Math.floor(canvas.width / 2) - player.x - 96 / 2;
