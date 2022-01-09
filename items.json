@@ -1,0 +1,22 @@
+{
+  "hatchet": {
+    "name": "Hatchet",
+    "texture": "textures/items/hatchet.png"
+  },
+  "pickmatic": {
+    "name": "Pickmatic",
+    "texture": "textures/items/pickmatic.png"
+  },
+  "pizza": {
+    "name": "Pizza",
+    "texture": "textures/items/pizza.png"
+  },
+  "spade": {
+    "name": "Spade",
+    "texture": "textures/items/spade.png"
+  },
+  "spearsword": {
+    "name": "Spearsword",
+    "texture": "textures/items/spearsword.png"
+  }
+}

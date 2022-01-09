@@ -10,7 +10,7 @@
 <meta name="description" content="Flatlands is a cross platform 2D game built in the browser!">
 <meta property="og:title" content="Flatlands">
 <meta property="og:description" content="Flatlands is a cross platform 2D game built in the browser!">
-<meta property="og:image" content="https://offroaders123.github.io/Flatlands/textures/Flatlands.png">
+<meta property="og:image" content="https://offroaders123.github.io/Flatlands/resources/share-temp.png">
 <meta property="og:url" content="https://offroaders123.github.io/Flatlands/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#779c43">
@@ -47,11 +47,11 @@
     --safe-area-inset-bottom: env(safe-area-inset-bottom,0px);
   }
   :root {
-    --item-hatchet: url("textures/hatchet.png");
-    --item-pickmatic: url("textures/pickmatic.png");
-    --item-pizza: url("textures/pizza.png");
-    --item-spade: url("textures/spade.png");
-    --item-spearsword: url("textures/spearsword.png");
+    --item-hatchet: url("textures/items/hatchet.png");
+    --item-pickmatic: url("textures/items/pickmatic.png");
+    --item-pizza: url("textures/items/pizza.png");
+    --item-spade: url("textures/items/spade.png");
+    --item-spearsword: url("textures/items/spearsword.png");
   }
   html {
     width: 100%;
@@ -108,14 +108,14 @@
     padding: 12px;
     position: relative;
     display: flex;
-    background: url("textures/slot.png") no-repeat 50%;
+    background: url("textures/interfaces/slot.png") no-repeat 50%;
     background-size: calc(100% - 8px);
   }
   #hotbar .slot.active::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: url("textures/slot_active.png") no-repeat;
+    background: url("textures/interfaces/slot_active.png") no-repeat;
     background-size: cover;
   }
   #hotbar .item {
@@ -247,7 +247,7 @@
 
 <script>
 // Service Worker
-//navigator.serviceWorker.register("service-worker.js");
+//window.addEventListener("load",() => navigator.serviceWorker.register("service-worker.js"));
 
 // Canvas
 const canvas = document.querySelector("#canvas");
@@ -291,7 +291,7 @@ document.addEventListener("keydown",event => {
   if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
   if (["Digit1","Digit2","Digit3","Digit4","Digit5","Digit6"].includes(event.code)){
     event.preventDefault();
-    setSlot(event.code);
+    setSlot(event.code.replace(/Digit/,""));
   }
   if (["ArrowLeft","KeyA"].includes(event.code)){
     event.preventDefault();
@@ -353,10 +353,10 @@ function setSlot(index){
 
 // Environment
 const missingSprite = new Image();
-missingSprite.src = "textures/missing_texture.png";
+missingSprite.src = "textures/terrain/missing_texture.png";
 
 const grassSprite = new Image();
-grassSprite.src = "textures/ground.png";
+grassSprite.src = "textures/terrain/ground.png";
 let grassPattern;
 grassSprite.addEventListener("load",() => grassPattern = ctx.createPattern(grassSprite,"repeat"));
 
@@ -369,7 +369,7 @@ const explored = {
 
 // Player
 const playerSprite = new Image();
-playerSprite.src = "textures/player_guy.png";
+playerSprite.src = "textures/entities/player_guy.png";
 class Player {
   constructor(){
     this.x = 0;
@@ -478,7 +478,7 @@ const player = new Player();
 // Trees
 const treesArray = [];
 const treeSprite = new Image();
-treeSprite.src = "textures/tree.png";
+treeSprite.src = "textures/terrain/tree.png";
 class Tree {
   constructor(){
     this.x = Math.floor(Math.random() * canvas.width) - Math.floor(canvas.width / 2) - player.x - 96 / 2;

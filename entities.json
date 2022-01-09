@@ -1,0 +1,10 @@
+{
+  "player_gal": {
+    "name": "Gal",
+    "texture": "textures/entity/player_gal.png"
+  },
+  "player_guy": {
+    "name": "Guy",
+    "texture": "textures/entity/player_guy.png"
+  }
+}

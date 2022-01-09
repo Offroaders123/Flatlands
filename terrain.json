@@ -1,0 +1,10 @@
+{
+  "ground": {
+    "name": "Ground",
+    "texture": "textures/terrain/ground.png"
+  },
+  "tree": {
+    "name": "Tree",
+    "texture": "textures/entity/tree.png"
+  }
+}
