@@ -47,11 +47,11 @@
     --safe-area-inset-bottom: env(safe-area-inset-bottom,0px);
   }
   :root {
-    --item-spearsword: url("textures/spearsword.png");
-    --item-pickmatic: url("textures/pickmatic.png");
     --item-hatchet: url("textures/hatchet.png");
-    --item-spade: url("textures/spade.png");
+    --item-pickmatic: url("textures/pickmatic.png");
     --item-pizza: url("textures/pizza.png");
+    --item-spade: url("textures/spade.png");
+    --item-spearsword: url("textures/spearsword.png");
   }
   html {
     width: 100%;
@@ -194,20 +194,20 @@
     border-top-color: currentColor;
     border-bottom: none;
   }
-  .spearsword {
-    --item-sprite: var(--item-spearsword);
+  .hatchet {
+    --item-sprite: var(--item-hatchet);
   }
   .pickmatic {
     --item-sprite: var(--item-pickmatic);
   }
-  .hatchet {
-    --item-sprite: var(--item-hatchet);
+  .pizza {
+    --item-sprite: var(--item-pizza);
   }
   .spade {
     --item-sprite: var(--item-spade);
   }
-  .pizza {
-    --item-sprite: var(--item-pizza);
+  .spearsword {
+    --item-sprite: var(--item-spearsword);
   }
 </style>
 
@@ -251,14 +251,14 @@
 
 // Canvas
 const canvas = document.querySelector("#canvas");
-const bounds = canvas.getBoundingClientRect();
 const ctx = canvas.getContext("2d",{ alpha: false });
 
 let scaling = 4;
 
 new ResizeObserver(() => {
-  canvas.width = canvas.offsetWidth / scaling;
-  canvas.height = canvas.offsetHeight / scaling;
+  const { offsetWidth: width, offsetHeight: height } = canvas;
+  canvas.width = width / scaling;
+  canvas.height = height / scaling;
   ctx.imageSmoothingEnabled = false;
   animate({ recursive: false });
 }).observe(canvas);
@@ -288,33 +288,34 @@ window.addEventListener("gamepaddisconnected",event => {
 document.addEventListener("keydown",event => {
   if (event.repeat || document.activeElement != document.body) return;
   document.documentElement.classList.remove("touch-device");
-  if (["1","2","3","4","5","6"].includes(event.key)){
+  if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+  if (["Digit1","Digit2","Digit3","Digit4","Digit5","Digit6"].includes(event.code)){
     event.preventDefault();
-    setSlot(event.key);
+    setSlot(event.code);
   }
-  if (["ArrowLeft","a"].includes(event.key)){
+  if (["ArrowLeft","KeyA"].includes(event.code)){
     event.preventDefault();
-    key.left = true;
+    key.left = event.code;
   }
-  if (["ArrowRight","d"].includes(event.key)){
+  if (["ArrowRight","KeyD"].includes(event.code)){
     event.preventDefault();
-    key.right = true;
+    key.right = event.code;
   }
-  if (["ArrowUp","w"].includes(event.key)){
+  if (["ArrowUp","KeyW"].includes(event.code)){
     event.preventDefault();
-    key.up = true;
+    key.up = event.code;
   }
-  if (["ArrowDown","s"].includes(event.key)){
+  if (["ArrowDown","KeyS"].includes(event.code)){
     event.preventDefault();
-    key.down = true;
+    key.down = event.code;
   }
 });
 document.addEventListener("keyup",event => {
   if (document.activeElement != document.body) return;
-  if (["ArrowLeft","a"].includes(event.key)) key.left = false;
-  if (["ArrowRight","d"].includes(event.key)) key.right = false;
-  if (["ArrowUp","w"].includes(event.key)) key.up = false;
-  if (["ArrowDown","s"].includes(event.key)) key.down = false;
+  if (["ArrowLeft","KeyA"].includes(event.code)) key.left = false;
+  if (["ArrowRight","KeyD"].includes(event.code)) key.right = false;
+  if (["ArrowUp","KeyW"].includes(event.code)) key.up = false;
+  if (["ArrowDown","KeyS"].includes(event.code)) key.down = false;
 });
 document.addEventListener("touchstart",() => document.documentElement.classList.add("touch-device"));
 document.addEventListener("contextmenu",event => event.preventDefault());
@@ -327,10 +328,10 @@ hotbar.addEventListener("touchstart",event => {
 dpad.down = event => {
   event.preventDefault();
   if (event.target.matches("button")) event.target.classList.add("active");
-  if (event.target.matches("[data-left]")) key.left = true;
-  if (event.target.matches("[data-right]")) key.right = true;
-  if (event.target.matches("[data-up]")) key.up = true;
-  if (event.target.matches("[data-down]")) key.down = true;
+  if (event.target.matches("[data-left]")) key.left = "DPadLeft";
+  if (event.target.matches("[data-right]")) key.right = "DPadRight";
+  if (event.target.matches("[data-up]")) key.up = "DPadUp";
+  if (event.target.matches("[data-down]")) key.down = "DPadDown";
 };
 dpad.up = event => {
   if (event.target.matches("button")) event.target.classList.remove("active");
