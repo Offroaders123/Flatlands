@@ -1,22 +1,32 @@
 {
   "hatchet": {
     "name": "Hatchet",
-    "texture": "textures/items/hatchet.png"
+    "texture": {
+      "source": "textures/items/hatchet.png"
+    }
   },
   "pickmatic": {
     "name": "Pickmatic",
-    "texture": "textures/items/pickmatic.png"
+    "texture": {
+      "source": "textures/items/pickmatic.png"
+    }
   },
   "pizza": {
     "name": "Pizza",
-    "texture": "textures/items/pizza.png"
+    "texture": {
+      "source": "textures/items/pizza.png"
+    }
   },
   "spade": {
     "name": "Spade",
-    "texture": "textures/items/spade.png"
+    "texture": {
+      "source": "textures/items/spade.png"
+    }
   },
   "spearsword": {
     "name": "Spearsword",
-    "texture": "textures/items/spearsword.png"
+    "texture": {
+      "source": "textures/items/spearsword.png"
+    }
   }
 }

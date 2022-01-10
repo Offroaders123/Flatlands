@@ -1,10 +1,18 @@
 {
   "player_gal": {
     "name": "Gal",
-    "texture": "textures/entity/player_gal.png"
+    "width": 16,
+    "height": 32,
+    "texture": {
+      "source": "textures/entities/player_gal.png"
+    }
   },
   "player_guy": {
     "name": "Guy",
-    "texture": "textures/entity/player_guy.png"
+    "width": 16,
+    "height": 32,
+    "texture": {
+      "source": "textures/entities/player_guy.png"
+    }
   }
 }

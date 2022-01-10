@@ -46,13 +46,6 @@
     --safe-area-inset-top: env(safe-area-inset-top,0px);
     --safe-area-inset-bottom: env(safe-area-inset-bottom,0px);
   }
-  :root {
-    --item-hatchet: url("textures/items/hatchet.png");
-    --item-pickmatic: url("textures/items/pickmatic.png");
-    --item-pizza: url("textures/items/pizza.png");
-    --item-spade: url("textures/items/spade.png");
-    --item-spearsword: url("textures/items/spearsword.png");
-  }
   html {
     width: 100%;
     height: calc(100% + var(--safe-area-inset-top));
@@ -195,19 +188,19 @@
     border-bottom: none;
   }
   .hatchet {
-    --item-sprite: var(--item-hatchet);
+    --item-sprite:hatchet;
   }
   .pickmatic {
-    --item-sprite: var(--item-pickmatic);
+    --item-sprite:pickmatic;
   }
   .pizza {
-    --item-sprite: var(--item-pizza);
+    --item-sprite:pizza;
   }
   .spade {
-    --item-sprite: var(--item-spade);
+    --item-sprite:spade;
   }
   .spearsword {
-    --item-sprite: var(--item-spearsword);
+    --item-sprite:spearsword;
   }
 </style>
 
@@ -349,17 +342,46 @@ function setSlot(index){
   const active = hotbar.querySelector(`.slot[data-slot="${index}"]`);
   hotbar.querySelectorAll(".slot.active").forEach(slot => slot.classList.remove("active"));
   active.classList.add("active");
+  const slot = active.querySelector(".item");
+  if (!items) return;
+  player.held_item = window.getComputedStyle(slot).getPropertyValue("--item-sprite") || null;console.log(`Player held item: ${player.held_item}`);
 }
 
+// Game Properties
+let entities, items, terrain, grassPattern;
+
+(async () => {
+
+let entitiesFile = await fetch("entities.json");
+entities = await entitiesFile.json();
+let itemsFile = await fetch("items.json");
+items = await itemsFile.json();
+let terrainFile = await fetch("terrain.json");
+terrain = await terrainFile.json();
+
+for (entity in entities) await loadSprite(entity,entities);
+for (item in items) await loadSprite(item,items);
+for (terraine in terrain) await loadSprite(terraine,terrain);
+grassPattern = ctx.createPattern(terrain["ground"].texture.image,"repeat");
+
+async function loadSprite(key,object){
+  return new Promise((resolve,reject) => {
+    let sprite = new Image(), { source } = object[key].texture;
+    sprite.addEventListener("load",event => {console.log(`${new URL(sprite.src).pathname.split("/").pop()} %cload?`,"color: green; font-size: 125%; font-weight: bold;");
+      object[key].texture.image = sprite;
+      resolve();
+    });
+    sprite.addEventListener("error",event => {console.log(`${new URL(sprite.src).pathname.split("/").pop()} %cERROR!`,"color: red; font-size: 125%; font-weight: bold;");
+      sprite.src = terrain["missing_texture"].texture.source;
+      resolve();
+    });
+    sprite.src = source;
+  });
+}
+
+})();
+
 // Environment
-const missingSprite = new Image();
-missingSprite.src = "textures/terrain/missing_texture.png";
-
-const grassSprite = new Image();
-grassSprite.src = "textures/terrain/ground.png";
-let grassPattern;
-grassSprite.addEventListener("load",() => grassPattern = ctx.createPattern(grassSprite,"repeat"));
-
 const explored = {
   left: 0,
   right: canvas.width,
@@ -368,8 +390,6 @@ const explored = {
 };
 
 // Player
-const playerSprite = new Image();
-playerSprite.src = "textures/entities/player_guy.png";
 class Player {
   constructor(){
     this.x = 0;
@@ -387,6 +407,7 @@ class Player {
     this.columns = 4;
     this.directionX = "right";
     this.directionY = false;
+    this.held_item = "hatchet";
   }
   update(){
     const gamepad = navigator.getGamepads()[gamepads[0]];
@@ -428,9 +449,8 @@ class Player {
     }
   }
   draw(){
-    const slot = hotbar.querySelector(".slot.active .item"), itemSprite = new Image();
-    itemSprite.src = window.getComputedStyle(slot).getPropertyValue("--item-sprite").split('"')[1] || "";
-
+    if (!entities) return;
+    let heldItemImage = (items && player.held_item) ? items[player.held_item].texture.image : null;
     let scale = 1, offset = 1, itemScale = 1;
 
     if (this.directionX == "left" && this.directionY != "up"){
@@ -448,9 +468,9 @@ class Player {
 
     if (this.directionY == "down"){
       this.drawCharacter(scale,offset);
-      this.drawItem(itemSprite,scale,itemScale);
+      if (heldItemImage) this.drawItem(heldItemImage,scale,itemScale);
     } else {
-      this.drawItem(itemSprite,scale,itemScale);
+      if (heldItemImage) this.drawItem(heldItemImage,scale,itemScale);
       this.drawCharacter(scale,offset);
     }
 
@@ -468,17 +488,16 @@ class Player {
     ctx.drawImage(itemSprite,(this.directionY) ? (this.directionY == "up") ? -2 : -1 : 0,1,itemSprite.naturalWidth,itemSprite.naturalHeight);
   }
   drawCharacter(scale,offset){
+    if (!entities["player_guy"].texture.image) return;
     ctx.setTransform((this.directionX == "left" && !this.directionY) ? -1 : 1,0,0,1,this.offsetX(),this.offsetY());
     ctx.transform(1,0,0,1,this.width / -2 + offset,this.height / -2);
-    ctx.drawImage(playerSprite,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,0,0,this.width,this.height);
+    ctx.drawImage(entities["player_guy"].texture.image,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,0,0,this.width,this.height);
   }
 }
 const player = new Player();
 
 // Trees
 const treesArray = [];
-const treeSprite = new Image();
-treeSprite.src = "textures/terrain/tree.png";
 class Tree {
   constructor(){
     this.x = Math.floor(Math.random() * canvas.width) - Math.floor(canvas.width / 2) - player.x - 96 / 2;
@@ -495,7 +514,8 @@ class Tree {
     this.height = 192;
   }
   draw(){
-    ctx.drawImage((treeSprite.naturalWidth) ? treeSprite : missingSprite,this.x + player.x + player.offsetX(),this.y + player.y + player.offsetY(),this.width,this.height);
+    if (!terrain["tree"].texture.image) return;
+    ctx.drawImage(terrain["tree"].texture.image,this.x + player.x + player.offsetX(),this.y + player.y + player.offsetY(),this.width,this.height);
   }
 }
 function handleTrees(){
