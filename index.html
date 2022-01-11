@@ -26,7 +26,7 @@
 
 <script>
   window.Flatlands = {
-    version: 0.35,
+    version: 0.41,
     environment: () => ({
       touch_device: ("ontouchstart" in window)
     })
@@ -270,11 +270,11 @@ const gamepads = [];
 window.addEventListener("gamepadconnected",event => {
   if (!event.gamepad.mapping) return;
   gamepads.push(event.gamepad.index);
-  console.log("Connected!\n",navigator.getGamepads()[event.gamepad.index]);
+  //console.log("Connected!\n",navigator.getGamepads()[event.gamepad.index]);
 });
 window.addEventListener("gamepaddisconnected",event => {
   if (!event.gamepad.mapping) return;
-  console.log("Disconnected.\n",event.gamepad.index);
+  //console.log("Disconnected.\n",event.gamepad.index);
   gamepads.splice(gamepads.indexOf(event.gamepad.index));
 });
 
@@ -343,12 +343,11 @@ function setSlot(index){
   hotbar.querySelectorAll(".slot.active").forEach(slot => slot.classList.remove("active"));
   active.classList.add("active");
   const slot = active.querySelector(".item");
-  //if (!items) return;
-  player.held_item = window.getComputedStyle(slot).getPropertyValue("--item-sprite") || null;console.log(`Player held item: ${player.held_item}`);
+  player.held_item = window.getComputedStyle(slot).getPropertyValue("--item-sprite") || null;//console.log(`Player held item: ${player.held_item}`);
 }
 
 // Game Properties
-let missingTextureSprite = new Image();
+const missingTextureSprite = new Image();
 missingTextureSprite.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAABIeJ9nAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAZQTFRF+QD/AAAASf/37wAAAAxJREFUeJxjcGBoAAABRADBOnocVgAAAABJRU5ErkJggg==";
 let entities, items, terrain, grassPattern;
 
@@ -369,12 +368,27 @@ grassPattern = ctx.createPattern(terrain["ground"].texture.image,"repeat");
 async function loadSprite(key,object){
   return new Promise((resolve,reject) => {
     let sprite = new Image(), { source } = object[key].texture;
-    sprite.addEventListener("load",event => {console.log(`${new URL(sprite.src).pathname.split("/").pop()} %cload?`,"color: green; font-size: 125%; font-weight: bold;");
+    sprite.addEventListener("load",event => {//console.log(`${new URL(sprite.src).pathname.split("/").pop()} %cload?`,"color: green; font-size: 125%; font-weight: bold;");
       object[key].texture.image = sprite;
+      if (object === items){/* This and the error listener should be made into a single function, they both add the sprites to the items in the hotbar */
+        let slots = hotbar.querySelectorAll(`.slot .item.${key}`);
+        if (slots.length !== 0){
+          slots.forEach(slot => {
+            slot.style.setProperty("background-image",`url("${source}")`);
+          });
+        }
+      }
       resolve();
     });
-    sprite.addEventListener("error",event => {console.log(`${new URL(sprite.src).pathname.split("/").pop()} %cERROR!`,"color: red; font-size: 125%; font-weight: bold;");
-      //object[key].texture.image = missingTextureSprite;
+    sprite.addEventListener("error",event => {//console.log(`${new URL(sprite.src).pathname.split("/").pop()} %cERROR!`,"color: red; font-size: 125%; font-weight: bold;");
+      if (object === items){/* Function mentioned above */
+        let slots = hotbar.querySelectorAll(`.slot .item.${key}`);
+        if (slots.length !== 0){
+          slots.forEach(slot => {
+            slot.style.setProperty("background-image",`url("${missingTextureSprite.src}")`);
+          });
+        }
+      }
       resolve();
     });
     sprite.src = source;
@@ -451,8 +465,7 @@ class Player {
     }
   }
   draw(){
-    //if (!entities) return;
-    let heldItemImage = (items && player.held_item) ? items[player.held_item].texture.image : missingTextureSprite;
+    let heldItemImage = (player.held_item !== null) ? (items && items[player.held_item].texture.image) ? items[player.held_item].texture.image : undefined : null;
     let scale = 1, offset = 1, itemScale = 1;
 
     if (this.directionX == "left" && this.directionY != "up"){
@@ -468,6 +481,9 @@ class Player {
       itemScale = 2/3;
     }
 
+    ctx.setTransform(scale,0,0,1,this.offsetX(),this.offsetY());
+    ctx.transform(1,0,0,1,-7,14);
+    if (entities && entities["shadow"].texture.image) ctx.drawImage(entities["shadow"].texture.image,0,0,this.width - 2,4);
     if (this.directionY == "down"){
       this.drawCharacter(scale,offset);
       this.drawItem(heldItemImage,scale,itemScale);
@@ -479,22 +495,26 @@ class Player {
     ctx.setTransform(1,0,0,1,0,0);
   }
   drawItem(itemSprite,scale,itemScale){
+    if (itemSprite === null) return;
     if (!itemSprite) itemSprite = missingTextureSprite;
+    const cachedSprite = (itemSprite !== missingTextureSprite);
     ctx.setTransform(scale,0,0,1,this.offsetX(),this.offsetY());
     ctx.transform(1,0,0,1,this.width / -2 + 1,this.height / -2);
-    ctx.transform(1,0,0,1,10,5);
+    ctx.transform(1,0,0,1,((cachedSprite) ? itemSprite.naturalWidth : 16) * 0.625,((cachedSprite) ? itemSprite.naturalHeight : 16) * 0.3125);
     ctx.scale(-1 * itemScale,1);
-    ctx.transform(1,0,0,1,-itemSprite.naturalWidth,itemSprite.naturalHeight);
+    ctx.transform(1,0,0,1,-((cachedSprite) ? itemSprite.naturalWidth : 16),((cachedSprite) ? itemSprite.naturalHeight : 16));
     ctx.rotate(Math.PI * -1 / 2);
     //ctx.fillStyle = "#00ff0030";
     //ctx.fillRect((this.directionY) ? (this.directionY == "up") ? -2 : -1 : 0,1,itemSprite.naturalWidth,itemSprite.naturalHeight);
-    ctx.drawImage(itemSprite,(this.directionY) ? (this.directionY == "up") ? -2 : -1 : 0,1,itemSprite.naturalWidth,itemSprite.naturalHeight);
+    ctx.drawImage(itemSprite,(this.directionY) ? (this.directionY == "up") ? -2 : -1 : 0,1,(cachedSprite) ? itemSprite.naturalWidth : 16,(cachedSprite) ? itemSprite.naturalHeight : 16);
   }
-  drawCharacter(scale,offset){
-    //if (!entities["player_guy"].texture.image) return;
+  drawCharacter(scale,offset){/* Mob idea name: ooogr */
+    const cachedSprite = (entities && entities["player_guy"].texture.image);
+    let charSprite = (cachedSprite) ? entities["player_guy"].texture.image : missingTextureSprite;
     ctx.setTransform((this.directionX == "left" && !this.directionY) ? -1 : 1,0,0,1,this.offsetX(),this.offsetY());
     ctx.transform(1,0,0,1,this.width / -2 + offset,this.height / -2);
-    ctx.drawImage((entities && entities["player_guy"].texture.image) ? entities["player_guy"].texture.image : missingTextureSprite,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,0,0,this.width,this.height);
+    if ( cachedSprite) ctx.drawImage(charSprite,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,0,0,this.width,this.height);
+    if (!cachedSprite) ctx.drawImage(charSprite,0,0,this.width,this.height);
   }
 }
 const player = new Player();
@@ -517,7 +537,6 @@ class Tree {
     this.height = 192;
   }
   draw(){
-    //if (!terrain["tree"].texture.image) return;
     ctx.drawImage((terrain && terrain["tree"].texture.image) ? terrain["tree"].texture.image : missingTextureSprite,this.x + player.x + player.offsetX(),this.y + player.y + player.offsetY(),this.width,this.height);
   }
 }

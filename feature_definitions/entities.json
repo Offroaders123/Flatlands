@@ -14,5 +14,10 @@
     "texture": {
       "source": "textures/entities/player_guy.png"
     }
+  },
+  "shadow": {
+    "texture": {
+      "source": "textures/entities/shadow.svg"
+    }
   }
 }
