@@ -348,17 +348,22 @@ function setSlot(index){
 }
 
 // Game Properties
-let entities, items, terrain, grassPattern;
+let missingTextures, entities, items, terrain, grassPattern;
 
 (async () => {
 
-let entitiesFile = await fetch("entities.json");
+let missingTexturesFile = await fetch("feature_definitions/missing_texture.json");
+missingTextures = await missingTexturesFile.json();
+
+let entitiesFile = await fetch("feature_definitions/entities.json");
 entities = await entitiesFile.json();
-let itemsFile = await fetch("items.json");
+let itemsFile = await fetch("feature_definitions/items.json");
 items = await itemsFile.json();
-let terrainFile = await fetch("terrain.json");
+let terrainFile = await fetch("feature_definitions/terrain.json");
 terrain = await terrainFile.json();
 
+/* Additional inspiration from https://github.com/cyan33/canvas-image-cache/blob/master/index.js */
+for (missingTexture in missingTextures) await loadSprite(missingTexture,missingTextures);
 for (entity in entities) await loadSprite(entity,entities);
 for (item in items) await loadSprite(item,items);
 for (terraine in terrain) await loadSprite(terraine,terrain);
@@ -372,7 +377,7 @@ async function loadSprite(key,object){
       resolve();
     });
     sprite.addEventListener("error",event => {console.log(`${new URL(sprite.src).pathname.split("/").pop()} %cERROR!`,"color: red; font-size: 125%; font-weight: bold;");
-      sprite.src = terrain["missing_texture"].texture.source;
+      object[key].texture.image = missingTextures["missing_texture"].texture.image;
       resolve();
     });
     sprite.src = source;

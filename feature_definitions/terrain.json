@@ -5,12 +5,6 @@
       "source": "textures/terrain/ground.png"
     }
   },
-  "missing_texture": {
-    "name": "Missing Texture",
-    "texture": {
-      "source": "textures/terrain/missing_texture.png"
-    }
-  },
   "tree": {
     "name": "Tree",
     "width": 96,
