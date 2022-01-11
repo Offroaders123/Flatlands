@@ -343,17 +343,16 @@ function setSlot(index){
   hotbar.querySelectorAll(".slot.active").forEach(slot => slot.classList.remove("active"));
   active.classList.add("active");
   const slot = active.querySelector(".item");
-  if (!items) return;
+  //if (!items) return;
   player.held_item = window.getComputedStyle(slot).getPropertyValue("--item-sprite") || null;console.log(`Player held item: ${player.held_item}`);
 }
 
 // Game Properties
-let missingTextures, entities, items, terrain, grassPattern;
+let missingTextureSprite = new Image();
+missingTextureSprite.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAABIeJ9nAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAZQTFRF+QD/AAAASf/37wAAAAxJREFUeJxjcGBoAAABRADBOnocVgAAAABJRU5ErkJggg==";
+let entities, items, terrain, grassPattern;
 
 (async () => {
-
-let missingTexturesFile = await fetch("feature_definitions/missing_texture.json");
-missingTextures = await missingTexturesFile.json();
 
 let entitiesFile = await fetch("feature_definitions/entities.json");
 entities = await entitiesFile.json();
@@ -362,8 +361,6 @@ items = await itemsFile.json();
 let terrainFile = await fetch("feature_definitions/terrain.json");
 terrain = await terrainFile.json();
 
-/* Additional inspiration from https://github.com/cyan33/canvas-image-cache/blob/master/index.js */
-for (missingTexture in missingTextures) await loadSprite(missingTexture,missingTextures);
 for (entity in entities) await loadSprite(entity,entities);
 for (item in items) await loadSprite(item,items);
 for (terraine in terrain) await loadSprite(terraine,terrain);
@@ -377,7 +374,7 @@ async function loadSprite(key,object){
       resolve();
     });
     sprite.addEventListener("error",event => {console.log(`${new URL(sprite.src).pathname.split("/").pop()} %cERROR!`,"color: red; font-size: 125%; font-weight: bold;");
-      object[key].texture.image = missingTextures["missing_texture"].texture.image;
+      //object[key].texture.image = missingTextureSprite;
       resolve();
     });
     sprite.src = source;
@@ -454,8 +451,8 @@ class Player {
     }
   }
   draw(){
-    if (!entities) return;
-    let heldItemImage = (items && player.held_item) ? items[player.held_item].texture.image : null;
+    //if (!entities) return;
+    let heldItemImage = (items && player.held_item) ? items[player.held_item].texture.image : missingTextureSprite;
     let scale = 1, offset = 1, itemScale = 1;
 
     if (this.directionX == "left" && this.directionY != "up"){
@@ -473,15 +470,16 @@ class Player {
 
     if (this.directionY == "down"){
       this.drawCharacter(scale,offset);
-      if (heldItemImage) this.drawItem(heldItemImage,scale,itemScale);
+      this.drawItem(heldItemImage,scale,itemScale);
     } else {
-      if (heldItemImage) this.drawItem(heldItemImage,scale,itemScale);
+      this.drawItem(heldItemImage,scale,itemScale);
       this.drawCharacter(scale,offset);
     }
 
     ctx.setTransform(1,0,0,1,0,0);
   }
   drawItem(itemSprite,scale,itemScale){
+    if (!itemSprite) itemSprite = missingTextureSprite;
     ctx.setTransform(scale,0,0,1,this.offsetX(),this.offsetY());
     ctx.transform(1,0,0,1,this.width / -2 + 1,this.height / -2);
     ctx.transform(1,0,0,1,10,5);
@@ -493,10 +491,10 @@ class Player {
     ctx.drawImage(itemSprite,(this.directionY) ? (this.directionY == "up") ? -2 : -1 : 0,1,itemSprite.naturalWidth,itemSprite.naturalHeight);
   }
   drawCharacter(scale,offset){
-    if (!entities["player_guy"].texture.image) return;
+    //if (!entities["player_guy"].texture.image) return;
     ctx.setTransform((this.directionX == "left" && !this.directionY) ? -1 : 1,0,0,1,this.offsetX(),this.offsetY());
     ctx.transform(1,0,0,1,this.width / -2 + offset,this.height / -2);
-    ctx.drawImage(entities["player_guy"].texture.image,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,0,0,this.width,this.height);
+    ctx.drawImage((entities && entities["player_guy"].texture.image) ? entities["player_guy"].texture.image : missingTextureSprite,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,0,0,this.width,this.height);
   }
 }
 const player = new Player();
@@ -519,8 +517,8 @@ class Tree {
     this.height = 192;
   }
   draw(){
-    if (!terrain["tree"].texture.image) return;
-    ctx.drawImage(terrain["tree"].texture.image,this.x + player.x + player.offsetX(),this.y + player.y + player.offsetY(),this.width,this.height);
+    //if (!terrain["tree"].texture.image) return;
+    ctx.drawImage((terrain && terrain["tree"].texture.image) ? terrain["tree"].texture.image : missingTextureSprite,this.x + player.x + player.offsetX(),this.y + player.y + player.offsetY(),this.width,this.height);
   }
 }
 function handleTrees(){
