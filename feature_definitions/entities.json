@@ -1,18 +1,26 @@
 {
-  "player_gal": {
-    "name": "Gal",
+  "player": {
+    "name": "Player",
+    "x": 0,
+    "y": 0,
     "width": 16,
     "height": 32,
-    "texture": {
-      "source": "textures/entities/player_gal.png"
-    }
-  },
-  "player_guy": {
-    "name": "Guy",
-    "width": 16,
-    "height": 32,
+    "speed": 2,
+    "direction": {
+      "x": "right",
+      "y": false
+    },
+    "held_item": "hatchet",
     "texture": {
       "source": "textures/entities/player_guy.png"
+    },
+    "animations": {
+      "tick": 0,
+      "ticks": 24,
+      "frame": 0,
+      "frames": 2,
+      "column": 0,
+      "columns": 4
     }
   },
   "shadow": {
