@@ -75,12 +75,23 @@
     margin: auto;
     width: 100%;
     height: 100%;
+    z-index: 1;
   }
-  #coordinates {
-    margin: 12px;
-    position: fixed;
-    left: var(--safe-area-inset-left);
-    top: var(--safe-area-inset-top);
+  #hud {//background: gray;
+    --padding: 12px;//border: solid red;
+    padding: max(var(--padding),var(--safe-area-inset-top)) max(var(--padding),var(--safe-area-inset-right)) max(var(--padding),var(--safe-area-inset-bottom)) max(var(--padding),var(--safe-area-inset-left));
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-areas:
+      "version ."
+      "coordinates ."
+      "dpad hotbar";
+    grid-template-columns: min-content 1fr;
+    grid-template-rows: repeat(2,min-content) 1fr;
+    gap: 8px;
+    justify-items: start;
+    align-items: end;
     color: #ffffff;
     font-size: 20px;
     font-family: ui-monospace, "Noto Sans Mono", "Cousine", monospace;
@@ -88,10 +99,19 @@
     text-shadow: 0.175ch 0.175ch 0 #000000;
     white-space: pre;
   }
+  #hud > * {
+    z-index: 1;
+  }
+  #version {
+    grid-area: version;
+  }
+  #coordinates {
+    grid-area: coordinates;
+  }
   #hotbar {
-    padding: 4px;
-    position: fixed;
-    bottom: calc(var(--safe-area-inset-bottom));
+    grid-area: hotbar;
+    grid-column: 1 / -1;
+    justify-self: center;
     display: flex;
     list-style: none;
     /*--hotbar-scale: min(min(12vh,8vw),64px);*/
@@ -118,18 +138,21 @@
     background-size: cover;
   }
   #dpad {
-    margin: 8px;
-    position: fixed;
-    left: calc(var(--safe-area-inset-left) + 54px);
-    bottom: calc(var(--safe-area-inset-bottom) + 54px);
-    width: 56px;
-    height: 56px;
+    //margin: 4px;
+    grid-area: dpad;
+    display: grid;
+    grid-template-areas:
+      ". up ."
+      "left . right"
+      ". down .";
+    color: initial;
+    white-space: initial;
+    z-index: initial;
   }
   :root:not(.touch-device) #dpad {
-    display: none;
+    //display: none;
   }
   #dpad button {
-    position: absolute;
     width: 56px;
     height: 56px;
     display: flex;
@@ -138,6 +161,7 @@
     background: #cccccc;
     border: 2px solid #000000cc;
     border-radius: 12px;
+    z-index: 1;
     transition: opacity 250ms;
   }
   #dpad button::before {
@@ -149,7 +173,7 @@
   }
   #dpad [data-left] {
     margin-right: -2px;
-    right: 100%;
+    grid-area: left;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
@@ -159,7 +183,7 @@
   }
   #dpad [data-right] {
     margin-left: -2px;
-    left: 100%;
+    grid-area: right;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
@@ -169,7 +193,7 @@
   }
   #dpad [data-up] {
     margin-bottom: -2px;
-    bottom: 100%;
+    grid-area: up;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }
@@ -179,7 +203,7 @@
   }
   #dpad [data-down] {
     margin-top: -2px;
-    top: 100%;
+    grid-area: down;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
   }
@@ -209,8 +233,12 @@
 <body ontouchstart>
 
 <canvas id="canvas"></canvas>
+
+<div id="hud">
+
 <span id="version"></span>
 <span id="coordinates"></span>
+
 <ul id="hotbar">
   <li class="slot" data-slot="1">
     <span class="item spearsword"></span>
@@ -231,6 +259,7 @@
     <span class="item pizza"></span>
   </li>
 </ul>
+
 <div id="dpad">
   <button data-left tabindex="-1"></button>
   <button data-right tabindex="-1"></button>
@@ -238,9 +267,15 @@
   <button data-down tabindex="-1"></button>
 </div>
 
+</div>
+
 <script>
 // Service Worker
 window.addEventListener("load",() => navigator.serviceWorker.register("service-worker.js"));
+
+// Version
+const version = document.querySelector("#version");
+version.textContent = `Flatlands v${Flatlands.version}`;
 
 // Canvas
 const canvas = document.querySelector("#canvas");
