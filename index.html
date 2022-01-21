@@ -26,7 +26,7 @@
 
 <script>
   window.Flatlands = {
-    version: 0.46,
+    version: 0.49,
     environment: () => ({
       touch_device: ("ontouchstart" in window)
     })
@@ -115,7 +115,7 @@
     background: url("textures/interfaces/slot.png") no-repeat 50%;
     background-size: calc(100% - 8px);
   }
-  #hotbar .slot.active::before {
+  #hotbar .slot[data-active]::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -125,8 +125,8 @@
   #hotbar .item {
     width: 64px;
     aspect-ratio: 1 / 1;
-    background: var(--item-sprite) no-repeat;
-    background-size: cover;
+    background: center no-repeat;
+    background-size: contain;
   }
   @media (max-width: 894px) {
     #hotbar {
@@ -185,7 +185,7 @@
     content: "";
     border: 10px solid transparent;
   }
-  #dpad button.active {
+  #dpad button[data-active] {
     opacity: 0.6;
   }
   #dpad [data-left] {
@@ -228,21 +228,6 @@
     border-top-color: currentColor;
     border-bottom: none;
   }
-  .hatchet {
-    --item-sprite:hatchet;
-  }
-  .pickmatic {
-    --item-sprite:pickmatic;
-  }
-  .pizza {
-    --item-sprite:pizza;
-  }
-  .spade {
-    --item-sprite:spade;
-  }
-  .spearsword {
-    --item-sprite:spearsword;
-  }
 </style>
 
 </head>
@@ -258,22 +243,22 @@
 
 <ul id="hotbar">
   <li class="slot" data-slot="1">
-    <span class="item spearsword"></span>
+    <span class="item" data-item="spearsword"></span>
   </li>
   <li class="slot" data-slot="2">
-    <span class="item pickmatic"></span>
+    <span class="item" data-item="pickmatic"></span>
   </li>
-  <li class="slot active" data-slot="3">
-    <span class="item hatchet"></span>
+  <li class="slot" data-slot="3" data-active>
+    <span class="item" data-item="hatchet"></span>
   </li>
   <li class="slot" data-slot="4">
-    <span class="item spade"></span>
+    <span class="item" data-item="spade"></span>
   </li>
   <li class="slot" data-slot="5">
-    <span class="item"></span>
+    <span class="item" data-item></span>
   </li>
   <li class="slot" data-slot="6">
-    <span class="item pizza"></span>
+    <span class="item" data-item="pizza"></span>
   </li>
 </ul>
 
@@ -328,10 +313,10 @@ coordinates.update = () => coordinates.textContent = `(${Math.round(player.x / 1
 const hotbar = document.querySelector("#hotbar");
 hotbar.setSlot = index => {
   const active = hotbar.querySelector(`.slot[data-slot="${index}"]`);
-  hotbar.querySelectorAll(".slot.active").forEach(slot => slot.classList.remove("active"));
-  active.classList.add("active");
+  hotbar.querySelectorAll(".slot[data-active]").forEach(slot => slot.removeAttribute("data-active"));
+  active.setAttribute("data-active","");
   const slot = active.querySelector(".item");
-  player.held_item = window.getComputedStyle(slot).getPropertyValue("--item-sprite") || null;//console.log(`Player held item: ${player.held_item}`);
+  player.held_item = slot.getAttribute("data-item") || null;//console.log(`Player held item: ${player.held_item}`);
 };
 hotbar.addEventListener("touchstart",event => {
   event.preventDefault();
@@ -342,14 +327,14 @@ hotbar.addEventListener("touchstart",event => {
 const dpad = document.querySelector("#dpad");
 dpad.down = event => {
   event.preventDefault();
-  if (event.target.matches("button")) event.target.classList.add("active");
+  if (event.target.matches("button")) event.target.setAttribute("data-active","");
   if (event.target.matches("[data-left]")) key.left = "DPadLeft";
   if (event.target.matches("[data-right]")) key.right = "DPadRight";
   if (event.target.matches("[data-up]")) key.up = "DPadUp";
   if (event.target.matches("[data-down]")) key.down = "DPadDown";
 };
 dpad.up = event => {
-  if (event.target.matches("button")) event.target.classList.remove("active");
+  if (event.target.matches("button")) event.target.removeAttribute("data-active");
   if (event.target.matches("[data-left]")) key.left = false;
   if (event.target.matches("[data-right]")) key.right = false;
   if (event.target.matches("[data-up]")) key.up = false;
@@ -440,7 +425,7 @@ async function loadSprite(key,object){
     sprite.addEventListener("load",event => {//console.log(`${new URL(sprite.src).pathname.split("/").pop()} %cload?`,"color: green; font-size: 125%; font-weight: bold;");
       object[key].texture.image = sprite;
       if (object === items){/* This and the error listener should be made into a single function, they both add the sprites to the items in the hotbar */
-        let slots = hotbar.querySelectorAll(`.slot .item.${key}`);
+        let slots = hotbar.querySelectorAll(`.slot .item[data-item="${key}"]`);
         if (slots.length !== 0){
           slots.forEach(slot => {
             slot.style.setProperty("background-image",`url("${source}")`);
@@ -451,7 +436,7 @@ async function loadSprite(key,object){
     });
     sprite.addEventListener("error",event => {//console.log(`${new URL(sprite.src).pathname.split("/").pop()} %cERROR!`,"color: red; font-size: 125%; font-weight: bold;");
       if (object === items){/* Function mentioned above */
-        let slots = hotbar.querySelectorAll(`.slot .item.${key}`);
+        let slots = hotbar.querySelectorAll(`.slot .item[data-item="${key}"]`);
         if (slots.length !== 0){
           slots.forEach(slot => {
             slot.style.setProperty("background-image",`url("${missingTextureSprite.src}")`);
@@ -500,7 +485,7 @@ class Player {
       key.right = (Math.round(axisX * 1000) > 0);
       key.up = (Math.round(axisY * 1000) < 0);
       key.down = (Math.round(axisY * 1000) > 0);
-      let active = parseInt(hotbar.querySelector(".slot.active").getAttribute("data-slot"));
+      let active = parseInt(hotbar.querySelector(".slot[data-active]").getAttribute("data-slot"));
       if (left1 && !right1 && tick % 10 == 0) hotbar.setSlot((active - 1 > 0) ? active - 1 : 6);
       if (right1 && !left1 && tick % 10 == 0) hotbar.setSlot((active + 1 < 7) ? active + 1 : 1);
     }
