@@ -313,9 +313,52 @@ new ResizeObserver(() => {
 
 let tick = 0;
 
+// HUD
+const hud = document.querySelector("#hud");
+
 // Version
 const version = document.querySelector("#version");
 version.textContent = `Flatlands v${Flatlands.version}`;
+
+// Coordinates
+const coordinates = document.querySelector("#coordinates");
+coordinates.update = () => coordinates.textContent = `(${Math.round(player.x / 16) * -1}, ${Math.round(player.y / 16)})`;
+
+// Hotbar
+const hotbar = document.querySelector("#hotbar");
+hotbar.setSlot = index => {
+  const active = hotbar.querySelector(`.slot[data-slot="${index}"]`);
+  hotbar.querySelectorAll(".slot.active").forEach(slot => slot.classList.remove("active"));
+  active.classList.add("active");
+  const slot = active.querySelector(".item");
+  player.held_item = window.getComputedStyle(slot).getPropertyValue("--item-sprite") || null;//console.log(`Player held item: ${player.held_item}`);
+};
+hotbar.addEventListener("touchstart",event => {
+  event.preventDefault();
+  if (event.target.closest(".slot")) hotbar.setSlot(event.target.closest(".slot").getAttribute("data-slot"));
+});
+
+// D-Pad
+const dpad = document.querySelector("#dpad");
+dpad.down = event => {
+  event.preventDefault();
+  if (event.target.matches("button")) event.target.classList.add("active");
+  if (event.target.matches("[data-left]")) key.left = "DPadLeft";
+  if (event.target.matches("[data-right]")) key.right = "DPadRight";
+  if (event.target.matches("[data-up]")) key.up = "DPadUp";
+  if (event.target.matches("[data-down]")) key.down = "DPadDown";
+};
+dpad.up = event => {
+  if (event.target.matches("button")) event.target.classList.remove("active");
+  if (event.target.matches("[data-left]")) key.left = false;
+  if (event.target.matches("[data-right]")) key.right = false;
+  if (event.target.matches("[data-up]")) key.up = false;
+  if (event.target.matches("[data-down]")) key.down = false;
+};
+dpad.addEventListener("touchstart",event => dpad.down(event));
+dpad.addEventListener("touchend",event => dpad.up(event));
+dpad.addEventListener("pointerdown",event => dpad.down(event));
+dpad.addEventListener("pointerup",event => dpad.up(event));
 
 // Input
 const key = {
@@ -343,7 +386,7 @@ document.addEventListener("keydown",event => {
   if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
   if (["Digit1","Digit2","Digit3","Digit4","Digit5","Digit6"].includes(event.code)){
     event.preventDefault();
-    setSlot(event.code.replace(/Digit/,""));
+    hotbar.setSlot(event.code.replace(/Digit/,""));
   }
   if (["ArrowLeft","KeyA"].includes(event.code)){
     event.preventDefault();
@@ -371,39 +414,6 @@ document.addEventListener("keyup",event => {
 });
 document.addEventListener("touchstart",() => document.documentElement.classList.add("touch-device"));
 document.addEventListener("contextmenu",event => event.preventDefault());
-
-hotbar.addEventListener("touchstart",event => {
-  event.preventDefault();
-  if (event.target.closest(".slot")) setSlot(event.target.closest(".slot").getAttribute("data-slot"));
-});
-
-dpad.down = event => {
-  event.preventDefault();
-  if (event.target.matches("button")) event.target.classList.add("active");
-  if (event.target.matches("[data-left]")) key.left = "DPadLeft";
-  if (event.target.matches("[data-right]")) key.right = "DPadRight";
-  if (event.target.matches("[data-up]")) key.up = "DPadUp";
-  if (event.target.matches("[data-down]")) key.down = "DPadDown";
-};
-dpad.up = event => {
-  if (event.target.matches("button")) event.target.classList.remove("active");
-  if (event.target.matches("[data-left]")) key.left = false;
-  if (event.target.matches("[data-right]")) key.right = false;
-  if (event.target.matches("[data-up]")) key.up = false;
-  if (event.target.matches("[data-down]")) key.down = false;
-};
-dpad.addEventListener("touchstart",event => dpad.down(event));
-dpad.addEventListener("touchend",event => dpad.up(event));
-dpad.addEventListener("pointerdown",event => dpad.down(event));
-dpad.addEventListener("pointerup",event => dpad.up(event));
-
-function setSlot(index){
-  const active = hotbar.querySelector(`.slot[data-slot="${index}"]`);
-  hotbar.querySelectorAll(".slot.active").forEach(slot => slot.classList.remove("active"));
-  active.classList.add("active");
-  const slot = active.querySelector(".item");
-  player.held_item = window.getComputedStyle(slot).getPropertyValue("--item-sprite") || null;//console.log(`Player held item: ${player.held_item}`);
-}
 
 // Game Properties
 const missingTextureSprite = new Image();
@@ -491,8 +501,8 @@ class Player {
       key.up = (Math.round(axisY * 1000) < 0);
       key.down = (Math.round(axisY * 1000) > 0);
       let active = parseInt(hotbar.querySelector(".slot.active").getAttribute("data-slot"));
-      if (left1 && !right1 && tick % 10 == 0) setSlot((active - 1 > 0) ? active - 1 : 6);
-      if (right1 && !left1 && tick % 10 == 0) setSlot((active + 1 < 7) ? active + 1 : 1);
+      if (left1 && !right1 && tick % 10 == 0) hotbar.setSlot((active - 1 > 0) ? active - 1 : 6);
+      if (right1 && !left1 && tick % 10 == 0) hotbar.setSlot((active + 1 < 7) ? active + 1 : 1);
     }
     if (key.left && !key.right) this.x += this.speed * (-axisX || 1);
     if (key.right && !key.left) this.x -= this.speed * (axisX || 1);
@@ -609,12 +619,6 @@ function handleTrees(){
   });
 }
 
-// Coordinates
-const coordinates = document.querySelector("#coordinates");
-function setCoordinateLabel(){
-  coordinates.textContent = `(${Math.round(player.x / 16) * -1}, ${Math.round(player.y / 16)})`;
-}
-
 //for (let i = 0; i < 4; i++) treesArray.push(new Tree());
 
 // Rendering
@@ -629,7 +633,7 @@ function animate({ recursive = true } = {}){
   handleTrees();
   player.update();
   player.draw();
-  setCoordinateLabel();
+  coordinates.update();
   tick++;
   if (recursive) window.requestAnimationFrame(animate);
 }
