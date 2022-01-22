@@ -1,5 +1,5 @@
 self.Flatlands = {
-  version: 0.49,
+  version: 0.50,
   cache: true
 }
 self.addEventListener("activate",event => {
