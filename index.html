@@ -430,28 +430,21 @@ async function loadSprite(key,object){
     let sprite = new Image(), { source } = object[key].texture;
     sprite.addEventListener("load",event => {//console.log(`${new URL(sprite.src).pathname.split("/").pop()} %cload?`,"color: green; font-size: 125%; font-weight: bold;");
       object[key].texture.image = sprite;
-      if (object === items){/* This and the error listener should be made into a single function, they both add the sprites to the items in the hotbar */
-        let slots = hotbar.querySelectorAll(`.slot .item[data-item="${key}"]`);
-        if (slots.length !== 0){
-          slots.forEach(slot => {
-            slot.style.setProperty("background-image",`url("${source}")`);
-          });
-        }
-      }
+      setSlotTexturesWithItem(key,source);/* Another goal would be to add functionality to use the cached image itself (the line above, or `sprite`), rather than re-fetching it again in the CSS after being added as a style in `setSlotTexture()`. */
       resolve();
     });
     sprite.addEventListener("error",event => {//console.log(`${new URL(sprite.src).pathname.split("/").pop()} %cERROR!`,"color: red; font-size: 125%; font-weight: bold;");
-      if (object === items){/* Function mentioned above */
-        let slots = hotbar.querySelectorAll(`.slot .item[data-item="${key}"]`);
-        if (slots.length !== 0){
-          slots.forEach(slot => {
-            slot.style.setProperty("background-image",`url("${missingTextureSprite.src}")`);
-          });
-        }
-      }
+      setSlotTexturesWithItem(key,missingTextureSprite.src);
       resolve();
     });
     sprite.src = source;
+    function setSlotTexturesWithItem(key,source){/* It could make sense to make this a method of either the hotbar element, or the hud container once an in-game inventory is implemented. Then you could update all item slots for an item to have a certain texture */
+      const slots = hotbar.querySelectorAll(`.slot .item[data-item="${key}"]`);
+      if (slots.length !== 0) slots.forEach(slot => setSlotTexture(slot,source));
+    }
+    function setSlotTexture(slot,source){/* Once slots have their own dedicated Web Component, this function can be added as method for the element itself. Something like `slot.setTexture(source)` */
+      slot.style.setProperty("background-image",`url("${source}")`);
+    }
   });
 }
 
