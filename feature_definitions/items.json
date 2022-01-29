@@ -1,4 +1,11 @@
 {
+  "fire": {
+    "name": "Fire",
+    "texture": {
+      "source": "textures/items/fire.png",
+      "frames": 4
+    }
+  },
   "hatchet": {
     "name": "Hatchet",
     "texture": {

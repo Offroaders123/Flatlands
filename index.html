@@ -26,7 +26,7 @@
 
 <script>
   window.Flatlands = {
-    version: 0.50,
+    version: 0.53,
     environment: () => ({
       touch_device: ("ontouchstart" in window)
     })
@@ -260,7 +260,7 @@
 
 <script>
 // Service Worker
-window.addEventListener("load",() => navigator.serviceWorker.register("service-worker.js"));
+if ("serviceWorker" in navigator) window.addEventListener("load",() => navigator.serviceWorker.register("service-worker.js"));
 
 // Canvas
 const canvas = document.querySelector("#canvas");
@@ -298,7 +298,7 @@ coordinates.update = () => coordinates.textContent = `(${Math.round(player.x / 1
 
 // Hotbar
 const hotbar = document.querySelector("#hotbar");
-Object.defineProperty(Object.getPrototypeOf(hotbar),"slots",{ get: () => Array.from(hotbar.querySelectorAll("item-slot")) });
+Object.defineProperty(Object.getPrototypeOf(hotbar),"slots",{ get: () => [...hotbar.querySelectorAll("item-slot")] });
 Object.getPrototypeOf(hotbar).setSlot = index => {
   const slot = hotbar.slots[index - 1];
   slot.activate();
