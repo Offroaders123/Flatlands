@@ -1,5 +1,5 @@
 window.Flatlands = {
-  version: 0.53,
+  version: 0.54,
   environment: () => ({
     touch_device: ("ontouchstart" in window)
   })

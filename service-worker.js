@@ -1,10 +1,10 @@
 self.Flatlands = {
-  version: 0.53,
+  version: `Flatlands v${0.54}`,
   cache: true
 }
 self.addEventListener("activate",event => {
   event.waitUntil(caches.keys().then(versions => Promise.all(versions.map(cache => {
-    if (cache !== Flatlands.version) return caches.delete(cache);
+    if (cache.startsWith("Flatlands") && cache !== Flatlands.version) return caches.delete(cache);
   }))));
   event.waitUntil(clients.claim());
 });
