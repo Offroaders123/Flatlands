@@ -1,5 +1,11 @@
+// ES Module imports
+import Flatlands from "./Flatlands.js";
+
 // Service Worker
-if ("serviceWorker" in navigator) window.addEventListener("load",() => navigator.serviceWorker.register("service-worker.js"));
+await Flatlands.serviceWorker.register();
+
+// Touch Device
+if (Flatlands.environment.touchDevice) document.documentElement.classList.add("touch-device");
 
 // Canvas
 const canvas = document.querySelector("#canvas");
@@ -185,13 +191,13 @@ items = await itemsFile.json();
 let terrainFile = await fetch("feature_definitions/terrain.json");
 terrain = await terrainFile.json();
 
-for (entity in entities) await loadSprite(entity,entities);
-for (item in items) await loadSprite(item,items);
-for (terraine in terrain) await loadSprite(terraine,terrain);
+for (let entity in entities) await loadSprite(entity,entities);
+for (let item in items) await loadSprite(item,items);
+for (let terraine in terrain) await loadSprite(terraine,terrain);
 grassPattern = ctx.createPattern(terrain["ground"].texture.image,"repeat");
 
 async function loadSprite(key,object){
-  return new Promise((resolve,reject) => {
+  return new Promise((resolve) => {
     let sprite = new Image(), { source } = object[key].texture;
     sprite.addEventListener("load",event => {//console.log(`${new URL(sprite.src).pathname.split("/").pop()} %cload?`,"color: green; font-size: 125%; font-weight: bold;");
       object[key].texture.image = sprite;
