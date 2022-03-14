@@ -56,7 +56,7 @@ button {
   text-shadow: 0.175ch 0.175ch 0 #000000;
   white-space: pre;
 }
-#hud > * {
+#hud > *:not(d-pad) {
   z-index: 1;
 }
 #version {
@@ -114,7 +114,7 @@ button {
     width: 32px;
   }
 }
-#dpad {
+d-pad {
   margin: 8px;
   position: absolute;
   left: var(--safe-area-inset-left);
@@ -126,12 +126,11 @@ button {
     ". down .";
   color: #000000;
   white-space: normal;
-  z-index: initial;
 }
-:root:not(.touch-device) #dpad {
+:root:not(.touch-device) d-pad {
   display: none;
 }
-#dpad button {
+d-pad button {
   width: 56px;
   height: 56px;
   display: flex;
@@ -143,50 +142,50 @@ button {
   z-index: 1;
   transition: opacity 250ms;
 }
-#dpad button::before {
+d-pad button::before {
   content: "";
   border: 10px solid transparent;
 }
-#dpad button[data-active] {
+d-pad button[data-active] {
   opacity: 0.6;
 }
-#dpad [data-left] {
+d-pad [data-left] {
   margin-right: -2px;
   grid-area: left;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
-#dpad [data-left]::before {
+d-pad [data-left]::before {
   border-left: none;
   border-right-color: currentColor;
 }
-#dpad [data-right] {
+d-pad [data-right] {
   margin-left: -2px;
   grid-area: right;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
-#dpad [data-right]::before {
+d-pad [data-right]::before {
   border-left-color: currentColor;
   border-right: none;
 }
-#dpad [data-up] {
+d-pad [data-up] {
   margin-bottom: -2px;
   grid-area: up;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
-#dpad [data-up]::before {
+d-pad [data-up]::before {
   border-top: none;
   border-bottom-color: currentColor;
 }
-#dpad [data-down] {
+d-pad [data-down] {
   margin-top: -2px;
   grid-area: down;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
-#dpad [data-down]::before {
+d-pad [data-down]::before {
   border-top-color: currentColor;
   border-bottom: none;
 }

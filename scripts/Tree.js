@@ -1,6 +1,6 @@
 import { ctx, offsetX, offsetY } from "./canvas.js";
 import { key } from "./input.js";
-import { terrain } from "./properties.js";
+import { missingTextureSprite, terrain } from "./properties.js";
 import { explored, player } from "./app.js";
 
 export default class Tree {
