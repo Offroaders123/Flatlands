@@ -3,7 +3,7 @@ const Flatlands = new class Flatlands {
   // constructor() {
   //   Object.defineProperty(Object.getPrototypeOf(this),Symbol.toStringTag,{ value: this.constructor.name });
   // }
-  version = 0.55;
+  version = 0.56;
   environment = {
     get touchDevice() {
       return ("ontouchstart" in window || navigator.maxTouchPoints > 0);
