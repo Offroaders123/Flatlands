@@ -1,27 +1,42 @@
-// This object helps to control the app and get information about the current state.
+// This object helps with app configuration, and to get information about the current state of the app.
 const Flatlands = new class Flatlands {
-  // constructor() {
-  //   Object.defineProperty(Object.getPrototypeOf(this),Symbol.toStringTag,{ value: this.constructor.name });
-  // }
   version = 0.56;
   environment = {
     get touchDevice() {
       return ("ontouchstart" in window || navigator.maxTouchPoints > 0);
     }
   }
+  appearance = {
+    get touch() {
+      return document.documentElement.classList.contains("touch");
+    },
+    set touch(value) {
+      if (typeof value !== "boolean") return;
+      if (this.touch === value) return;
+      const method = (value === true) ? "add" : "remove";
+      document.documentElement.classList[method]("touch");
+    }
+  }
   serviceWorker = {
     get supported() {
       return ("serviceWorker" in navigator);
     },
-    register() {
+    async register() {
       if (!this.supported) return false;
-      return navigator.serviceWorker.register("service-worker.js");
+      try {
+        return await navigator.serviceWorker.register("service-worker.js");
+      } catch (error) {
+        console.error(error);
+        return false;
+      }
     }
   }
 }
 
-// Object.freeze(Flatlands);
+// Set a custom string tag label for the Flatlands object
+Object.defineProperty(Object.getPrototypeOf(Flatlands),Symbol.toStringTag,{ value: Flatlands.constructor.name });
 
+// Expose the Flatlands object in the global window object, which helps with debugging
 window.Flatlands = Flatlands;
 
 export default Flatlands;

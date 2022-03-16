@@ -21,7 +21,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", system-ui, sans-serif;
+  font-family: ui-monospace, "Noto Sans Mono", "Cousine", monospace;
   image-rendering: pixelated;
   overflow: hidden;
   -webkit-user-select: none;
@@ -51,7 +51,6 @@ button {
   gap: 8px;
   color: #ffffff;
   font-size: 20px;
-  font-family: ui-monospace, "Noto Sans Mono", "Cousine", monospace;
   line-height: 1;
   text-shadow: 0.175ch 0.175ch 0 #000000;
   white-space: pre;
@@ -127,7 +126,7 @@ d-pad {
   color: #000000;
   white-space: normal;
 }
-:root:not(.touch-device) d-pad {
+:root:not(.touch) d-pad {
   display: none;
 }
 d-pad button {

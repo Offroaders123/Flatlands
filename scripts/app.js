@@ -1,11 +1,15 @@
-// ES Module imports
+// ES Module Imports
 import Flatlands from "./Flatlands.js";
 
 // Service Worker
-await Flatlands.serviceWorker.register();
+Flatlands.serviceWorker.register();
 
-// Touch Device
-if (Flatlands.environment.touchDevice) document.documentElement.classList.add("touch-device");
+// Touch Handling
+
+/* This is to allow for :active styling on iOS Safari */
+document.body.setAttribute("ontouchstart","");
+
+if (Flatlands.environment.touchDevice) Flatlands.appearance.touch = true;
 
 // Canvas
 import { canvas, ctx, scaling, offsetX, offsetY } from "./canvas.js";
