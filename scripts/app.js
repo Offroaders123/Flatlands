@@ -15,7 +15,7 @@ new ResizeObserver(() => {
   canvas.width = width / scaling;
   canvas.height = height / scaling;
   ctx.imageSmoothingEnabled = false;
-  animate({ recursive: false });
+  draw();
 }).observe(canvas);
 
 let tick = 0;
@@ -89,20 +89,45 @@ function handleTrees(){
 
 //for (let i = 0; i < 4; i++) treesArray.push(new Tree());
 
-// Rendering
-function animate({ recursive = true } = {}){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle = (grassPattern) ? grassPattern : "#779c43";
-  ctx.beginPath();
-  ctx.rect(0,0,canvas.width,canvas.height);
-  if (grassPattern) ctx.setTransform(1,0,0,1,offsetX() + player.x,offsetY() + player.y);
-  ctx.fill();
-  ctx.setTransform(1,0,0,1,0,0);
-  handleTrees();
+// Update Game State
+function update(){
   player.update();
-  player.draw();
   coordinates.update();
   tick++;
-  if (recursive) window.requestAnimationFrame(animate);
 }
-animate();
+
+// Draw Game State to the renderer
+function draw(){
+  const { width, height } = canvas;
+
+  // Reset for next frame
+  ctx.clearRect(0,0,width,height);
+
+  // Draw Grass
+  ctx.fillStyle = (grassPattern) ? grassPattern : "#779c43";
+  ctx.beginPath();
+  ctx.rect(0,0,width,height);
+  if (grassPattern) ctx.setTransform(1,0,0,1,offsetX() + player.x,offsetY() + player.y);
+  ctx.fill();
+
+  // Draw Trees
+  ctx.setTransform(1,0,0,1,0,0);
+  handleTrees();
+
+  // Draw Player
+  player.draw();
+}
+
+// Game Loop
+window.requestAnimationFrame(loop);
+
+function loop(){
+  // Update Game State
+  update();
+
+  // Draw game state to the renderer
+  draw();
+
+  // Request next render frame
+  window.requestAnimationFrame(loop);
+}
