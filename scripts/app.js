@@ -119,14 +119,28 @@ function draw(){
 }
 
 // Game Loop
+let delta = 0;
+let lastRenderTime = 0;
+
+/* Eventually it would be key to make this align with the user's display refresh rate, rather than default to 60hz */
+const timestep = 1000 / 60;
+
 window.requestAnimationFrame(loop);
 
-function loop(){
+function loop(time){
+  // Calculate the amount of time that hasn't been simulated since the last tick
+  delta += time - lastRenderTime;
+  lastRenderTime = time;
+
   // Update Game State
-  update();
+  while (delta >= timestep){
+    update();
+    delta -= timestep;
+  }
 
   // Draw game state to the renderer
   draw();
+  lastRenderTime = time;
 
   // Request next render frame
   window.requestAnimationFrame(loop);
