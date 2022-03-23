@@ -58,7 +58,35 @@ button {
 #hud > *:not(d-pad) {
   z-index: 1;
 }
-#version {
+#debug_toggle {
+  margin: 8px;
+  position: absolute;
+  width: unset;
+  height: unset;
+  right: var(--safe-area-inset-right);
+  top: var(--safe-area-inset-top);
+  color: inherit;
+  font: inherit;
+  font-size: 1.2em;
+  text-shadow: inherit;
+  border-radius: 0;
+  appearance: none;
+}
+:root:not(.touch) #debug_toggle {
+  display: none;
+}
+#debug_toggle::before {
+  content: "⚙";
+  width: 1em;
+  height: 1em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#debug {
+  font-size: 0.8em;
+}
+#debug_toggle:not(:checked) + #debug {
   display: none;
 }
 #hotbar {

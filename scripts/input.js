@@ -21,6 +21,10 @@ document.addEventListener("keydown",event => {
   if (event.repeat || document.activeElement != document.body) return;
   document.documentElement.classList.remove("touch-device");
   if (event.ctrlKey || event.metaKey || event.altKey) return;
+  if (event.shiftKey && event.code === "KeyD"){
+    event.preventDefault();
+    debug_toggle.click();
+  }
   if (event.shiftKey && event.code === "KeyF"){
     event.preventDefault();
     if (document.webkitFullscreenEnabled && !document.fullscreenEnabled) (!document.webkitFullscreenElement) ? document.documentElement.webkitRequestFullscreen() : document.webkitExitFullscreen();

@@ -1,6 +1,6 @@
 // This object helps with app configuration, and to get information about the current state of the app.
 const Flatlands = new class Flatlands {
-  version = 0.61;
+  version = 0.62;
   environment = {
     get touchDevice() {
       return ("ontouchstart" in window || navigator.maxTouchPoints > 0);
@@ -30,6 +30,10 @@ const Flatlands = new class Flatlands {
         return false;
       }
     }
+  }
+  debug = {
+    frames: 0,
+    droppedFrames: 0
   }
 }
 

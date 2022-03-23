@@ -27,9 +27,18 @@ let tick = 0;
 // HUD
 const hud = document.querySelector("#hud");
 
-// Version
-const version = document.querySelector("#version");
-version.textContent = `Flatlands v${Flatlands.version}`;
+// Debug
+const debug_toggle = document.querySelector("#debug_toggle");
+const debug = document.querySelector("#debug");
+debug.update = () => debug.textContent =
+`Flatlands v${Flatlands.version}
+Time Origin: ${timeOrigin}
+Current Time: ${new Date().toLocaleTimeString()}
+Game Time: ${Math.floor((Date.now() - timeOrigin) / 1000)}s
+Ticks: ${tick}
+Frames: ${Flatlands.debug.frames}
+Dropped Frames: ${Flatlands.debug.droppedFrames}
+Frame Delta: ${Math.floor(delta).toString().padStart(2,"0")}`;
 
 // Coordinates
 const coordinates = document.querySelector("#coordinates");
@@ -96,7 +105,6 @@ function handleTrees(){
 // Update Game State
 function update(){
   player.update();
-  coordinates.update();
   tick++;
 }
 
@@ -120,31 +128,40 @@ function draw(){
 
   // Draw Player
   player.draw();
+
+  // Set HUD Content
+  if (debug_toggle.checked && !debug.matches(":hover")) debug.update();
+  coordinates.update();
 }
 
 // Game Loop
+/* Rounding the time origin because some browsers do that by default, and some don't. Thought it would make sense to ensure it is consistently an integer */
+const timeOrigin = Math.round(performance.timeOrigin);
 let delta = 0;
-let lastRenderTime = 0;
+let lastFrameTime = 0;
 
 /* Eventually it would be key to make this align with the user's display refresh rate, rather than default to 60hz */
 const timestep = 1000 / 60;
 
 window.requestAnimationFrame(loop);
 
-function loop(time){
+function loop(){
   // Calculate the amount of time that hasn't been simulated since the last tick
-  delta += time - lastRenderTime;
-  lastRenderTime = time;
+  const time = Date.now() - timeOrigin;
+  delta += time - lastFrameTime;
+  lastFrameTime = time;
 
   // Update Game State
   while (delta >= timestep){
     update();
     delta -= timestep;
+    if (delta > timestep) Flatlands.debug.droppedFrames++;
   }
 
   // Draw game state to the renderer
   draw();
-  lastRenderTime = time;
+  lastFrameTime = time;
+  Flatlands.debug.frames++;
 
   // Request next render frame
   window.requestAnimationFrame(loop);
