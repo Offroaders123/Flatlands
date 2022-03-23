@@ -1,3 +1,5 @@
+import Flatlands from "./Flatlands.js";
+
 const key = {
   left: false,
   right: false,
@@ -19,7 +21,7 @@ window.addEventListener("gamepaddisconnected",event => {
 
 document.addEventListener("keydown",event => {
   if (event.repeat || document.activeElement != document.body) return;
-  document.documentElement.classList.remove("touch-device");
+  Flatlands.appearance.touch = false;
   if (event.ctrlKey || event.metaKey || event.altKey) return;
   if (event.shiftKey && event.code === "KeyD"){
     event.preventDefault();
@@ -59,7 +61,7 @@ document.addEventListener("keyup",event => {
   if (["ArrowUp","KeyW"].includes(event.code)) key.up = false;
   if (["ArrowDown","KeyS"].includes(event.code)) key.down = false;
 });
-document.addEventListener("touchstart",() => document.documentElement.classList.add("touch-device"));
+document.addEventListener("touchstart",() => Flatlands.appearance.touch = true);
 document.addEventListener("contextmenu",event => event.preventDefault());
 
 export { key, gamepads };

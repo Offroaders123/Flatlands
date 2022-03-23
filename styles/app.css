@@ -117,7 +117,7 @@ button {
   background: center no-repeat;
   background-size: contain;
 }
-@media (max-width: 894px) {
+@media (max-width: 894px), (max-height: 255px) {
   #hotbar {
     padding: 3px;
   }
@@ -129,7 +129,7 @@ button {
     width: 48px;
   }
 }
-@media (max-width: 389px) {
+@media (max-width: 749px), (max-height: 223px) {
   #hotbar {
     padding: 2px;
   }
