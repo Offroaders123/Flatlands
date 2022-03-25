@@ -8,12 +8,6 @@ class ItemSlotElement extends HTMLElement {
     this.defined = true;
     this.appendChild(document.createElement("item-render"));
   }
-  static get observedAttributes() {
-    return ["value","sprite"];
-  }
-  attributeChangedCallback(attribute,current,replacement) {
-    if (current !== replacement) this[attribute] = replacement;
-  }
   get value() {
     return this.getAttribute("value") || null;
   }
@@ -23,9 +17,10 @@ class ItemSlotElement extends HTMLElement {
   get sprite() {
     return this.getAttribute("sprite") || null;
   }
-  set sprite(source) {
+  set sprite([source,frames]) {
     if (this.sprite === source) return;
     this.setAttribute("sprite",source);
+    if (frames) this.setAttribute("frames",frames);
     this.querySelector("item-render").style.setProperty("background-image",`url("${source}")`);
   }
   activate() {
