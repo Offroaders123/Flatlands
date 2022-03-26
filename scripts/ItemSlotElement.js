@@ -17,10 +17,15 @@ class ItemSlotElement extends HTMLElement {
   get sprite() {
     return this.getAttribute("sprite") || null;
   }
-  set sprite([source,frames]) {
+  set sprite({ source, width, height, frames } = texture) {
     if (this.sprite === source) return;
     this.setAttribute("sprite",source);
-    if (frames) this.setAttribute("frames",frames);
+    if (frames){
+      this.setAttribute("animate","");
+      this.style.setProperty("--width",`${width}px`);
+      this.style.setProperty("--height",`${height}px`);
+      this.style.setProperty("--frames",frames);
+    }
     this.querySelector("item-render").style.setProperty("background-image",`url("${source}")`);
   }
   activate() {

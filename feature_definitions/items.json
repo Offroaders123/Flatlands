@@ -2,8 +2,10 @@
   "fire": {
     "name": "Fire",
     "texture": {
-      "source": "textures/items/fire.png",
-      "frames": 4
+      "width": 16,
+      "height": 16,
+      "frames": 4,
+      "source": "textures/items/fire.png"
     }
   },
   "hatchet": {

@@ -1,3 +1,4 @@
+import { tick } from "./app.js";
 import { ctx, offsetX, offsetY } from "./canvas.js";
 import { key, gamepads } from "./input.js";
 import { missingTextureSprite, entities, items } from "./properties.js";
@@ -31,10 +32,44 @@ export default class Player {
       if (left1 && !right1 && tick % 10 == 0) hotbar.setSlot((active - 1 > 0) ? active - 1 : 6);
       if (right1 && !left1 && tick % 10 == 0) hotbar.setSlot((active + 1 < 7) ? active + 1 : 1);
     }
+
+
+    // Experimental diagonal player movement
+    const { left, right, up, down } = key;
+    const diagonal = Math.round(Math.sin(this.speed));
+    const cardinal = this.speed;
+
+    /* Diagonals */
+    if (left && up && !down){
+      this.x += diagonal;
+      this.y += diagonal;
+    }
+    if (left && down && !up){
+      this.x += diagonal;
+      this.y -= diagonal;
+    }
+    if (right && up && !down){
+      this.x -= diagonal;
+      this.y += diagonal;
+    }
+    if (right && down && !up){
+      this.x -= diagonal;
+      this.y -= diagonal;
+    }
+
+    /* Cardinals */
+    if (left && !right && !up && !down) this.x += cardinal;
+    if (right && !left && !up && !down) this.x -= cardinal;
+    if (up && !down && !left && !right) this.y += cardinal;
+    if (down && !up && !left && !right) this.y -= cardinal;
+
+    /*
     if (key.left && !key.right) this.x += this.speed * (-axisX || 1);
     if (key.right && !key.left) this.x -= this.speed * (axisX || 1);
     if (key.up && !key.down) this.y += this.speed * (-axisY || 1);
     if (key.down && !key.up) this.y -= this.speed * (axisY || 1);
+    */
+
 
     if (key.left && !key.right) this.directionX = "left";
     if (key.right && !key.left) this.directionX = "right";
@@ -59,7 +94,7 @@ export default class Player {
     }
   }
   draw(){
-    let heldItemImage = (this.held_item !== null) ? (items && items[this.held_item].texture.image) ? items[this.held_item].texture.image : undefined : null;
+    let heldItemTexture = (this.held_item !== null && items) ? items[this.held_item].texture : null;
     let scale = 1, offset = 1, itemScale = 1;
 
     if (this.directionX == "left" && this.directionY != "up"){
@@ -80,27 +115,40 @@ export default class Player {
     if (entities && entities["shadow"].texture.image) ctx.drawImage(entities["shadow"].texture.image,0,0,this.width - 2,4);
     if (this.directionY == "down"){
       this.drawCharacter(scale,offset);
-      this.drawItem(heldItemImage,scale,itemScale);
+      this.drawItem(heldItemTexture,scale,itemScale);
     } else {
-      this.drawItem(heldItemImage,scale,itemScale);
+      this.drawItem(heldItemTexture,scale,itemScale);
       this.drawCharacter(scale,offset);
     }
 
     ctx.setTransform(1,0,0,1,0,0);
   }
-  drawItem(itemSprite,scale,itemScale){
-    if (itemSprite === null) return;
+  drawItem(heldItemTexture,scale,itemScale){
+    if (heldItemTexture === null) return;
+    let { image: itemSprite } = heldItemTexture;
     if (!itemSprite) itemSprite = missingTextureSprite;
     const cachedSprite = (itemSprite !== missingTextureSprite);
+
+    const { frames } = heldItemTexture;
+    let { naturalWidth, naturalHeight } = itemSprite;
+    if (frames && cachedSprite){
+      const { width, height } = heldItemTexture;
+      naturalWidth = width;
+      naturalHeight = height;
+    }
+
     ctx.setTransform(scale,0,0,1,offsetX(),offsetY());
     ctx.transform(1,0,0,1,this.width / -2 + 1,this.height / -2);
-    ctx.transform(1,0,0,1,((cachedSprite) ? itemSprite.naturalWidth : 16) * 0.625,((cachedSprite) ? itemSprite.naturalHeight : 16) * 0.3125);
+    ctx.transform(1,0,0,1,((cachedSprite) ? naturalWidth : 16) * 0.625,((cachedSprite) ? naturalHeight : 16) * 0.3125);
     ctx.scale(-1 * itemScale,1);
-    ctx.transform(1,0,0,1,-((cachedSprite) ? itemSprite.naturalWidth : 16),((cachedSprite) ? itemSprite.naturalHeight : 16));
+    ctx.transform(1,0,0,1,-((cachedSprite) ? naturalWidth : 16),((cachedSprite) ? naturalHeight : 16));
     ctx.rotate(Math.PI * -1 / 2);
     //ctx.fillStyle = "#00ff0030";
-    //ctx.fillRect((this.directionY) ? (this.directionY == "up") ? -2 : -1 : 0,1,itemSprite.naturalWidth,itemSprite.naturalHeight);
-    ctx.drawImage(itemSprite,(this.directionY) ? (this.directionY == "up") ? -2 : -1 : 0,1,(cachedSprite) ? itemSprite.naturalWidth : 16,(cachedSprite) ? itemSprite.naturalHeight : 16);
+    //ctx.fillRect((this.directionY) ? (this.directionY == "up") ? -2 : -1 : 0,1,naturalWidth,naturalHeight);
+
+    const sy = 0;/* This is where the item keyframe eventually will be calculated */
+
+    ctx.drawImage(itemSprite,0,sy,naturalWidth,naturalHeight,(this.directionY) ? (this.directionY == "up") ? -2 : -1 : 0,1,(cachedSprite) ? naturalWidth : 16,(cachedSprite) ? naturalHeight : 16);
   }
   drawCharacter(scale,offset){/* Mob idea name: ooogr */
     const cachedSprite = (entities && entities["player"].texture.image);

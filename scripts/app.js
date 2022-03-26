@@ -24,6 +24,8 @@ new ResizeObserver(() => {
 
 let tick = 0;
 
+export { tick };
+
 // HUD
 const hud = document.querySelector("#hud");
 
