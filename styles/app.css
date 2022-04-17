@@ -104,14 +104,14 @@ button {
   padding: 12px;
   position: relative;
   display: flex;
-  background: url("../textures/interfaces/slot.png") no-repeat 50%;
+  background: url("../textures/interface/slot.png") no-repeat 50%;
   background-size: calc(100% - 8px);
 }
 #hotbar item-slot[active]::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: url("../textures/interfaces/slot_active.png") no-repeat;
+  background: url("../textures/interface/slot_active.png") no-repeat;
   background-size: cover;
 }
 #hotbar item-render {

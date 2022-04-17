@@ -5,37 +5,37 @@
       "width": 16,
       "height": 16,
       "frames": 4,
-      "source": "textures/items/fire.png"
+      "source": "textures/item/fire.png"
     }
   },
   "hatchet": {
     "name": "Hatchet",
     "texture": {
-      "source": "textures/items/hatchet.png"
+      "source": "textures/item/hatchet.png"
     }
   },
   "pickmatic": {
     "name": "Pickmatic",
     "texture": {
-      "source": "textures/items/pickmatic.png"
+      "source": "textures/item/pickmatic.png"
     }
   },
   "pizza": {
     "name": "Pizza",
     "texture": {
-      "source": "textures/items/pizza.png"
+      "source": "textures/item/pizza.png"
     }
   },
   "spade": {
     "name": "Spade",
     "texture": {
-      "source": "textures/items/spade.png"
+      "source": "textures/item/spade.png"
     }
   },
   "spearsword": {
     "name": "Spearsword",
     "texture": {
-      "source": "textures/items/spearsword.png"
+      "source": "textures/item/spearsword.png"
     }
   }
 }

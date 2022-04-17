@@ -12,7 +12,7 @@
     },
     "held_item": "hatchet",
     "texture": {
-      "source": "textures/entities/player_guy.png"
+      "source": "textures/entity/player/guy.png"
     },
     "animations": {
       "tick": 0,
@@ -25,7 +25,7 @@
   },
   "shadow": {
     "texture": {
-      "source": "textures/entities/shadow.png"
+      "source": "textures/entity/shadow.png"
     }
   }
 }

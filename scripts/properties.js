@@ -6,11 +6,11 @@ let entities, items, terrain, grassPattern;
 
 (async () => {
 
-let entitiesFile = await fetch("feature_definitions/entities.json");
+let entitiesFile = await fetch("features/entity.json");
 entities = await entitiesFile.json();
-let itemsFile = await fetch("feature_definitions/items.json");
+let itemsFile = await fetch("features/item.json");
 items = await itemsFile.json();
-let terrainFile = await fetch("feature_definitions/terrain.json");
+let terrainFile = await fetch("features/terrain.json");
 terrain = await terrainFile.json();
 
 for (let entity in entities) await loadSprite(entity,entities);
