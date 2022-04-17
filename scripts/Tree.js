@@ -1,10 +1,12 @@
+import Entity from "./Entity.js";
 import { ctx, offsetX, offsetY } from "./canvas.js";
 import { key } from "./input.js";
 import { missingTextureSprite, terrain } from "./properties.js";
-import { explored, player } from "./app.js";
+import { debug_toggle, explored, player } from "./app.js";
 
-export default class Tree {
-  constructor(){
+export default class Tree extends Entity {
+  constructor() {
+    super();
     this.x = Math.floor(Math.random() * canvas.width) - Math.floor(canvas.width / 2) - player.x - 96 / 2;
     //this.y = Math.floor(Math.random() * canvas.height) - canvas.height / 2 - player.y - 192 / 2;
     if (key.up && !key.down){
@@ -18,7 +20,11 @@ export default class Tree {
     this.width = 96;
     this.height = 192;
   }
-  draw(){
+  draw() {
+    if (this.overlapRender && debug_toggle.checked){
+      ctx.fillStyle = "#f00";
+      ctx.fillRect(this.x + player.x + offsetX(),this.y + player.y + offsetY(),this.width,this.height);
+    }
     ctx.drawImage((terrain && terrain["tree"].texture.image) ? terrain["tree"].texture.image : missingTextureSprite,this.x + player.x + offsetX(),this.y + player.y + offsetY(),this.width,this.height);
   }
 }

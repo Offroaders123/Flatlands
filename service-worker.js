@@ -1,5 +1,5 @@
 self.Flatlands = {
-  version: `Flatlands v${0.66}`,
+  version: `Flatlands v${0.67}`,
   cache: true
 }
 self.addEventListener("activate",event => {

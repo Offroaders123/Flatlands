@@ -1,10 +1,12 @@
-import { tick } from "./app.js";
+import Entity from "./Entity.js";
+import { tick, treesArray } from "./app.js";
 import { ctx, offsetX, offsetY } from "./canvas.js";
 import { key, gamepads } from "./input.js";
 import { missingTextureSprite, entities, items } from "./properties.js";
 
-export default class Player {
-  constructor(){
+export default class Player extends Entity {
+  constructor() {
+    super();
     this.x = 0;
     this.y = 0;
     this.width = 16;
@@ -20,7 +22,20 @@ export default class Player {
     this.directionY = false;
     this.held_item = "hatchet";
   }
-  update(){
+  getEntityOverlap() {
+    const rect1 = this.getBoundingClientRect();
+    treesArray.forEach(tree => {
+      const rect2 = tree.getBoundingClientRect();
+      const overlap =
+        (-rect1.top <= rect2.bottom &&
+         -rect1.bottom >= rect2.top &&
+         -rect1.left <= rect2.right &&
+         -rect1.right >= rect2.left);
+      tree.overlapRender = overlap;
+    });
+  }
+  update() {
+    this.getEntityOverlap();
     const gamepad = navigator.getGamepads()[gamepads[0]];
     let [axisX,axisY] = (gamepad) ? gamepad.axes : [null,null,null,null], [left1,right1] = (gamepad) ? [gamepad.buttons[4].value,gamepad.buttons[5].value] : [null,null];
     if (gamepad){
@@ -33,43 +48,14 @@ export default class Player {
       if (right1 && !left1 && tick % 10 == 0) hotbar.setSlot((active + 1 < 7) ? active + 1 : 1);
     }
 
-
-    // Experimental diagonal player movement
     const { left, right, up, down } = key;
-    const diagonal = Math.round(Math.sin(this.speed));
     const cardinal = this.speed;
 
-    /* Diagonals */
-    if (left && up && !down){
-      this.x += diagonal;
-      this.y += diagonal;
-    }
-    if (left && down && !up){
-      this.x += diagonal;
-      this.y -= diagonal;
-    }
-    if (right && up && !down){
-      this.x -= diagonal;
-      this.y += diagonal;
-    }
-    if (right && down && !up){
-      this.x -= diagonal;
-      this.y -= diagonal;
-    }
-
     /* Cardinals */
-    if (left && !right && !up && !down) this.x += cardinal;
-    if (right && !left && !up && !down) this.x -= cardinal;
-    if (up && !down && !left && !right) this.y += cardinal;
-    if (down && !up && !left && !right) this.y -= cardinal;
-
-    /*
-    if (key.left && !key.right) this.x += this.speed * (-axisX || 1);
-    if (key.right && !key.left) this.x -= this.speed * (axisX || 1);
-    if (key.up && !key.down) this.y += this.speed * (-axisY || 1);
-    if (key.down && !key.up) this.y -= this.speed * (axisY || 1);
-    */
-
+    if (left && !right) this.x += cardinal * (-axisX || 1);
+    if (right && !left) this.x -= cardinal * (axisX || 1);
+    if (up && !down) this.y += cardinal * (-axisY || 1);
+    if (down && !up) this.y -= cardinal * (axisY || 1);
 
     if (key.left && !key.right) this.directionX = "left";
     if (key.right && !key.left) this.directionX = "right";
@@ -93,7 +79,7 @@ export default class Player {
       (this.frame < this.frames - 1) ? this.frame++ : this.frame = 0;
     }
   }
-  draw(){
+  draw() {
     let heldItemTexture = (this.held_item !== null && items) ? items[this.held_item].texture : null;
     let scale = 1, offset = 1, itemScale = 1;
 
@@ -123,7 +109,7 @@ export default class Player {
 
     ctx.setTransform(1,0,0,1,0,0);
   }
-  drawItem(heldItemTexture,scale,itemScale){
+  drawItem(heldItemTexture,scale,itemScale) {
     if (heldItemTexture === null) return;
     let { image: itemSprite } = heldItemTexture;
     if (!itemSprite) itemSprite = missingTextureSprite;
@@ -150,7 +136,7 @@ export default class Player {
 
     ctx.drawImage(itemSprite,0,sy,naturalWidth,naturalHeight,(this.directionY) ? (this.directionY == "up") ? -2 : -1 : 0,1,(cachedSprite) ? naturalWidth : 16,(cachedSprite) ? naturalHeight : 16);
   }
-  drawCharacter(scale,offset){/* Mob idea name: ooogr */
+  drawCharacter(scale,offset) {/* Mob idea name: ooogr */
     const cachedSprite = (entities && entities["player"].texture.image);
     let charSprite = (cachedSprite) ? entities["player"].texture.image : missingTextureSprite;
     ctx.setTransform((this.directionX == "left" && !this.directionY) ? -1 : 1,0,0,1,offsetX(),offsetY());

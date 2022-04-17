@@ -31,6 +31,7 @@ const hud = document.querySelector("#hud");
 
 // Debug
 const debug_toggle = document.querySelector("#debug_toggle");
+export { debug_toggle };
 const debug = document.querySelector("#debug");
 debug.update = () => debug.textContent =
 `Flatlands v${Flatlands.version}
@@ -87,6 +88,7 @@ export { player };
 
 // Trees
 const treesArray = [];
+export { treesArray };
 
 import Tree from "./Tree.js";
 
