@@ -1,0 +1,8 @@
+{
+  "spade": {
+    "name": "Spade",
+    "texture": {
+      "src": "textures/item/spade.png"
+    }
+  }
+}

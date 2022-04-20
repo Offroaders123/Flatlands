@@ -1,0 +1,8 @@
+{
+  "hatchet": {
+    "name": "Hatchet",
+    "texture": {
+      "src": "textures/item/hatchet.png"
+    }
+  }
+}

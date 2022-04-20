@@ -1,0 +1,12 @@
+{
+  "tree": {
+    "name": "Tree",
+    "box": {
+      "width": 96,
+      "height": 192
+    },
+    "texture": {
+      "src": "textures/terrain/tree.png"
+    }
+  }
+}

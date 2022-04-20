@@ -1,0 +1,8 @@
+{
+  "pickmatic": {
+    "name": "Pickmatic",
+    "texture": {
+      "src": "textures/item/pickmatic.png"
+    }
+  }
+}

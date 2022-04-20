@@ -1,0 +1,31 @@
+{
+  "player": {
+    "name": "Player",
+    "box": {
+      "x": 0,
+      "y": 0,
+      "width": 16,
+      "height": 32
+    },
+    "texture": {
+      "src": "textures/entity/player/guy.png",
+      "animation": {
+        "type": "reactive",
+        "duration": 24,
+        "keyframes": 2,
+        "columns": 4
+      },
+      "direction": {
+        "horizontal": 1,
+        "vertical": false
+      }
+    },
+    "data": {
+      "speed": 2,
+      "hotbar": {
+        "slots": ["spearsword","pickmatic","hatchet","spade","fire","pizza"],
+        "active": 2
+      }
+    }
+  }
+}

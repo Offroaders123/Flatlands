@@ -1,0 +1,13 @@
+{
+  "fire": {
+    "name": "Fire",
+    "texture": {
+      "src": "textures/item/fire.png",
+      "animation": {
+        "type": "repeat",
+        "duration": "750ms",
+        "keyframes": 4
+      }
+    }
+  }
+}
