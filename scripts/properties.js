@@ -25,8 +25,8 @@ const { entity, item, terrain } = definitions;
 function loadSprite(source){
   return new Promise(resolve => {
     const sprite = new Image();
-    sprite.addEventListener("load",event => resolve(sprite));
-    sprite.addEventListener("error",event => resolve(null));
+    sprite.addEventListener("load",() => resolve(sprite));
+    sprite.addEventListener("error",() => resolve(null));
     sprite.src = source;
   });
 }

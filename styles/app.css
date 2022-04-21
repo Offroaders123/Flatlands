@@ -121,7 +121,7 @@ button {
   background-size: contain;
 }
 #hotbar item-slot[animate] item-render {
-  background-size: calc(var(--width) * var(--hotbar-scale)) calc(var(--height) * var(--frames) * var(--hotbar-scale));
+  background-size: calc(var(--width) * var(--hotbar-scale)) calc(var(--height) * var(--keyframes) * var(--hotbar-scale));
   animation: animated-item-render 750ms step-end infinite;
 }
 @keyframes animated-item-render {

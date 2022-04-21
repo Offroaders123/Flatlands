@@ -53,17 +53,14 @@ const hotbar = document.querySelector("#hotbar");
 // Define hotbar getters, methods, and event listeners
 Object.defineProperty(Object.getPrototypeOf(hotbar),"slots",{ get: () => [...hotbar.querySelectorAll("item-slot")] });
 Object.getPrototypeOf(hotbar).setSlot = index => {
-  const slot = hotbar.slots[index - 1];
+  const slot = hotbar.slots[index];
   slot.activate();
-  player.held_item = slot.value;//console.log(`Player held item: ${player.held_item}`);
+  player.hotbar.active = index;
 };
 hotbar.addEventListener("touchstart",event => {
   event.preventDefault();
   if (event.target.closest("item-slot")) hotbar.setSlot(event.target.closest("item-slot").getAttribute("index"));
 },{ passive: false });
-
-// Loop over all of the hotbar slots and render their sprites
-hotbar.slots.filter(slot => slot.value).forEach(slot => slot.render());
 
 import "./ItemSlotElement.js";
 
@@ -89,6 +86,11 @@ export { explored };
 // Player
 import Player from "./Player.js";
 const player = new Player();
+
+// Loop over each hotbar slot and update it's state to match the player's state
+hotbar.slots.forEach((slot,i) => slot.value = player.hotbar.slots[i]);
+hotbar.slots[player.hotbar.active].activate();
+
 export { player };
 
 // Trees

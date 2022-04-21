@@ -7,20 +7,18 @@ import { entity, item } from "./properties.js";
 export default class Player extends Entity {
   constructor() {
     super();
-    this.x = 0;
-    this.y = 0;
-    this.width = 16;
-    this.height = 32;
-    this.speed = 2;
-    this.tick = 0;
-    this.ticks = 24;
-    this.frame = 0;
-    this.frames = 2;
-    this.column = 0;
-    this.columns = 4;
-    this.directionX = "right";
-    this.directionY = false;
-    this.held_item = "hatchet";
+
+    // Inherit all properties defined inside of the Player JSON file
+    for (const property in entity.player){
+      this[property] = entity.player[property];
+    }
+
+    // Define properties only used internally by the game that don't need to be in the source file
+    this.animation.tick = 0;
+    this.animation.frame = 0;
+    this.animation.column = 0;
+
+    Object.defineProperty(this.hotbar,"held_item",{ get: () => this.hotbar.slots[this.hotbar.active] });
   }
   getEntityOverlap() {
     const rect1 = this.getBoundingClientRect();
@@ -57,49 +55,49 @@ export default class Player extends Entity {
     if (up && !down) this.y += cardinal * (-axisY || 1);
     if (down && !up) this.y -= cardinal * (axisY || 1);
 
-    if (key.left && !key.right) this.directionX = "left";
-    if (key.right && !key.left) this.directionX = "right";
+    if (key.left && !key.right) this.direction.horizontal = "left";
+    if (key.right && !key.left) this.direction.horizontal = "right";
 
-    if (key.down && !key.up && !key.left && !key.right) this.directionY = "down";
-    if (key.up && !key.down && !key.left && !key.right) this.directionY = "up";
-    if (!key.up && !key.down || key.left || key.right) this.directionY = false;
+    if (key.down && !key.up && !key.left && !key.right) this.direction.vertical = "down";
+    if (key.up && !key.down && !key.left && !key.right) this.direction.vertical = "up";
+    if (!key.up && !key.down || key.left || key.right) this.direction.vertical = false;
 
-    if (this.directionY == "down") this.column = 2;
-    if (this.directionY == "up") this.column = 3;
-    if (!this.directionY) this.column = 1;
+    if (this.direction.vertical == "down") this.animation.column = 2;
+    if (this.direction.vertical == "up") this.animation.column = 3;
+    if (!this.direction.vertical) this.animation.column = 1;
 
     if ((key.left && !key.right) || (key.right && !key.left) || (key.up && !key.down) || (key.down && !key.up)){
-      this.tick++;
+      this.animation.tick++;
     } else {
-      this.column = 0;
-      this.directionY = false;
+      this.animation.column = 0;
+      this.direction.vertical = false;
     }
-    if (this.tick > this.ticks - 1){
-      this.tick = 0;
-      (this.frame < this.frames - 1) ? this.frame++ : this.frame = 0;
+    if (this.animation.tick > this.animation.duration - 1){
+      this.animation.tick = 0;
+      (this.animation.frame < this.animation.keyframes - 1) ? this.animation.frame++ : this.animation.frame = 0;
     }
   }
   draw() {
-    let heldItemTexture = (this.held_item !== null && item) ? item[this.held_item].texture : null;
+    let heldItemTexture = (this.hotbar.held_item !== null && item) ? item[this.hotbar.held_item].texture : null;
     let scale = 1, offset = 1, itemScale = 1;
 
-    if (this.directionX == "left" && this.directionY != "up"){
+    if (this.direction.horizontal == "left" && this.direction.vertical != "up"){
       scale = -1;
     }
-    if (this.directionX == "right" && this.directionY == "up"){
+    if (this.direction.horizontal == "right" && this.direction.vertical == "up"){
       scale = -1;
     }
-    if (this.directionX == "right" && this.directionY){
+    if (this.direction.horizontal == "right" && this.direction.vertical){
       offset = 0;
     }
-    if (this.directionY){
+    if (this.direction.vertical){
       itemScale = 2/3;
     }
 
     ctx.setTransform(scale,0,0,1,offsetX(),offsetY());
     ctx.transform(1,0,0,1,-7,14);
-    if (entity && entity.shadow.texture.image) ctx.drawImage(entity.shadow.texture.image,0,0,this.width - 2,4);
-    if (this.directionY == "down"){
+    if (entity && entity.shadow.texture.image) ctx.drawImage(entity.shadow.texture.image,0,0,this.box.width - 2,4);
+    if (this.direction.vertical == "down"){
       this.drawCharacter(scale,offset);
       this.drawItem(heldItemTexture,scale,itemScale);
     } else {
@@ -122,22 +120,22 @@ export default class Player extends Entity {
     }
 
     ctx.setTransform(scale,0,0,1,offsetX(),offsetY());
-    ctx.transform(1,0,0,1,this.width / -2 + 1,this.height / -2);
+    ctx.transform(1,0,0,1,this.box.width / -2 + 1,this.box.height / -2);
     ctx.transform(1,0,0,1,naturalWidth * 0.625,naturalHeight * 0.3125);
     ctx.scale(-1 * itemScale,1);
     ctx.transform(1,0,0,1,-naturalWidth,naturalHeight);
     ctx.rotate(Math.PI * -1 / 2);
     //ctx.fillStyle = "#00ff0030";
-    //ctx.fillRect((this.directionY) ? (this.directionY == "up") ? -2 : -1 : 0,1,naturalWidth,naturalHeight);
+    //ctx.fillRect((this.direction.vertical) ? (this.direction.vertical == "up") ? -2 : -1 : 0,1,naturalWidth,naturalHeight);
 
     const sy = 0;/* This is where the item keyframe eventually will be calculated */
 
-    ctx.drawImage(itemSprite,0,sy,naturalWidth,naturalHeight,(this.directionY) ? (this.directionY == "up") ? -2 : -1 : 0,1,naturalWidth,naturalHeight);
+    ctx.drawImage(itemSprite,0,sy,naturalWidth,naturalHeight,(this.direction.vertical) ? (this.direction.vertical == "up") ? -2 : -1 : 0,1,naturalWidth,naturalHeight);
   }
   drawCharacter(scale,offset) {/* Mob idea name: ooogr */
     let charSprite = entity.player.texture.image;
-    ctx.setTransform((this.directionX == "left" && !this.directionY) ? -1 : 1,0,0,1,offsetX(),offsetY());
-    ctx.transform(1,0,0,1,this.width / -2 + offset,this.height / -2);
-    ctx.drawImage(charSprite,this.width * ((this.column != 0) ? this.frame : 0),this.height * this.column,this.width,this.height,0,0,this.width,this.height);
+    ctx.setTransform((this.direction.horizontal == "left" && !this.direction.vertical) ? -1 : 1,0,0,1,offsetX(),offsetY());
+    ctx.transform(1,0,0,1,this.box.width / -2 + offset,this.box.height / -2);
+    ctx.drawImage(charSprite,this.box.width * ((this.animation.column != 0) ? this.animation.frame : 0),this.box.height * this.animation.column,this.box.width,this.box.height,0,0,this.box.width,this.box.height);
   }
 }

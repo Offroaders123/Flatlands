@@ -1,8 +1,10 @@
 {
   "tree": {
     "name": "Tree",
-    "width": 96,
-    "height": 192,
+    "box": {
+      "width": 96,
+      "height": 192
+    },
     "texture": {
       "source": "textures/terrain/tree.png"
     }

@@ -35,7 +35,7 @@ document.addEventListener("keydown",event => {
   if (event.shiftKey) return;
   if (["Digit1","Digit2","Digit3","Digit4","Digit5","Digit6"].includes(event.code)){
     event.preventDefault();
-    hotbar.setSlot(event.code.replace(/Digit/,""));
+    hotbar.setSlot(event.code.replace(/Digit/,"") - 1);
   }
   if (["ArrowLeft","KeyA"].includes(event.code)){
     event.preventDefault();

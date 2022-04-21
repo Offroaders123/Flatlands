@@ -1,26 +1,27 @@
 {
   "player": {
     "name": "Player",
-    "x": 0,
-    "y": 0,
-    "width": 16,
-    "height": 32,
-    "speed": 2,
-    "direction": {
-      "x": "right",
-      "y": false
+    "box": {
+      "width": 16,
+      "height": 32
     },
-    "held_item": "hatchet",
     "texture": {
       "source": "textures/entity/player/guy.png"
     },
-    "animations": {
-      "tick": 0,
-      "ticks": 24,
-      "frame": 0,
-      "frames": 2,
-      "column": 0,
+    "animation": {
+      "type": "reactive",
+      "duration": 24,
+      "keyframes": 2,
       "columns": 4
-    }
+    },
+    "direction": {
+      "horizontal": "right",
+      "vertical": false
+    },
+    "hotbar": {
+      "slots": ["spearsword","pickmatic","hatchet","spade","fire","pizza"],
+      "active": 0
+    },
+    "speed": 2
   }
 }
