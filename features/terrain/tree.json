@@ -1,10 +1,4 @@
 {
-  "ground": {
-    "name": "Ground",
-    "texture": {
-      "source": "textures/terrain/ground.png"
-    }
-  },
   "tree": {
     "name": "Tree",
     "width": 96,

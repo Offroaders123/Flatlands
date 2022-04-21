@@ -20,7 +20,7 @@ class DPadElement extends HTMLElement {
     if (this.defined || !this.isConnected) return;
     this.defined = true;
     Object.values(this.buttons).forEach(button => this.appendChild(button));
-    this.addEventListener("touchstart",this.down);
+    this.addEventListener("touchstart",this.down,{ passive: false });
     this.addEventListener("touchend",this.up);
     this.addEventListener("pointerdown",this.down);
     this.addEventListener("pointerup",this.up);

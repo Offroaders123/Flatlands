@@ -49,6 +49,8 @@ coordinates.update = () => coordinates.textContent = `(${Math.round(player.x / 1
 
 // Hotbar
 const hotbar = document.querySelector("#hotbar");
+
+// Define hotbar getters, methods, and event listeners
 Object.defineProperty(Object.getPrototypeOf(hotbar),"slots",{ get: () => [...hotbar.querySelectorAll("item-slot")] });
 Object.getPrototypeOf(hotbar).setSlot = index => {
   const slot = hotbar.slots[index - 1];
@@ -58,7 +60,10 @@ Object.getPrototypeOf(hotbar).setSlot = index => {
 hotbar.addEventListener("touchstart",event => {
   event.preventDefault();
   if (event.target.closest("item-slot")) hotbar.setSlot(event.target.closest("item-slot").getAttribute("index"));
-});
+},{ passive: false });
+
+// Loop over all of the hotbar slots and render their sprites
+hotbar.slots.filter(slot => slot.value).forEach(slot => slot.render());
 
 import "./ItemSlotElement.js";
 
@@ -70,7 +75,7 @@ import "./DPadElement.js";
 import { key } from "./input.js";
 
 // Game Properties
-import { grassPattern } from "./properties.js";
+import { terrain } from "./properties.js";
 
 // Environment
 const explored = {
@@ -120,10 +125,11 @@ function draw(){
   ctx.clearRect(0,0,width,height);
 
   // Draw Grass
-  ctx.fillStyle = (grassPattern) ? grassPattern : "#779c43";
+  ctx.fillStyle = terrain.ground.texture.pattern;
+  // ctx.fillStyle = "#779c43";
   ctx.beginPath();
   ctx.rect(0,0,width,height);
-  if (grassPattern) ctx.setTransform(1,0,0,1,offsetX() + player.x,offsetY() + player.y);
+  ctx.setTransform(1,0,0,1,offsetX() + player.x,offsetY() + player.y);
   ctx.fill();
 
   // Draw Trees

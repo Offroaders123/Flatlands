@@ -1,7 +1,7 @@
 import Entity from "./Entity.js";
 import { ctx, offsetX, offsetY } from "./canvas.js";
 import { key } from "./input.js";
-import { missingTextureSprite, terrain } from "./properties.js";
+import { terrain } from "./properties.js";
 import { debug_toggle, explored, player } from "./app.js";
 
 export default class Tree extends Entity {
@@ -25,6 +25,6 @@ export default class Tree extends Entity {
       ctx.fillStyle = "#f00";
       ctx.fillRect(this.x + player.x + offsetX(),this.y + player.y + offsetY(),this.width,this.height);
     }
-    ctx.drawImage((terrain && terrain["tree"].texture.image) ? terrain["tree"].texture.image : missingTextureSprite,this.x + player.x + offsetX(),this.y + player.y + offsetY(),this.width,this.height);
+    ctx.drawImage(terrain.tree.texture.image,this.x + player.x + offsetX(),this.y + player.y + offsetY(),this.width,this.height);
   }
 }

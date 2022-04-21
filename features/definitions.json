@@ -1,0 +1,18 @@
+{
+  "entity": [
+    "player.json",
+    "shadow.json"
+  ],
+  "item": [
+    "fire.json",
+    "hatchet.json",
+    "pickmatic.json",
+    "pizza.json",
+    "spade.json",
+    "spearsword.json"
+  ],
+  "terrain": [
+    "ground.json",
+    "tree.json"
+  ]
+}

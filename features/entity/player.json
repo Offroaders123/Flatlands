@@ -22,10 +22,5 @@
       "column": 0,
       "columns": 4
     }
-  },
-  "shadow": {
-    "texture": {
-      "source": "textures/entity/shadow.png"
-    }
   }
 }

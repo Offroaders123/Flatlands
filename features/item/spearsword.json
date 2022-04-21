@@ -1,0 +1,8 @@
+{
+  "spearsword": {
+    "name": "Spearsword",
+    "texture": {
+      "source": "textures/item/spearsword.png"
+    }
+  }
+}

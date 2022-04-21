@@ -1,0 +1,11 @@
+{
+  "fire": {
+    "name": "Fire",
+    "texture": {
+      "width": 16,
+      "height": 16,
+      "frames": 4,
+      "source": "textures/item/fire.png"
+    }
+  }
+}
