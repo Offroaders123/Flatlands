@@ -78,64 +78,58 @@ export default class Player extends Entity {
     }
   }
   draw() {
-    let heldItemTexture = (this.hotbar.held_item !== null && item) ? item[this.hotbar.held_item].texture : null;
-    let scale = 1, offset = 1, itemScale = 1;
+    let scale = 1;
+    let offset = 1;
+    let itemScale = 1;
 
-    if (this.direction.horizontal == "left" && this.direction.vertical != "up"){
-      scale = -1;
-    }
-    if (this.direction.horizontal == "right" && this.direction.vertical == "up"){
-      scale = -1;
-    }
-    if (this.direction.horizontal == "right" && this.direction.vertical){
-      offset = 0;
-    }
-    if (this.direction.vertical){
-      itemScale = 2/3;
-    }
+    if (this.direction.horizontal === "left" && this.direction.vertical !== "up") scale = -1;
+    if (this.direction.horizontal === "right" && this.direction.vertical === "up") scale = -1;
+    if (this.direction.horizontal === "right" && this.direction.vertical) offset = 0;
+    if (this.direction.vertical) itemScale = 2/3;
 
     ctx.setTransform(scale,0,0,1,offsetX(),offsetY());
     ctx.transform(1,0,0,1,-7,14);
-    if (entity && entity.shadow.texture.image) ctx.drawImage(entity.shadow.texture.image,0,0,this.box.width - 2,4);
-    if (this.direction.vertical == "down"){
+
+    ctx.drawImage(entity.shadow.texture.image,0,0,this.box.width - 2,4);
+    if (this.direction.vertical === "down"){
       this.drawCharacter(scale,offset);
-      this.drawItem(heldItemTexture,scale,itemScale);
+      this.drawItem(scale,itemScale);
     } else {
-      this.drawItem(heldItemTexture,scale,itemScale);
+      this.drawItem(scale,itemScale);
       this.drawCharacter(scale,offset);
     }
 
     ctx.setTransform(1,0,0,1,0,0);
   }
-  drawItem(heldItemTexture,scale,itemScale) {
-    if (heldItemTexture === null) return;
-    let { image: itemSprite } = heldItemTexture;
-
-    const { frames } = heldItemTexture;
-    let { naturalWidth, naturalHeight } = itemSprite;
-    if (frames){
-      const { width, height } = heldItemTexture;
-      naturalWidth = width;
-      naturalHeight = height;
-    }
+  drawItem(scale,itemScale) {
+    const definition = item[this.hotbar.held_item];
+    let { naturalWidth: width, naturalHeight: height } = definition.texture.image;
+    if (definition.animation) height /= definition.animation.keyframes;
 
     ctx.setTransform(scale,0,0,1,offsetX(),offsetY());
     ctx.transform(1,0,0,1,this.box.width / -2 + 1,this.box.height / -2);
-    ctx.transform(1,0,0,1,naturalWidth * 0.625,naturalHeight * 0.3125);
-    ctx.scale(-1 * itemScale,1);
-    ctx.transform(1,0,0,1,-naturalWidth,naturalHeight);
-    ctx.rotate(Math.PI * -1 / 2);
-    //ctx.fillStyle = "#00ff0030";
-    //ctx.fillRect((this.direction.vertical) ? (this.direction.vertical == "up") ? -2 : -1 : 0,1,naturalWidth,naturalHeight);
+    ctx.transform(1,0,0,1,10,5);
+    if (definition.texture.directional !== false){
+      ctx.scale(-1 * itemScale,1);
+      ctx.transform(1,0,0,1,-width,height);
+      ctx.rotate(Math.PI * -1 / 2);
+    } else {
+      ctx.transform(1,0,0,1,-1,-1);
+      ctx.scale(itemScale,1);
+    }
 
-    const sy = 0;/* This is where the item keyframe eventually will be calculated */
+    let keyframe = 0;
+    if (definition.animation){
+      const current = tick / 60 * 1000;
+      const { duration, keyframes } = definition.animation;
+      keyframe = Math.floor((current % duration) / duration * keyframes) * height;
+    }
 
-    ctx.drawImage(itemSprite,0,sy,naturalWidth,naturalHeight,(this.direction.vertical) ? (this.direction.vertical == "up") ? -2 : -1 : 0,1,naturalWidth,naturalHeight);
+    ctx.drawImage(definition.texture.image,0,keyframe,width,height,this.direction.vertical ? this.direction.vertical === "up" ? -2 : -1 : 0,1,width,height);
   }
-  drawCharacter(scale,offset) {/* Mob idea name: ooogr */
-    let charSprite = entity.player.texture.image;
-    ctx.setTransform((this.direction.horizontal == "left" && !this.direction.vertical) ? -1 : 1,0,0,1,offsetX(),offsetY());
+  drawCharacter(scale,offset) {
+    ctx.setTransform(this.direction.horizontal === "left" && !this.direction.vertical ? -1 : 1,0,0,1,offsetX(),offsetY());
     ctx.transform(1,0,0,1,this.box.width / -2 + offset,this.box.height / -2);
-    ctx.drawImage(charSprite,this.box.width * ((this.animation.column != 0) ? this.animation.frame : 0),this.box.height * this.animation.column,this.box.width,this.box.height,0,0,this.box.width,this.box.height);
+    ctx.drawImage(entity.player.texture.image,this.box.width * (this.animation.column !== 0 ? this.animation.frame : 0),this.box.height * this.animation.column,this.box.width,this.box.height,0,0,this.box.width,this.box.height);
   }
 }

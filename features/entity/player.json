@@ -20,7 +20,7 @@
     },
     "hotbar": {
       "slots": ["spearsword","pickmatic","hatchet","spade","fire","pizza"],
-      "active": 0
+      "active": 4
     },
     "speed": 2
   }

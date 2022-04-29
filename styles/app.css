@@ -122,8 +122,9 @@ button {
 }
 #hotbar item-slot[animate] item-render {
   background-size: calc(var(--width) * var(--hotbar-scale)) calc(var(--height) * var(--keyframes) * var(--hotbar-scale));
-  animation: animated-item-render 750ms step-end infinite;
+  animation: animated-item-render var(--duration) step-end infinite;
 }
+/* I plan to make this driven by Web Animations rather than CSS, as that means I can add textures with more than 4 keyframes dynamically! */
 @keyframes animated-item-render {
   0%, 100% {
     background-position-y: 0%;

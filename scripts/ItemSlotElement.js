@@ -31,6 +31,7 @@ class ItemSlotElement extends HTMLElement {
       this.setAttribute("animate","");
       this.style.setProperty("--width",`${width}px`);
       this.style.setProperty("--height",`${height}px`);
+      this.style.setProperty("--duration",`${animation.duration}ms`);
       this.style.setProperty("--keyframes",animation.keyframes);
     }
     /* Another goal would be to add functionality to use the cached image itself (the line above, or `sprite`), rather than re-fetching it again in the CSS after being added as a style in `setSlotTexture()`. *edit: Super cool idea! Add canvases for each of the item renderers, rather than just an inline element, so then it can also eventually allow for item animations :O *edit2: or just use CSS instead :) (it's already implemented now!) */
