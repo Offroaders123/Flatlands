@@ -1,7 +1,6 @@
 import Flatlands from "./Flatlands.js";
 import { canvas, ctx, scaling, offsetX, offsetY } from "./canvas.js";
 import "./ItemSlotElement.js";
-import "./DPadElement.js";
 /* Inconsistently implemented, app.js does not handle the gamepad and key logic, it is all used in Player.js. Ideally I would like to have user input placed located inside either app.js or it's own ES Module. */
 import { key } from "./input.js";
 import { terrain } from "./properties.js";
@@ -62,6 +61,28 @@ hotbar.addEventListener("touchstart",event => {
   event.preventDefault();
   if (event.target.closest("item-slot")) hotbar.setSlot(event.target.closest("item-slot").getAttribute("index"));
 },{ passive: false });
+
+// D-Pad
+const dpad = document.querySelector("#dpad");
+dpad.down = event => {
+  event.preventDefault();
+  if (event.target.matches("button")) event.target.setAttribute("data-active","");
+  if (event.target.matches("[data-left]")) key.left = "DPadLeft";
+  if (event.target.matches("[data-right]")) key.right = "DPadRight";
+  if (event.target.matches("[data-up]")) key.up = "DPadUp";
+  if (event.target.matches("[data-down]")) key.down = "DPadDown";
+};
+dpad.up = event => {
+  if (event.target.matches("button")) event.target.removeAttribute("data-active");
+  if (event.target.matches("[data-left]")) key.left = false;
+  if (event.target.matches("[data-right]")) key.right = false;
+  if (event.target.matches("[data-up]")) key.up = false;
+  if (event.target.matches("[data-down]")) key.down = false;
+};
+dpad.addEventListener("touchstart",event => dpad.down(event),{ passive: false });
+dpad.addEventListener("touchend",event => dpad.up(event));
+dpad.addEventListener("pointerdown",event => dpad.down(event));
+dpad.addEventListener("pointerup",event => dpad.up(event));
 
 // Environment
 const explored = {

@@ -55,7 +55,7 @@ button {
   text-shadow: 0.175ch 0.175ch 0 #000000;
   white-space: pre;
 }
-#hud > *:not(d-pad) {
+#hud > *:not(#dpad) {
   z-index: 1;
 }
 #debug_toggle {
@@ -168,7 +168,7 @@ button {
     width: 32px;
   }
 }
-d-pad {
+#dpad {
   margin: 8px;
   position: absolute;
   left: var(--safe-area-inset-left);
@@ -181,10 +181,10 @@ d-pad {
   color: #000000;
   white-space: normal;
 }
-:root:not(.touch) d-pad {
+:root:not(.touch) #dpad {
   display: none;
 }
-d-pad button {
+#dpad button {
   width: 56px;
   height: 56px;
   display: flex;
@@ -196,50 +196,50 @@ d-pad button {
   z-index: 1;
   transition: opacity 250ms;
 }
-d-pad button::before {
+#dpad button::before {
   content: "";
   border: 10px solid transparent;
 }
-d-pad button[data-active] {
+#dpad button[data-active] {
   opacity: 0.6;
 }
-d-pad [data-left] {
+#dpad [data-left] {
   margin-right: -2px;
   grid-area: left;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
-d-pad [data-left]::before {
+#dpad [data-left]::before {
   border-left: none;
   border-right-color: currentColor;
 }
-d-pad [data-right] {
+#dpad [data-right] {
   margin-left: -2px;
   grid-area: right;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
-d-pad [data-right]::before {
+#dpad [data-right]::before {
   border-left-color: currentColor;
   border-right: none;
 }
-d-pad [data-up] {
+#dpad [data-up] {
   margin-bottom: -2px;
   grid-area: up;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
-d-pad [data-up]::before {
+#dpad [data-up]::before {
   border-top: none;
   border-bottom-color: currentColor;
 }
-d-pad [data-down] {
+#dpad [data-down] {
   margin-top: -2px;
   grid-area: down;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
-d-pad [data-down]::before {
+#dpad [data-down]::before {
   border-top-color: currentColor;
   border-bottom: none;
 }
