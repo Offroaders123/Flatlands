@@ -1,5 +1,12 @@
-// ES Module Imports
 import Flatlands from "./Flatlands.js";
+import { canvas, ctx, scaling, offsetX, offsetY } from "./canvas.js";
+import "./ItemSlotElement.js";
+import "./DPadElement.js";
+/* Inconsistently implemented, app.js does not handle the gamepad and key logic, it is all used in Player.js. Ideally I would like to have user input placed located inside either app.js or it's own ES Module. */
+import { key } from "./input.js";
+import { terrain } from "./properties.js";
+import Player from "./Player.js";
+import Tree from "./Tree.js";
 
 // Service Worker
 Flatlands.serviceWorker.register();
@@ -11,9 +18,6 @@ document.body.setAttribute("ontouchstart","");
 
 if (Flatlands.environment.touchDevice) Flatlands.appearance.touch = true;
 
-// Canvas
-import { canvas, ctx, scaling, offsetX, offsetY } from "./canvas.js";
-
 new ResizeObserver(() => {
   const { offsetWidth: width, offsetHeight: height } = canvas;
   canvas.width = width / scaling;
@@ -24,14 +28,11 @@ new ResizeObserver(() => {
 
 let tick = 0;
 
-export { tick };
-
 // HUD
 const hud = document.querySelector("#hud");
 
 // Debug
 const debug_toggle = document.querySelector("#debug_toggle");
-export { debug_toggle };
 const debug = document.querySelector("#debug");
 debug.update = () => debug.textContent =
 `Flatlands v${Flatlands.version}
@@ -62,18 +63,6 @@ hotbar.addEventListener("touchstart",event => {
   if (event.target.closest("item-slot")) hotbar.setSlot(event.target.closest("item-slot").getAttribute("index"));
 },{ passive: false });
 
-import "./ItemSlotElement.js";
-
-// D-Pad
-import "./DPadElement.js";
-
-// Input
-/* Inconsistently implemented, app.js does not handle the gamepad and key logic, it is all used in Player.js. Ideally I would like to have user input placed located inside either app.js or it's own ES Module. */
-import { key } from "./input.js";
-
-// Game Properties
-import { terrain } from "./properties.js";
-
 // Environment
 const explored = {
   left: 0,
@@ -81,23 +70,16 @@ const explored = {
   top: 0,
   bottom: canvas.height
 };
-export { explored };
 
 // Player
-import Player from "./Player.js";
 const player = new Player();
 
 // Loop over each hotbar slot and update it's state to match the player's state
 hotbar.slots.forEach((slot,i) => slot.value = player.hotbar.slots[i]);
 hotbar.slots[player.hotbar.active].activate();
 
-export { player };
-
 // Trees
 const treesArray = [];
-export { treesArray };
-
-import Tree from "./Tree.js";
 
 function handleTrees(){
   if (tick % 20 === 0){
@@ -178,3 +160,5 @@ function loop(){
   // Request next render frame
   window.requestAnimationFrame(loop);
 }
+
+export { tick, debug_toggle, explored, player, treesArray };
