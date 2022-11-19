@@ -1,11 +1,11 @@
-import Flatlands from "./Flatlands.js";
+import { Flatlands } from "./Flatlands.js";
 import { canvas, ctx, scaling, offsetX, offsetY } from "./canvas.js";
 import "./ItemSlotElement.js";
 /* Inconsistently implemented, app.js does not handle the gamepad and key logic, it is all used in Player.js. Ideally I would like to have user input placed located inside either app.js or it's own ES Module. */
 import { key } from "./input.js";
 import { terrain } from "./properties.js";
-import Player from "./Player.js";
-import Tree from "./Tree.js";
+import { Player } from "./Player.js";
+import { Tree } from "./Tree.js";
 
 // Service Worker
 Flatlands.serviceWorker.register();
@@ -25,13 +25,13 @@ new ResizeObserver(() => {
   draw();
 }).observe(canvas);
 
-let tick = 0;
+export let tick = 0;
 
 // HUD
 const hud = document.querySelector<HTMLDivElement>("#hud")!;
 
 // Debug
-const debug_toggle = document.querySelector<HTMLInputElement>("#debug_toggle")!;
+export const debug_toggle = document.querySelector<HTMLInputElement>("#debug_toggle")!;
 
 interface Debug extends HTMLPreElement {
   update: () => void;
@@ -106,7 +106,7 @@ dpad.addEventListener("pointerdown",event => dpad.down(event));
 dpad.addEventListener("pointerup",event => dpad.up(event));
 
 // Environment
-const explored = {
+export const explored = {
   left: 0,
   right: canvas.width,
   top: 0,
@@ -114,14 +114,14 @@ const explored = {
 };
 
 // Player
-const player = new Player();
+export const player = new Player();
 
 // Loop over each hotbar slot and update it's state to match the player's state
 hotbar.slots.forEach((slot,i) => slot.value = player.hotbar.slots[i]);
 hotbar.slots[player.hotbar.active].activate();
 
 // Trees
-const treesArray: Tree[] = [];
+export const treesArray: Tree[] = [];
 
 function handleTrees(){
   if (tick % 20 === 0){
@@ -202,5 +202,3 @@ function loop(){
   // Request next render frame
   window.requestAnimationFrame(loop);
 }
-
-export { tick, debug_toggle, explored, player, treesArray };

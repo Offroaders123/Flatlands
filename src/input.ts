@@ -1,16 +1,16 @@
-import Flatlands from "./Flatlands.js";
+import { Flatlands } from "./Flatlands.js";
 
 interface Key {
   [name: string]: string | boolean;
 }
 
-const key: Key = {
+export const key: Key = {
   left: false,
   right: false,
   up: false,
   down: false
 };
-const gamepads: number[] = [];
+export const gamepads: number[] = [];
 
 window.addEventListener("gamepadconnected",event => {
   if (!event.gamepad.mapping) return;
@@ -68,5 +68,3 @@ document.addEventListener("keyup",event => {
 });
 document.addEventListener("touchstart",() => Flatlands.appearance.touch = true);
 document.addEventListener("contextmenu",event => event.preventDefault());
-
-export { key, gamepads };

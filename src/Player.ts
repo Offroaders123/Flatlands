@@ -1,10 +1,10 @@
-import Entity from "./Entity.js";
+import { Entity } from "./Entity.js";
 import { tick, treesArray } from "./app.js";
 import { ctx, offsetX, offsetY } from "./canvas.js";
 import { key, gamepads } from "./input.js";
 import { entity, item } from "./properties.js";
 
-export default class Player extends Entity {
+export class Player extends Entity {
   constructor() {
     super();
 
@@ -20,6 +20,7 @@ export default class Player extends Entity {
 
     Object.defineProperty(this.hotbar,"held_item",{ get: () => this.hotbar.slots[this.hotbar.active] });
   }
+
   getEntityOverlap() {
     const rect1 = this.getBoundingClientRect();
     treesArray.forEach(tree => {
@@ -32,6 +33,7 @@ export default class Player extends Entity {
       tree.overlapRender = overlap;
     });
   }
+
   update() {
     this.getEntityOverlap();
     const gamepad = navigator.getGamepads()[gamepads[0]];
@@ -77,6 +79,7 @@ export default class Player extends Entity {
       (this.animation.frame < this.animation.keyframes - 1) ? this.animation.frame++ : this.animation.frame = 0;
     }
   }
+
   draw() {
     let scale = 1;
     let offset = 1;
@@ -101,6 +104,7 @@ export default class Player extends Entity {
 
     ctx.setTransform(1,0,0,1,0,0);
   }
+
   drawItem(scale,itemScale) {
     const definition = item[this.hotbar.held_item];
     let { naturalWidth: width, naturalHeight: height } = definition.texture.image;
@@ -127,6 +131,7 @@ export default class Player extends Entity {
 
     ctx.drawImage(definition.texture.image,0,keyframe,width,height,this.direction.vertical ? this.direction.vertical === "up" ? -2 : -1 : 0,1,width,height);
   }
+
   drawCharacter(scale,offset) {
     ctx.setTransform(this.direction.horizontal === "left" && !this.direction.vertical ? -1 : 1,0,0,1,offsetX(),offsetY());
     ctx.transform(1,0,0,1,this.box.width / -2 + offset,this.box.height / -2);

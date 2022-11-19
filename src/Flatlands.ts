@@ -1,5 +1,5 @@
 // This object helps with app configuration, and to get information about the current state of the app.
-const Flatlands = new class Flatlands {
+export const Flatlands = new class Flatlands {
   version = 0.73;
   environment = {
     get touchDevice() {
@@ -42,5 +42,3 @@ Object.defineProperty(Object.getPrototypeOf(Flatlands),Symbol.toStringTag,{ valu
 
 // Expose the Flatlands object in the global window object, which helps with debugging
 window.Flatlands = Flatlands;
-
-export default Flatlands;

@@ -1,8 +1,7 @@
-export default class Entity {
-  constructor() {
-    this.x = 0;
-    this.y = 0;
-  }
+export class Entity {
+  x = 0;
+  y = 0;
+
   getBoundingClientRect() {
     const { x, y, x: left, y: top } = this;
     const { width, height } = this.box;

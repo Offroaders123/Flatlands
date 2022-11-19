@@ -1,10 +1,10 @@
-import Entity from "./Entity.js";
+import { Entity } from "./Entity.js";
 import { ctx, offsetX, offsetY } from "./canvas.js";
 import { key } from "./input.js";
 import { terrain } from "./properties.js";
 import { debug_toggle, explored, player } from "./app.js";
 
-export default class Tree extends Entity {
+export class Tree extends Entity {
   constructor() {
     super();
 
@@ -24,6 +24,7 @@ export default class Tree extends Entity {
       if (explored.bottom < this.y) explored.bottom = this.y;
     }
   }
+
   draw() {
     if (this.overlapRender && debug_toggle.checked){
       ctx.fillStyle = "#f00";
