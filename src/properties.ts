@@ -22,7 +22,7 @@ definitions.terrain.ground.texture.pattern = ctx.createPattern(definitions.terra
 
 const { entity, item, terrain } = definitions;
 
-function loadSprite(source){
+function loadSprite(source: string){
   return new Promise(resolve => {
     const sprite = new Image();
     sprite.addEventListener("load",() => resolve(sprite));

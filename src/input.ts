@@ -1,12 +1,16 @@
 import Flatlands from "./Flatlands.js";
 
-const key = {
+interface Key {
+  [name: string]: string | boolean;
+}
+
+const key: Key = {
   left: false,
   right: false,
   up: false,
   down: false
 };
-const gamepads = [];
+const gamepads: number[] = [];
 
 window.addEventListener("gamepadconnected",event => {
   if (!event.gamepad.mapping) return;
@@ -29,6 +33,7 @@ document.addEventListener("keydown",event => {
   }
   if (event.shiftKey && event.code === "KeyF"){
     event.preventDefault();
+    // @ts-ignore
     if (document.webkitFullscreenEnabled && !document.fullscreenEnabled) (!document.webkitFullscreenElement) ? document.documentElement.webkitRequestFullscreen() : document.webkitExitFullscreen();
     if (document.fullscreenEnabled) (!document.fullscreenElement) ? document.documentElement.requestFullscreen() : document.exitFullscreen();
   }

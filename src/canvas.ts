@@ -1,5 +1,5 @@
-const canvas = document.querySelector("#canvas");
-const ctx = canvas.getContext("2d",{ alpha: false });
+const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
+const ctx = canvas.getContext("2d",{ alpha: false })!;
 
 let scaling = 4;
 

@@ -28,11 +28,16 @@ new ResizeObserver(() => {
 let tick = 0;
 
 // HUD
-const hud = document.querySelector("#hud");
+const hud = document.querySelector<HTMLDivElement>("#hud")!;
 
 // Debug
-const debug_toggle = document.querySelector("#debug_toggle");
-const debug = document.querySelector("#debug");
+const debug_toggle = document.querySelector<HTMLInputElement>("#debug_toggle")!;
+
+interface Debug extends HTMLPreElement {
+  update: () => void;
+}
+
+const debug = document.querySelector<HTMLPreElement>("#debug")! as Debug;
 debug.update = () => debug.textContent =
 `Flatlands v${Flatlands.version}
 Time Origin: ${timeOrigin}
@@ -46,40 +51,54 @@ Dropped Frames: ${Flatlands.debug.droppedFrames}
 Frame Delta: ${Math.floor(delta).toString().padStart(2,"0")}`;
 
 // Coordinates
-const coordinates = document.querySelector("#coordinates");
+interface Coordinates extends HTMLSpanElement {
+  update: () => void;
+}
+
+const coordinates = document.querySelector<HTMLSpanElement>("#coordinates")! as Coordinates;
 coordinates.update = () => coordinates.textContent = `(${Math.round(player.x / 16) * -1}, ${Math.round(player.y / 16)})`;
 
 // Hotbar
-const hotbar = document.querySelector("#hotbar");
+interface Hotbar extends HTMLDivElement {
+  readonly setSlot: (index: number) => void;
+  readonly slots: ItemSlotElement[];
+}
+
+const hotbar = document.querySelector<HTMLDivElement>("#hotbar")! as Hotbar;
 
 // Define hotbar getters, methods, and event listeners
 Object.defineProperty(Object.getPrototypeOf(hotbar),"slots",{ get: () => [...hotbar.querySelectorAll("item-slot")] });
-Object.getPrototypeOf(hotbar).setSlot = index => {
+Object.getPrototypeOf(hotbar).setSlot = (index: number) => {
   const slot = hotbar.slots[index];
   slot.activate();
   player.hotbar.active = index;
 };
 hotbar.addEventListener("touchstart",event => {
   event.preventDefault();
-  if (event.target.closest("item-slot")) hotbar.setSlot(event.target.closest("item-slot").getAttribute("index"));
+  if ((event.target as Element).closest("item-slot")) hotbar.setSlot((event.target as Element).closest("item-slot")!.getAttribute("index") as number);
 },{ passive: false });
 
 // D-Pad
-const dpad = document.querySelector("#dpad");
+interface DPad extends HTMLDivElement {
+  down: (event: Event) => void;
+  up: (event: Event) => void;
+}
+
+const dpad = document.querySelector<HTMLDivElement>("#dpad")! as DPad;
 dpad.down = event => {
   event.preventDefault();
-  if (event.target.matches("button")) event.target.setAttribute("data-active","");
-  if (event.target.matches("[data-left]")) key.left = "DPadLeft";
-  if (event.target.matches("[data-right]")) key.right = "DPadRight";
-  if (event.target.matches("[data-up]")) key.up = "DPadUp";
-  if (event.target.matches("[data-down]")) key.down = "DPadDown";
+  if ((event.target as Element).matches("button")) (event.target as Element).setAttribute("data-active","");
+  if ((event.target as Element).matches("[data-left]")) key.left = "DPadLeft";
+  if ((event.target as Element).matches("[data-right]")) key.right = "DPadRight";
+  if ((event.target as Element).matches("[data-up]")) key.up = "DPadUp";
+  if ((event.target as Element).matches("[data-down]")) key.down = "DPadDown";
 };
 dpad.up = event => {
-  if (event.target.matches("button")) event.target.removeAttribute("data-active");
-  if (event.target.matches("[data-left]")) key.left = false;
-  if (event.target.matches("[data-right]")) key.right = false;
-  if (event.target.matches("[data-up]")) key.up = false;
-  if (event.target.matches("[data-down]")) key.down = false;
+  if ((event.target as Element).matches("button")) (event.target as Element).removeAttribute("data-active");
+  if ((event.target as Element).matches("[data-left]")) key.left = false;
+  if ((event.target as Element).matches("[data-right]")) key.right = false;
+  if ((event.target as Element).matches("[data-up]")) key.up = false;
+  if ((event.target as Element).matches("[data-down]")) key.down = false;
 };
 dpad.addEventListener("touchstart",event => dpad.down(event),{ passive: false });
 dpad.addEventListener("touchend",event => dpad.up(event));
@@ -102,7 +121,7 @@ hotbar.slots.forEach((slot,i) => slot.value = player.hotbar.slots[i]);
 hotbar.slots[player.hotbar.active].activate();
 
 // Trees
-const treesArray = [];
+const treesArray: Tree[] = [];
 
 function handleTrees(){
   if (tick % 20 === 0){

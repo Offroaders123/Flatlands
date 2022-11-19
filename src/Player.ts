@@ -37,11 +37,11 @@ export default class Player extends Entity {
     const gamepad = navigator.getGamepads()[gamepads[0]];
     let [axisX,axisY] = (gamepad) ? gamepad.axes : [null,null,null,null], [left1,right1] = (gamepad) ? [gamepad.buttons[4].value,gamepad.buttons[5].value] : [null,null];
     if (gamepad){
-      key.left = (Math.round(axisX * 1000) < 0);
-      key.right = (Math.round(axisX * 1000) > 0);
-      key.up = (Math.round(axisY * 1000) < 0);
-      key.down = (Math.round(axisY * 1000) > 0);
-      let active = parseInt(hotbar.querySelector("item-slot[active]").getAttribute("slot"));
+      key.left = (Math.round(axisX as number * 1000) < 0);
+      key.right = (Math.round(axisX as number * 1000) > 0);
+      key.up = (Math.round(axisY as number * 1000) < 0);
+      key.down = (Math.round(axisY as number * 1000) > 0);
+      let active = parseInt(hotbar.querySelector<ItemSlotElement>("item-slot[active]")!.getAttribute("slot") as string);
       if (left1 && !right1 && tick % 10 == 0) hotbar.setSlot((active - 1 > 0) ? active - 1 : 6);
       if (right1 && !left1 && tick % 10 == 0) hotbar.setSlot((active + 1 < 7) ? active + 1 : 1);
     }
