@@ -61,7 +61,7 @@ coordinates.update = () => coordinates.textContent = `(${Math.round(player.x / 1
 // Hotbar
 interface Hotbar extends HTMLDivElement {
   readonly setSlot: (index: number) => void;
-  readonly slots: ItemSlotElement[];
+  readonly slots: import("ItemSlotElement.js").ItemSlotElement[];
 }
 
 export const hotbar = document.querySelector<HTMLDivElement>("#hotbar")! as Hotbar;
