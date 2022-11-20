@@ -41,4 +41,5 @@ export const Flatlands = new class Flatlands {
 Object.defineProperty(Object.getPrototypeOf(Flatlands),Symbol.toStringTag,{ value: Flatlands.constructor.name });
 
 // Expose the Flatlands object in the global window object, which helps with debugging
+// @ts-ignore
 window.Flatlands = Flatlands;

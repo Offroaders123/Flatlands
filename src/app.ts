@@ -75,7 +75,7 @@ Object.getPrototypeOf(hotbar).setSlot = (index: number) => {
 };
 hotbar.addEventListener("touchstart",event => {
   event.preventDefault();
-  if ((event.target as Element).closest("item-slot")) hotbar.setSlot((event.target as Element).closest("item-slot")!.getAttribute("index") as number);
+  if ((event.target as Element).closest("item-slot")) hotbar.setSlot(Number((event.target as Element).closest("item-slot")!.getAttribute("index")));
 },{ passive: false });
 
 // D-Pad

@@ -1,15 +1,18 @@
 import { Entity } from "./Entity.js";
-import { ctx, offsetX, offsetY } from "./canvas.js";
+import { canvas, ctx, offsetX, offsetY } from "./canvas.js";
 import { key } from "./input.js";
 import { terrain } from "./properties.js";
 import { debug_toggle, explored, player } from "./app.js";
 
 export class Tree extends Entity {
+  declare overlapRender: boolean;
+
   constructor() {
     super();
 
     // Inherit all properties defined inside of the Tree JSON file
-    for (const property in terrain.tree){
+    for (const property in terrain.tree as typeof Tree){
+      // @ts-ignore
       this[property] = terrain.tree[property];
     }
 

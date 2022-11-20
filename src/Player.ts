@@ -1,15 +1,41 @@
 import { Entity } from "./Entity.js";
-import { tick, treesArray } from "./app.js";
+import { hotbar, tick, treesArray } from "./app.js";
 import { ctx, offsetX, offsetY } from "./canvas.js";
+import { ItemSlotElement } from "./ItemSlotElement.js";
 import { key, gamepads } from "./input.js";
 import { entity, item } from "./properties.js";
 
 export class Player extends Entity {
+  declare animation: {
+    type: string;
+    duration: number;
+    keyframes: number;
+    columns: number;
+
+    tick: number;
+    frame: number;
+    column: number;
+  };
+  
+  declare direction: {
+    horizontal: string;
+    vertical: string | boolean;
+  };
+
+  declare hotbar: {
+    slots: [string,string,string,string,string,string];
+    active: number;
+    readonly held_item: number;
+  }
+
+  declare speed: number;
+
   constructor() {
     super();
 
     // Inherit all properties defined inside of the Player JSON file
-    for (const property in entity.player){
+    for (const property in entity.player as typeof Player){
+      // @ts-ignore
       this[property] = entity.player[property];
     }
 
@@ -52,10 +78,10 @@ export class Player extends Entity {
     const cardinal = this.speed;
 
     /* Cardinals */
-    if (left && !right) this.x += cardinal * (-axisX || 1);
-    if (right && !left) this.x -= cardinal * (axisX || 1);
-    if (up && !down) this.y += cardinal * (-axisY || 1);
-    if (down && !up) this.y -= cardinal * (axisY || 1);
+    if (left && !right) this.x += cardinal * (-axisX! || 1);
+    if (right && !left) this.x -= cardinal * (axisX! || 1);
+    if (up && !down) this.y += cardinal * (-axisY! || 1);
+    if (down && !up) this.y -= cardinal * (axisY! || 1);
 
     if (key.left && !key.right) this.direction.horizontal = "left";
     if (key.right && !key.left) this.direction.horizontal = "right";
@@ -105,7 +131,7 @@ export class Player extends Entity {
     ctx.setTransform(1,0,0,1,0,0);
   }
 
-  drawItem(scale,itemScale) {
+  drawItem(scale: number, itemScale: number) {
     const definition = item[this.hotbar.held_item];
     let { naturalWidth: width, naturalHeight: height } = definition.texture.image;
     if (definition.animation) height /= definition.animation.keyframes;
@@ -132,7 +158,7 @@ export class Player extends Entity {
     ctx.drawImage(definition.texture.image,0,keyframe,width,height,this.direction.vertical ? this.direction.vertical === "up" ? -2 : -1 : 0,1,width,height);
   }
 
-  drawCharacter(scale,offset) {
+  drawCharacter(scale: number, offset: number) {
     ctx.setTransform(this.direction.horizontal === "left" && !this.direction.vertical ? -1 : 1,0,0,1,offsetX(),offsetY());
     ctx.transform(1,0,0,1,this.box.width / -2 + offset,this.box.height / -2);
     ctx.drawImage(entity.player.texture.image,this.box.width * (this.animation.column !== 0 ? this.animation.frame : 0),this.box.height * this.animation.column,this.box.width,this.box.height,0,0,this.box.width,this.box.height);

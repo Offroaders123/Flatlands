@@ -1,6 +1,7 @@
+import { hotbar } from "./app.js";
 import { item } from "./properties.js";
 
-class ItemSlotElement extends HTMLElement {
+export class ItemSlotElement extends HTMLElement {
   #isDefined = false;
 
   connectedCallback() {
@@ -23,7 +24,7 @@ class ItemSlotElement extends HTMLElement {
     return this.getAttribute("sprite") || null;
   }
 
-  set sprite(texture) {// Note to me: pleeease tidy up this parameter usage, it's really ugly at the moment.
+  set sprite(texture: { [name: string]: typeof item[keyof typeof item]; }) {// Note to me: pleeease tidy up this parameter usage, it's really ugly at the moment.
     const [id] = Object.keys(texture);
     const { source, width = 16, height = 16 } = texture[id].texture;
     const { animation } = texture[id];
@@ -46,7 +47,7 @@ class ItemSlotElement extends HTMLElement {
   }
 
   activate() {
-    hotbar.querySelectorAll("item-slot[active]").forEach(slot => slot.deactivate());
+    hotbar.querySelectorAll<ItemSlotElement>("item-slot[active]").forEach(slot => slot.deactivate());
     this.setAttribute("active","");
   }
 
