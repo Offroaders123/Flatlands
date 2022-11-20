@@ -1,3 +1,5 @@
+import { coordinates, hotbar, hud } from "./app.js";
+
 export const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
 export const ctx = canvas.getContext("2d",{ alpha: false })!;
 

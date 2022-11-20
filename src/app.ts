@@ -28,7 +28,7 @@ new ResizeObserver(() => {
 export let tick = 0;
 
 // HUD
-const hud = document.querySelector<HTMLDivElement>("#hud")!;
+export const hud = document.querySelector<HTMLDivElement>("#hud")!;
 
 // Debug
 export const debug_toggle = document.querySelector<HTMLInputElement>("#debug_toggle")!;
@@ -55,7 +55,7 @@ interface Coordinates extends HTMLSpanElement {
   update: () => void;
 }
 
-const coordinates = document.querySelector<HTMLSpanElement>("#coordinates")! as Coordinates;
+export const coordinates = document.querySelector<HTMLSpanElement>("#coordinates")! as Coordinates;
 coordinates.update = () => coordinates.textContent = `(${Math.round(player.x / 16) * -1}, ${Math.round(player.y / 16)})`;
 
 // Hotbar
@@ -64,7 +64,7 @@ interface Hotbar extends HTMLDivElement {
   readonly slots: ItemSlotElement[];
 }
 
-const hotbar = document.querySelector<HTMLDivElement>("#hotbar")! as Hotbar;
+export const hotbar = document.querySelector<HTMLDivElement>("#hotbar")! as Hotbar;
 
 // Define hotbar getters, methods, and event listeners
 Object.defineProperty(Object.getPrototypeOf(hotbar),"slots",{ get: () => [...hotbar.querySelectorAll("item-slot")] });
