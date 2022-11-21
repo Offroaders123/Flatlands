@@ -11,21 +11,21 @@ export class ItemSlotElement extends HTMLElement {
   }
 
   get value() {
-    return this.getAttribute("value") || null;
+    return this.getAttribute("value") || "";
   }
 
   set value(value) {
     if (this.value === value) return;
     this.setAttribute("value",value);
-    this.sprite = { [value]: item[value] };// Look at the note below, this is what I am talking about XD
+    this.sprite = value;// Look at the note below, this is what I am talking about XD
   }
 
   get sprite() {
-    return this.getAttribute("sprite") || null;
+    return this.getAttribute("sprite") || "";
   }
 
-  set sprite(texture: { [name: string]: typeof item[keyof typeof item]; }) {// Note to me: pleeease tidy up this parameter usage, it's really ugly at the moment.
-    const [id] = Object.keys(texture);
+  set sprite(id: string) {// Note to me: pleeease tidy up this parameter usage, it's really ugly at the moment.
+    const texture = { [id]: item[id] };// Same as note above, I essentially just moved the weird parameter into the function itself now XD
     const { source, width = 16, height = 16 } = texture[id].texture;
     const { animation } = texture[id];
     if (this.sprite === id) return;
@@ -43,7 +43,7 @@ export class ItemSlotElement extends HTMLElement {
   }
 
   render() {
-    this.sprite = { [this.value]: item[this.value] };
+    this.sprite = this.value;
   }
 
   activate() {
