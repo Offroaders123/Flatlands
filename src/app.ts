@@ -1,10 +1,10 @@
 import "./Coordinates.js";
+import "./Debug.js";
+import "./DPad.js";
 import "./Hotbar.js";
 import "./ItemSlot.js";
-import "./Debug.js";
 import Flatlands from "./Flatlands.js";
 import { canvas, ctx, scaling, offsetX, offsetY } from "./canvas.js";
-import "./ItemSlot.js";
 /* Inconsistently implemented, app.js does not handle the gamepad and key logic, it is all used in Player.js. Ideally I would like to have user input placed located inside either app.js or it's own ES Module. */
 import { key } from "./input.js";
 import { terrain } from "./properties.js";
