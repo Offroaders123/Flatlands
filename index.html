@@ -31,13 +31,13 @@
 
 <canvas id="canvas"></canvas>
 
-<div id="hud">
+<hud-panel>
 
 <input id="debug_toggle" type="checkbox" tabindex="-1">
-<debug-panel id="debug"></debug-panel>
-<coordinates-panel id="coordinates"></coordinates-panel>
+<debug-panel></debug-panel>
+<coordinates-panel></coordinates-panel>
 
-<hotbar-panel id="hotbar">
+<hotbar-panel>
   <item-slot index="0"></item-slot>
   <item-slot index="1"></item-slot>
   <item-slot index="2"></item-slot>
@@ -46,14 +46,14 @@
   <item-slot index="5"></item-slot>
 </hotbar-panel>
 
-<dpad-panel id="dpad">
+<dpad-panel>
   <button data-left tabindex="-1"></button>
   <button data-right tabindex="-1"></button>
   <button data-up tabindex="-1"></button>
   <button data-down tabindex="-1"></button>
 </dpad-panel>
 
-</div>
+</hud-panel>
 
 <script type="module" src="dist/app.js"></script>
 

@@ -34,7 +34,7 @@ new ResizeObserver(() => {
 export let tick = 0;
 
 // HUD
-export const hud = document.querySelector<HTMLDivElement>("#hud")!;
+export const hud = document.querySelector("hud-panel")!;
 
 // Debug
 export const debug_toggle = document.querySelector<HTMLInputElement>("#debug_toggle")!;

@@ -40,7 +40,7 @@ button {
   height: 100%;
   z-index: 1;
 }
-#hud {
+hud-panel {
   --padding: 12px;
   padding: calc(var(--safe-area-inset-top) + var(--padding)) calc(var(--safe-area-inset-right) + var(--padding)) calc(var(--safe-area-inset-bottom) + var(--padding)) calc(var(--safe-area-inset-left) + var(--padding));
   position: absolute;
@@ -55,7 +55,7 @@ button {
   text-shadow: 0.175ch 0.175ch 0 #000000;
   white-space: pre;
 }
-#hud > *:not(#dpad) {
+hud-panel > *:not(dpad-panel) {
   z-index: 1;
 }
 #debug_toggle {
@@ -83,16 +83,14 @@ button {
   justify-content: center;
   align-items: center;
 }
-#debug {
+debug-panel {
   font-size: 0.8em;
 }
-#debug_toggle:not(:checked) + #debug {
+#debug_toggle:not(:checked) + debug-panel {
   display: none;
 }
-#hotbar {
+hotbar-panel {
   --hotbar-scale: 4;
-}
-#hotbar {
   padding: 4px;
   position: absolute;
   left: 50%;
@@ -100,27 +98,27 @@ button {
   display: flex;
   transform: translateX(-50%);
 }
-#hotbar item-slot {
+hotbar-panel item-slot {
   padding: 12px;
   position: relative;
   display: flex;
   background: url("../textures/interface/slot.png") no-repeat 50%;
   background-size: calc(100% - 8px);
 }
-#hotbar item-slot[active]::before {
+hotbar-panel item-slot[active]::before {
   content: "";
   position: absolute;
   inset: 0;
   background: url("../textures/interface/slot_active.png") no-repeat;
   background-size: cover;
 }
-#hotbar item-render {
+hotbar-panel item-render {
   width: 64px;
   aspect-ratio: 1 / 1;
   background: center no-repeat;
   background-size: contain;
 }
-#hotbar item-slot[animate] item-render {
+hotbar-panel item-slot[animate] item-render {
   background-size: calc(var(--width) * var(--hotbar-scale)) calc(var(--height) * var(--keyframes) * var(--hotbar-scale));
   animation: animated-item-render var(--duration) step-end infinite;
 }
@@ -140,36 +138,32 @@ button {
   }
 }
 @media (max-width: 894px), (max-height: 255px) {
-  #hotbar {
+  hotbar-panel {
     --hotbar-scale: 3;
-  }
-  #hotbar {
     padding: 3px;
   }
-  #hotbar item-slot {
+  hotbar-panel item-slot {
     padding: 8px;
     background-size: calc(100% - 6px);
   }
-  #hotbar item-render {
+  hotbar-panel item-render {
     width: 48px;
   }
 }
 @media (max-width: 749px), (max-height: 223px) {
-  #hotbar {
+  hotbar-panel {
     --hotbar-scale: 2;
-  }
-  #hotbar {
     padding: 2px;
   }
-  #hotbar item-slot {
+  hotbar-panel item-slot {
     padding: 6px;
     background-size: calc(100% - 4px);
   }
-  #hotbar item-render {
+  hotbar-panel item-render {
     width: 32px;
   }
 }
-#dpad {
+dpad-panel {
   margin: 8px;
   position: absolute;
   left: var(--safe-area-inset-left);
@@ -182,10 +176,10 @@ button {
   color: #000000;
   white-space: normal;
 }
-:root:not(.touch) #dpad {
+:root:not(.touch) dpad-panel {
   display: none;
 }
-#dpad button {
+dpad-panel button {
   width: 56px;
   height: 56px;
   display: flex;
@@ -197,50 +191,50 @@ button {
   z-index: 1;
   transition: opacity 250ms;
 }
-#dpad button::before {
+dpad-panel button::before {
   content: "";
   border: 10px solid transparent;
 }
-#dpad button[data-active] {
+dpad-panel button[data-active] {
   opacity: 0.6;
 }
-#dpad [data-left] {
+dpad-panel [data-left] {
   margin-right: -2px;
   grid-area: left;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
-#dpad [data-left]::before {
+dpad-panel [data-left]::before {
   border-left: none;
   border-right-color: currentColor;
 }
-#dpad [data-right] {
+dpad-panel [data-right] {
   margin-left: -2px;
   grid-area: right;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
-#dpad [data-right]::before {
+dpad-panel [data-right]::before {
   border-left-color: currentColor;
   border-right: none;
 }
-#dpad [data-up] {
+dpad-panel [data-up] {
   margin-bottom: -2px;
   grid-area: up;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
-#dpad [data-up]::before {
+dpad-panel [data-up]::before {
   border-top: none;
   border-bottom-color: currentColor;
 }
-#dpad [data-down] {
+dpad-panel [data-down] {
   margin-top: -2px;
   grid-area: down;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
-#dpad [data-down]::before {
+dpad-panel [data-down]::before {
   border-top-color: currentColor;
   border-bottom: none;
 }
