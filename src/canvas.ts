@@ -10,5 +10,5 @@ export function offsetX(){
 }
 
 export function offsetY(){
-  return Math.round((canvas.offsetHeight + coordinates.offsetHeight - hotbar.offsetHeight - parseInt(window.getComputedStyle(hud).getPropertyValue("padding-bottom"))) / scaling / 2);
+  return Math.round((canvas.offsetHeight + coordinates.offsetHeight - hotbar.offsetHeight - parseInt(getComputedStyle(hud).paddingBottom)) / scaling / 2);
 }

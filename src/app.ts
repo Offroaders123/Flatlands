@@ -1,4 +1,4 @@
-import { Flatlands } from "./Flatlands.js";
+import Flatlands from "./Flatlands.js";
 import { canvas, ctx, scaling, offsetX, offsetY } from "./canvas.js";
 import "./ItemSlotElement.js";
 /* Inconsistently implemented, app.js does not handle the gamepad and key logic, it is all used in Player.js. Ideally I would like to have user input placed located inside either app.js or it's own ES Module. */
@@ -15,7 +15,9 @@ Flatlands.serviceWorker.register();
 /* This is to allow for :active styling on iOS Safari */
 document.body.setAttribute("ontouchstart","");
 
-if (Flatlands.environment.touchDevice) Flatlands.appearance.touch = true;
+if (Flatlands.environment.touchDevice){
+  Flatlands.appearance.touch = true;
+}
 
 new ResizeObserver(() => {
   const { offsetWidth: width, offsetHeight: height } = canvas;
@@ -38,6 +40,7 @@ interface Debug extends HTMLPreElement {
 }
 
 const debug = document.querySelector<HTMLPreElement>("#debug")! as Debug;
+
 debug.update = () => debug.textContent =
 `Flatlands v${Flatlands.version}
 Time Origin: ${timeOrigin}
@@ -56,7 +59,10 @@ interface Coordinates extends HTMLSpanElement {
 }
 
 export const coordinates = document.querySelector<HTMLSpanElement>("#coordinates")! as Coordinates;
-coordinates.update = () => coordinates.textContent = `(${Math.round(player.x / 16) * -1}, ${Math.round(player.y / 16)})`;
+
+coordinates.update = () => {
+  coordinates.textContent = `(${Math.round(player.x / 16) * -1}, ${Math.round(player.y / 16)})`;
+}
 
 // Hotbar
 interface Hotbar extends HTMLDivElement {
@@ -67,15 +73,23 @@ interface Hotbar extends HTMLDivElement {
 export const hotbar = document.querySelector<HTMLDivElement>("#hotbar")! as Hotbar;
 
 // Define hotbar getters, methods, and event listeners
-Object.defineProperty(Object.getPrototypeOf(hotbar),"slots",{ get: () => [...hotbar.querySelectorAll("item-slot")] });
+Object.defineProperty(Object.getPrototypeOf(hotbar),"slots",{
+  get() {
+    return [...hotbar.querySelectorAll("item-slot")];
+  }
+});
+
 Object.getPrototypeOf(hotbar).setSlot = (index: number) => {
   const slot = hotbar.slots[index];
   slot.activate();
   player.hotbar.active = index;
 };
+
 hotbar.addEventListener("touchstart",event => {
   event.preventDefault();
-  if ((event.target as Element).closest("item-slot")) hotbar.setSlot(Number((event.target as Element).closest("item-slot")!.getAttribute("index")));
+  if ((event.target as Element).closest("item-slot")){
+    hotbar.setSlot(Number((event.target as Element).closest("item-slot")!.getAttribute("index")));
+  }
 },{ passive: false });
 
 // D-Pad
@@ -85,25 +99,62 @@ interface DPad extends HTMLDivElement {
 }
 
 const dpad = document.querySelector<HTMLDivElement>("#dpad")! as DPad;
+
 dpad.down = event => {
   event.preventDefault();
-  if ((event.target as Element).matches("button")) (event.target as Element).setAttribute("data-active","");
-  if ((event.target as Element).matches("[data-left]")) key.left = "DPadLeft";
-  if ((event.target as Element).matches("[data-right]")) key.right = "DPadRight";
-  if ((event.target as Element).matches("[data-up]")) key.up = "DPadUp";
-  if ((event.target as Element).matches("[data-down]")) key.down = "DPadDown";
+
+  if ((event.target as Element).matches("button")){
+    (event.target as Element).setAttribute("data-active","");
+  }
+
+  if ((event.target as Element).matches("[data-left]")){
+    key.left = "DPadLeft";
+  }
+  if ((event.target as Element).matches("[data-right]")){
+    key.right = "DPadRight";
+  }
+  if ((event.target as Element).matches("[data-up]")){
+    key.up = "DPadUp";
+  }
+  if ((event.target as Element).matches("[data-down]")){
+    key.down = "DPadDown";
+  }
 };
+
 dpad.up = event => {
-  if ((event.target as Element).matches("button")) (event.target as Element).removeAttribute("data-active");
-  if ((event.target as Element).matches("[data-left]")) key.left = false;
-  if ((event.target as Element).matches("[data-right]")) key.right = false;
-  if ((event.target as Element).matches("[data-up]")) key.up = false;
-  if ((event.target as Element).matches("[data-down]")) key.down = false;
+  if ((event.target as Element).matches("button")){
+    (event.target as Element).removeAttribute("data-active");
+  }
+
+  if ((event.target as Element).matches("[data-left]")){
+    key.left = false;
+  }
+  if ((event.target as Element).matches("[data-right]")){
+    key.right = false;
+  }
+  if ((event.target as Element).matches("[data-up]")){
+    key.up = false;
+  }
+  if ((event.target as Element).matches("[data-down]")){
+    key.down = false;
+  }
 };
-dpad.addEventListener("touchstart",event => dpad.down(event),{ passive: false });
-dpad.addEventListener("touchend",event => dpad.up(event));
-dpad.addEventListener("pointerdown",event => dpad.down(event));
-dpad.addEventListener("pointerup",event => dpad.up(event));
+
+dpad.addEventListener("touchstart",event => {
+  dpad.down(event);
+},{ passive: false });
+
+dpad.addEventListener("touchend",event => {
+  dpad.up(event);
+});
+
+dpad.addEventListener("pointerdown",event => {
+  dpad.down(event);
+});
+
+dpad.addEventListener("pointerup",event => {
+  dpad.up(event);
+});
 
 // Environment
 export const explored = {
@@ -117,7 +168,10 @@ export const explored = {
 export const player = new Player();
 
 // Loop over each hotbar slot and update it's state to match the player's state
-hotbar.slots.forEach((slot,i) => slot.value = player.hotbar.slots[i]);
+hotbar.slots.forEach((slot,i) => {
+  slot.value = player.hotbar.slots[i];
+});
+
 hotbar.slots[player.hotbar.active].activate();
 
 // Trees
@@ -126,13 +180,18 @@ export const treesArray: Tree[] = [];
 function handleTrees(){
   if (tick % 20 === 0){
     if (canvas.height / -2 - player.y - offsetX() < explored.top || canvas.height - player.y - offsetY() > explored.bottom){
-      if (key.up && !key.down) treesArray.unshift(new Tree());
-      if (key.down && !key.up) treesArray.push(new Tree());
+      if (key.up && !key.down){
+        treesArray.unshift(new Tree());
+      }
+      if (key.down && !key.up){
+        treesArray.push(new Tree());
+      }
     }
   }
-  treesArray.forEach(tree => {
+
+  for (const tree of treesArray){
     tree.draw();
-  });
+  }
 }
 
 //for (let i = 0; i < 4; i++) treesArray.push(new Tree());
@@ -166,7 +225,9 @@ function draw(){
   player.draw();
 
   // Set HUD Content
-  if (debug_toggle.checked && !debug.matches(":hover")) debug.update();
+  if (debug_toggle.checked && !debug.matches(":hover")){
+    debug.update();
+  }
   coordinates.update();
 }
 
@@ -191,7 +252,9 @@ function loop(){
   while (delta >= timestep){
     update();
     delta -= timestep;
-    if (delta > timestep) Flatlands.debug.droppedFrames++;
+    if (delta > timestep){
+      Flatlands.debug.droppedFrames++;
+    }
   }
 
   // Draw game state to the renderer

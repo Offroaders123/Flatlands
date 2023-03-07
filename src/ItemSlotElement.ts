@@ -29,7 +29,9 @@ export class ItemSlotElement extends HTMLElement {
     const { source, width = 16, height = 16 } = texture[id].texture;
     const { animation } = texture[id];
     if (this.sprite === id) return;
+
     this.setAttribute("sprite",id);
+
     if (animation){
       this.setAttribute("animate","");
       this.style.setProperty("--width",`${width}px`);
@@ -37,6 +39,7 @@ export class ItemSlotElement extends HTMLElement {
       this.style.setProperty("--duration",`${animation.duration}ms`);
       this.style.setProperty("--keyframes",animation.keyframes);
     }
+
     /* Another goal would be to add functionality to use the cached image itself (the line above, or `sprite`), rather than re-fetching it again in the CSS after being added as a style in `setSlotTexture()`. *edit: Super cool idea! Add canvases for each of the item renderers, rather than just an inline element, so then it can also eventually allow for item animations :O *edit2: or just use CSS instead :) (it's already implemented now!) */
     /* It could make sense to make this a method of either the hotbar element, or the hud container once an in-game inventory is implemented. Then you could update all item slots for an item to have a certain texture *edit: Almost there! This comment used to be in `properties.js`, but now all of the slot rendering logic is part of the slot element itself :) */
     this.querySelector<HTMLElement>("item-render")!.style.setProperty("background-image",`url("${source}")`);
@@ -47,7 +50,9 @@ export class ItemSlotElement extends HTMLElement {
   }
 
   activate() {
-    hotbar.querySelectorAll<ItemSlotElement>("item-slot[active]").forEach(slot => slot.deactivate());
+    for (const slot of hotbar.querySelectorAll<ItemSlotElement>("item-slot[active]")){
+      slot.deactivate();
+    }
     this.setAttribute("active","");
   }
 
@@ -57,3 +62,11 @@ export class ItemSlotElement extends HTMLElement {
 }
 
 window.customElements.define("item-slot",ItemSlotElement);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "item-slot": ItemSlotElement;
+  }
+}
+
+export default ItemSlotElement;

@@ -8,13 +8,20 @@ const definitions = await fetch("features/definitions.json").then(response => re
 for (const definition in definitions){
   const entries = definitions[definition];
   definitions[definition] = {};
+
   for (const value of entries){
     const feature = await fetch(`features/${definition}/${value}`).then(response => response.json());
     const [key] = Object.keys(feature);
+
     Object.assign(definitions[definition],feature);
     const { source } = definitions[definition][key].texture;
     const image = await loadSprite(source);
-    Object.defineProperty(definitions[definition][key].texture,"image",{ get: () => (image) ? image : missingTextureSprite });
+
+    Object.defineProperty(definitions[definition][key].texture,"image",{
+      get() {
+        return (image) ? image : missingTextureSprite;
+      }
+    });
   }
 }
 
@@ -23,7 +30,7 @@ definitions.terrain.ground.texture.pattern = ctx.createPattern(definitions.terra
 export const { entity, item, terrain } = definitions;
 
 function loadSprite(source: string){
-  return new Promise(resolve => {
+  return new Promise<HTMLImageElement | null>(resolve => {
     const sprite = new Image();
     sprite.addEventListener("load",() => resolve(sprite));
     sprite.addEventListener("error",() => resolve(null));

@@ -1,45 +1,49 @@
-// This object helps with app configuration, and to get information about the current state of the app.
-export const Flatlands = new class Flatlands {
-  version = 0.73;
-  environment = {
+export default class Flatlands {
+  static version = 0.73;
+
+  static environment = {
     get touchDevice() {
       return ("ontouchstart" in window || navigator.maxTouchPoints > 0);
     }
   }
-  appearance = {
+
+  static appearance = {
     get touch() {
       return document.documentElement.classList.contains("touch");
     },
-    set touch(value) {
+
+    set touch(value: boolean) {
       if (typeof value !== "boolean") return;
-      if (this.touch === value) return;
-      const method = (value === true) ? "add" : "remove";
-      document.documentElement.classList[method]("touch");
+      if (Flatlands.appearance.touch === value) return;
+
+      if (value){
+        document.documentElement.classList.add("touch");
+      } else {
+        document.documentElement.classList.remove("touch");
+      }
     }
   }
-  serviceWorker = {
+
+  static serviceWorker = {
     get supported() {
       return ("serviceWorker" in navigator);
     },
+
     async register() {
-      if (!this.supported) return false;
+      if (!Flatlands.serviceWorker.supported) return false;
+
       try {
-        return await navigator.serviceWorker.register("service-worker.js");
-      } catch (error) {
+        await navigator.serviceWorker.register("service-worker.js");
+        return true;
+      } catch (error){
         console.error(error);
         return false;
       }
     }
   }
-  debug = {
+
+  static debug = {
     frames: 0,
     droppedFrames: 0
   }
 }
-
-// Set a custom string tag label for the Flatlands object
-Object.defineProperty(Object.getPrototypeOf(Flatlands),Symbol.toStringTag,{ value: Flatlands.constructor.name });
-
-// Expose the Flatlands object in the global window object, which helps with debugging
-// @ts-ignore
-window.Flatlands = Flatlands;
