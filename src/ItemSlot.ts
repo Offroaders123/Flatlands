@@ -1,13 +1,10 @@
 import { hotbar } from "./app.js";
 import { item } from "./properties.js";
 
-export class ItemSlotElement extends HTMLElement {
-  #isDefined = false;
-
-  connectedCallback() {
-    if (this.#isDefined || !this.isConnected) return;
-    this.#isDefined = true;
-    this.appendChild(document.createElement("item-render"));
+export class ItemSlot extends HTMLElement {
+  constructor() {
+    super();
+    this.append(document.createElement("item-render"));
   }
 
   get value() {
@@ -18,6 +15,10 @@ export class ItemSlotElement extends HTMLElement {
     if (this.value === value) return;
     this.setAttribute("value",value);
     this.sprite = value;// Look at the note below, this is what I am talking about XD
+  }
+
+  get index() {
+    return Number(this.getAttribute("index"));
   }
 
   get sprite() {
@@ -50,7 +51,7 @@ export class ItemSlotElement extends HTMLElement {
   }
 
   activate() {
-    for (const slot of hotbar.querySelectorAll<ItemSlotElement>("item-slot[active]")){
+    for (const slot of hotbar.querySelectorAll<ItemSlot>("item-slot[active]")){
       slot.deactivate();
     }
     this.setAttribute("active","");
@@ -61,12 +62,12 @@ export class ItemSlotElement extends HTMLElement {
   }
 }
 
-window.customElements.define("item-slot",ItemSlotElement);
+window.customElements.define("item-slot",ItemSlot);
 
 declare global {
   interface HTMLElementTagNameMap {
-    "item-slot": ItemSlotElement;
+    "item-slot": ItemSlot;
   }
 }
 
-export default ItemSlotElement;
+export default ItemSlot;

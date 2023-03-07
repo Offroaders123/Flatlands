@@ -1,7 +1,7 @@
 import { Entity } from "./Entity.js";
 import { hotbar, tick, treesArray } from "./app.js";
 import { ctx, offsetX, offsetY } from "./canvas.js";
-import { ItemSlotElement } from "./ItemSlotElement.js";
+import type ItemSlot from "./ItemSlot.js";
 import { key, gamepads } from "./input.js";
 import { entity, item } from "./properties.js";
 
@@ -72,7 +72,7 @@ export class Player extends Entity {
       key.up = (Math.round(axisY as number * 1000) < 0);
       key.down = (Math.round(axisY as number * 1000) > 0);
 
-      let active = parseInt(hotbar.querySelector<ItemSlotElement>("item-slot[active]")!.getAttribute("slot") as string);
+      let active = parseInt(hotbar.querySelector<ItemSlot>("item-slot[active]")!.getAttribute("slot") as string);
 
       if (left1 && !right1 && tick % 10 == 0){
         hotbar.setSlot((active - 1 > 0) ? active - 1 : 6);

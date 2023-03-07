@@ -4,6 +4,7 @@
     "outDir": "./dist",
     "module": "ESNext",
     "target": "ESNext",
+    "sourceMap": true,
     "strict": true
   }
 }
