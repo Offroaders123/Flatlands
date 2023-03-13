@@ -1,0 +1,13 @@
+{
+  "name": "flatlands",
+  "private": true,
+  "type": "module",
+  "browser": "./dist/app.js",
+  "scripts": {
+    "build": "npx tsc"
+  },
+  "devDependencies": {
+    "better-typescript": "^0.0.7",
+    "new-javascript": "^0.2.4"
+  }
+}

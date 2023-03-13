@@ -11,7 +11,7 @@ export class Debug extends HTMLElement {
 
   update() {
     this.#pre.textContent =
-`Flatlands v${Flatlands.version}
+`Flatlands ${Flatlands.version}
 Time Origin: ${timeOrigin}
 Current Time: ${new Date().toLocaleTimeString()}
 Game Time: ${Math.floor((Date.now() - timeOrigin) / 1000)}s
