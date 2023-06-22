@@ -1,12 +1,10 @@
-// @ts-check
-/// <reference lib="WebWorker"/>
+/// <reference no-default-lib="true"/>
+/// <reference types="better-typescript/worker.d.ts"/>
 
-(async () => {
-
-var self = /** @type { ServiceWorkerGlobalScope } */ (/** @type { unknown } */ (globalThis.self));
+var self = /** @type { ServiceWorkerGlobalScope } */ (/** @type { unknown } */ (globalThis));
 
 const Flatlands = {
-  version: "Flatlands v0.9.0",
+  version: "Flatlands v0.10.0",
   cache: true
 };
 
@@ -37,5 +35,3 @@ self.addEventListener("fetch",async event => {
     return fetched;
   })());
 });
-
-})();

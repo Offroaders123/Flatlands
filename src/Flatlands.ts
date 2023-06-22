@@ -1,5 +1,5 @@
 export default class Flatlands {
-  static version = "v0.9.0";
+  static version = "v0.10.0";
 
   static environment = {
     get touchDevice() {
