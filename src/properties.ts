@@ -4,7 +4,7 @@ export interface BaseDefinition {
   name: string;
   texture: {
     source: string;
-    readonly image: HTMLElement;
+    readonly image: HTMLImageElement;
     directional?: false;
   };
 }
@@ -54,7 +54,7 @@ export interface Fire extends AnimatedDefinition {
 
 export interface Ground extends BaseDefinition {
   texture: BaseDefinition["texture"] & {
-    pattern: CanvasPattern;
+    pattern: CanvasPattern | null;
   };
 }
 
@@ -66,23 +66,39 @@ export interface Tree extends BaseDefinition {
 }
 
 export interface Definitions {
-  entity: {
-    player: Player;
-    shadow: BaseDefinition;
-  };
-  item: {
-    fire: Fire;
-    hatchet: BaseDefinition;
-    pickmatic: BaseDefinition;
-    pizza: BaseDefinition;
-    spade: BaseDefinition;
-    spearsword: BaseDefinition;
-  };
-  terrain: {
-    ground: Ground;
-    tree: Tree;
-  };
+  entity: Entity;
+  item: Item;
+  terrain: Terrain;
+}
+
+export type DefinitionSrc = {
+  [K in keyof Definitions]: (Definitions[K][keyof Definitions[K]])[];
 };
+
+export type DefinitionFile = {
+  [K in keyof DefinitionSrc]: string[];
+};
+
+export interface Entity {
+  player: Player;
+  shadow: BaseDefinition;
+}
+
+export interface Item {
+  fire: Fire;
+  hatchet: BaseDefinition;
+  pickmatic: BaseDefinition;
+  pizza: BaseDefinition;
+  spade: BaseDefinition;
+  spearsword: BaseDefinition;
+}
+
+export interface Terrain {
+  ground: Ground;
+  tree: Tree;
+}
+
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
 
 const missingTextureSprite = new Image();
 missingTextureSprite.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAABIeJ9nAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAZQTFRF+QD/AAAASf/37wAAAAxJREFUeJxjcGBoAAABRADBOnocVgAAAABJRU5ErkJggg==";
@@ -113,7 +129,7 @@ definitions.terrain.ground.texture.pattern = ctx.createPattern(definitions.terra
 
 export const { entity, item, terrain } = definitions;
 
-function loadSprite(source: string){
+async function loadSprite(source: string): Promise<HTMLImageElement | null> {
   return new Promise<HTMLImageElement | null>(resolve => {
     const sprite = new Image();
     sprite.addEventListener("load",() => resolve(sprite));
