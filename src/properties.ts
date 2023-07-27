@@ -54,7 +54,7 @@ export interface Fire extends AnimatedDefinition {
 
 export interface Ground extends BaseDefinition {
   texture: BaseDefinition["texture"] & {
-    pattern: CanvasPattern | null;
+    pattern: CanvasPattern;
   };
 }
 
@@ -78,6 +78,10 @@ export type DefinitionSrc = {
 export type DefinitionFile = {
   [K in keyof DefinitionSrc]: string[];
 };
+
+export interface FeatureFile {
+  [id: string]: DefinitionSrc[keyof DefinitionSrc][number];
+}
 
 export interface Entity {
   player: Player;
@@ -103,21 +107,24 @@ type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
 const missingTextureSprite = new Image();
 missingTextureSprite.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAABIeJ9nAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAZQTFRF+QD/AAAASf/37wAAAAxJREFUeJxjcGBoAAABRADBOnocVgAAAABJRU5ErkJggg==";
 
-const definitions = await fetch("features/definitions.json").then(response => response.json());
+const definitionFile: DefinitionFile = await fetch("features/definitions.json").then(response => response.json());
+const definitions = {} as Definitions;
 
-for (const definition in definitions){
-  const entries = definitions[definition];
-  definitions[definition] = {};
+for (const definition in definitionFile){
+  const entries = definitionFile[definition as keyof typeof definitionFile];
+  definitions[definition as keyof typeof definitionFile] = {} as UnionToIntersection<typeof definitions[keyof typeof definitions]>;
 
   for (const value of entries){
-    const feature = await fetch(`features/${definition}/${value}`).then(response => response.json());
+    const feature: FeatureFile = await fetch(`features/${definition as keyof typeof definitionFile}/${value}`).then(response => response.json());
     const [key] = Object.keys(feature);
 
-    Object.assign(definitions[definition],feature);
-    const { source } = definitions[definition][key].texture;
+    Object.assign(definitions[definition as keyof typeof definitionFile],feature);
+    // @ts-expect-error - indexing
+    const { source } = definitions[definition as keyof typeof definitionFile][key].texture;
     const image = await loadSprite(source);
 
-    Object.defineProperty(definitions[definition][key].texture,"image",{
+    // @ts-expect-error
+    Object.defineProperty(definitions[definition as keyof typeof definitionFile][key].texture,"image",{
       get() {
         return (image) ? image : missingTextureSprite;
       }
@@ -125,7 +132,7 @@ for (const definition in definitions){
   }
 }
 
-definitions.terrain.ground.texture.pattern = ctx.createPattern(definitions.terrain.ground.texture.image,"repeat");
+definitions.terrain.ground.texture.pattern = ctx.createPattern(definitions.terrain.ground.texture.image,"repeat")!;
 
 export const { entity, item, terrain } = definitions;
 
