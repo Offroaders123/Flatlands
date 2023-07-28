@@ -1,8 +1,0 @@
-{
-  "shadow": {
-    "name": "Shadow",
-    "texture": {
-      "source": "textures/entity/shadow.png"
-    }
-  }
-}

@@ -1,8 +1,0 @@
-{
-  "ground": {
-    "name": "Ground",
-    "texture": {
-      "source": "textures/terrain/ground.png"
-    }
-  }
-}

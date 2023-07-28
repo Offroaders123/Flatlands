@@ -22,6 +22,9 @@ export interface ReactiveAnimation {
   duration: number;
   keyframes: number;
   columns: number;
+  tick: number;
+  frame: number;
+  column: number;
 }
 
 export interface RepeatAnimation {
@@ -77,14 +80,6 @@ export type DefinitionSrc = {
   [K in keyof Definitions]: (Definitions[K][keyof Definitions[K]])[];
 };
 
-export type DefinitionFile = {
-  [K in keyof DefinitionSrc]: string[];
-};
-
-export interface FeatureFile {
-  [id: string]: DefinitionSrc[keyof DefinitionSrc][number];
-}
-
 export interface Entity {
   player: Player;
   shadow: BaseDefinition;
@@ -112,24 +107,120 @@ const missingTextureSprite = new Image();
 // const missingTextureSprite = new ImageData(new Uint8ClampedArray([249,0,255,255,0,0,0,255,0,0,0,255,249,0,255,255]),2,2);
 missingTextureSprite.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAABIeJ9nAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAZQTFRF+QD/AAAASf/37wAAAAxJREFUeJxjcGBoAAABRADBOnocVgAAAABJRU5ErkJggg==";
 
-const definitionFile: DefinitionFile = await fetch("features/definitions.json").then(response => response.json());
-const definitions = {} as Definitions;
+const definitions: Definitions = {
+  entity: {
+    player: {
+      name: "Player",
+      box: {
+        width: 16,
+        height: 32
+      },
+      texture: {
+        source: "textures/entity/player/guy.png"
+      },
+      animation: {
+        type: "reactive",
+        duration: 24,
+        keyframes: 2,
+        columns: 4,
+        tick: 0,
+        frame: 0,
+        column: 0
+      },
+      direction: {
+        horizontal: "right",
+        vertical: false
+      },
+      hotbar: {
+        slots: [
+          "spearsword",
+          "pickmatic",
+          "hatchet",
+          "spade",
+          "fire",
+          "pizza"
+        ],
+        active: 4
+      },
+      speed: 2
+    },
+    shadow: {
+      name: "Shadow",
+      texture: {
+        source: "textures/entity/shadow.png"
+      }
+    }
+  },
+  item: {
+    fire: {
+      name: "Fire",
+      texture: {
+        source: "textures/item/fire.png",
+        directional: false
+      },
+      animation: {
+        type: "repeat",
+        duration: 750,
+        keyframes: 4
+      }
+    },
+    hatchet: {
+      name: "Hatchet",
+      texture: {
+        source: "textures/item/hatchet.png"
+      }
+    },
+    pickmatic: {
+      name: "Pickmatic",
+      texture: {
+        source: "textures/item/pickmatic.png"
+      }
+    },
+    pizza: {
+      name: "Pizza",
+      texture: {
+        source: "textures/item/pizza.png",
+        directional: false
+      }
+    },
+    spade: {
+      name: "Spade",
+      texture: {
+        source: "textures/item/spade.png"
+      }
+    },
+    spearsword: {
+      name: "Spearsword",
+      texture: {
+        source: "textures/item/spearsword.png"
+      }
+    }
+  },
+  terrain: {
+    ground: {
+      name: "Ground",
+      texture: {
+        source: "textures/terrain/ground.png"
+      }
+    },
+    tree: {
+      name: "Tree",
+      box: {
+        width: 96,
+        height: 192
+      },
+      texture: {
+        source: "textures/terrain/tree.png"
+      }
+    }
+  }
+} as Definitions;
 
-for (const definition in definitionFile){
-  const entries = definitionFile[definition as keyof typeof definitionFile];
-  definitions[definition as keyof typeof definitionFile] = {} as UnionToIntersection<typeof definitions[keyof typeof definitions]>;
-
-  for (const value of entries){
-    const feature: FeatureFile = await fetch(`features/${definition as keyof typeof definitionFile}/${value}`).then(response => response.json());
-    const [key] = Object.keys(feature);
-
-    Object.assign(definitions[definition as keyof typeof definitionFile],feature);
-    // @ts-expect-error - indexing
-    const { source } = definitions[definition as keyof typeof definitionFile][key].texture;
+for (const definition of Object.values(definitions) as Definitions[keyof Definitions][]){
+  for (const feature of Object.values(definition) as UnionToIntersection<typeof definition>[keyof UnionToIntersection<typeof definition>][]){
+    const { source } = feature.texture;
     const image = await loadSprite(source);
-
-    // @ts-expect-error
-    Object.defineProperty(definitions[definition as keyof typeof definitionFile][key].texture,"image",{
+    Object.defineProperty(feature.texture,"image",{
       get() {
         return (image) ? image : missingTextureSprite;
       }

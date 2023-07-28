@@ -1,9 +1,0 @@
-{
-  "pizza": {
-    "name": "Pizza",
-    "texture": {
-      "source": "textures/item/pizza.png",
-      "directional": false
-    }
-  }
-}
