@@ -6,7 +6,7 @@ export interface BaseDefinition {
     width?: number;
     height?: number;
     source: string;
-    readonly image: HTMLImageElement;
+    image: HTMLImageElement;
     directional?: false;
   };
 }
@@ -116,7 +116,8 @@ const definitions: Definitions = {
         height: 32
       },
       texture: {
-        source: "textures/entity/player/guy.png"
+        source: "textures/entity/player/guy.png",
+        image: missingTextureSprite
       },
       animation: {
         type: "reactive",
@@ -147,7 +148,8 @@ const definitions: Definitions = {
     shadow: {
       name: "Shadow",
       texture: {
-        source: "textures/entity/shadow.png"
+        source: "textures/entity/shadow.png",
+        image: missingTextureSprite
       }
     }
   },
@@ -156,6 +158,7 @@ const definitions: Definitions = {
       name: "Fire",
       texture: {
         source: "textures/item/fire.png",
+        image: missingTextureSprite,
         directional: false
       },
       animation: {
@@ -167,32 +170,37 @@ const definitions: Definitions = {
     hatchet: {
       name: "Hatchet",
       texture: {
-        source: "textures/item/hatchet.png"
+        source: "textures/item/hatchet.png",
+        image: missingTextureSprite
       }
     },
     pickmatic: {
       name: "Pickmatic",
       texture: {
-        source: "textures/item/pickmatic.png"
+        source: "textures/item/pickmatic.png",
+        image: missingTextureSprite
       }
     },
     pizza: {
       name: "Pizza",
       texture: {
         source: "textures/item/pizza.png",
+        image: missingTextureSprite,
         directional: false
       }
     },
     spade: {
       name: "Spade",
       texture: {
-        source: "textures/item/spade.png"
+        source: "textures/item/spade.png",
+        image: missingTextureSprite
       }
     },
     spearsword: {
       name: "Spearsword",
       texture: {
-        source: "textures/item/spearsword.png"
+        source: "textures/item/spearsword.png",
+        image: missingTextureSprite
       }
     }
   },
@@ -200,9 +208,10 @@ const definitions: Definitions = {
     ground: {
       name: "Ground",
       texture: {
-        source: "textures/terrain/ground.png"
+        source: "textures/terrain/ground.png",
+        image: missingTextureSprite
       }
-    },
+    } as Ground,
     tree: {
       name: "Tree",
       box: {
@@ -210,21 +219,20 @@ const definitions: Definitions = {
         height: 192
       },
       texture: {
-        source: "textures/terrain/tree.png"
+        source: "textures/terrain/tree.png",
+        image: missingTextureSprite
       }
     }
   }
-} as Definitions;
+};
 
 for (const definition of Object.values(definitions) as Definitions[keyof Definitions][]){
   for (const feature of Object.values(definition) as UnionToIntersection<typeof definition>[keyof UnionToIntersection<typeof definition>][]){
     const { source } = feature.texture;
     const image = await loadSprite(source);
-    Object.defineProperty(feature.texture,"image",{
-      get() {
-        return (image) ? image : missingTextureSprite;
-      }
-    });
+    if (image !== null){
+      feature.texture.image = image;
+    }
   }
 }
 
