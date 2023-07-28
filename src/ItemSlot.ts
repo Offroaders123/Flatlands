@@ -1,34 +1,38 @@
 import { hotbar } from "./app.js";
 import { item } from "./properties.js";
 
+import type { ItemID, UnionToIntersection } from "./properties.js";
+
 export class ItemSlot extends HTMLElement {
+  #itemRender = document.createElement("item-render");
+
   constructor() {
     super();
-    this.append(document.createElement("item-render"));
+    this.append(this.#itemRender);
   }
 
-  get value() {
-    return this.getAttribute("value") || "";
+  get value(): ItemID {
+    return this.getAttribute("value")! as ItemID;
   }
 
-  set value(value) {
+  set value(value: ItemID) {
     if (this.value === value) return;
     this.setAttribute("value",value);
-    this.sprite = value;// Look at the note below, this is what I am talking about XD
+    this.sprite = value;
   }
 
-  get index() {
+  get index(): number {
     return Number(this.getAttribute("index"));
   }
 
-  get sprite() {
-    return this.getAttribute("sprite") || "";
+  get sprite(): ItemID {
+    return this.getAttribute("sprite")! as ItemID;
   }
 
-  set sprite(id: string) {// Note to me: pleeease tidy up this parameter usage, it's really ugly at the moment.
-    const texture = { [id]: item[id] };// Same as note above, I essentially just moved the weird parameter into the function itself now XD
-    const { source, width = 16, height = 16 } = texture[id].texture;
-    const { animation } = texture[id];
+  set sprite(id: ItemID) {
+    const itemEntry = item[id];
+    const { texture, animation } = itemEntry as UnionToIntersection<typeof item[typeof id]>;
+    const { source, width = 16, height = 16 } = texture;
     if (this.sprite === id) return;
 
     this.setAttribute("sprite",id);
@@ -38,26 +42,26 @@ export class ItemSlot extends HTMLElement {
       this.style.setProperty("--width",`${width}px`);
       this.style.setProperty("--height",`${height}px`);
       this.style.setProperty("--duration",`${animation.duration}ms`);
-      this.style.setProperty("--keyframes",animation.keyframes);
+      this.style.setProperty("--keyframes",`${animation.keyframes}`);
     }
 
     /* Another goal would be to add functionality to use the cached image itself (the line above, or `sprite`), rather than re-fetching it again in the CSS after being added as a style in `setSlotTexture()`. *edit: Super cool idea! Add canvases for each of the item renderers, rather than just an inline element, so then it can also eventually allow for item animations :O *edit2: or just use CSS instead :) (it's already implemented now!) */
     /* It could make sense to make this a method of either the hotbar element, or the hud container once an in-game inventory is implemented. Then you could update all item slots for an item to have a certain texture *edit: Almost there! This comment used to be in `properties.js`, but now all of the slot rendering logic is part of the slot element itself :) */
-    this.querySelector<HTMLElement>("item-render")!.style.setProperty("background-image",`url("${source}")`);
+    this.#itemRender.style.setProperty("background-image",`url("${source}")`);
   }
 
-  render() {
+  render(): void {
     this.sprite = this.value;
   }
 
-  activate() {
+  activate(): void {
     for (const slot of hotbar.querySelectorAll<ItemSlot>("item-slot[active]")){
       slot.deactivate();
     }
     this.setAttribute("active","");
   }
 
-  deactivate() {
+  deactivate(): void {
     this.removeAttribute("active");
   }
 }

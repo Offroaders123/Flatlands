@@ -5,10 +5,10 @@ export const ctx = canvas.getContext("2d",{ alpha: false })!;
 
 export let scaling = 4;
 
-export function offsetX(){
+export function offsetX(): number {
   return Math.round(canvas.width / 2);
 }
 
-export function offsetY(){
+export function offsetY(): number {
   return Math.round((canvas.offsetHeight + coordinates.offsetHeight - hotbar.offsetHeight - parseInt(getComputedStyle(hud).paddingBottom)) / scaling / 2);
 }

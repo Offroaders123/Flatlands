@@ -2,13 +2,13 @@ export default class Flatlands {
   static version = "v0.10.0";
 
   static environment = {
-    get touchDevice() {
-      return ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+    get touchDevice(): boolean {
+      return "ontouchstart" in window || navigator.maxTouchPoints > 0;
     }
   }
 
   static appearance = {
-    get touch() {
+    get touch(): boolean {
       return document.documentElement.classList.contains("touch");
     },
 
@@ -25,11 +25,11 @@ export default class Flatlands {
   }
 
   static serviceWorker = {
-    get supported() {
-      return ("serviceWorker" in navigator);
+    get supported(): boolean {
+      return "serviceWorker" in navigator;
     },
 
-    async register() {
+    async register(): Promise<boolean> {
       if (!Flatlands.serviceWorker.supported) return false;
 
       try {

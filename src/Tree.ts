@@ -11,7 +11,7 @@ export class Tree extends Entity {
     super();
 
     // Inherit all properties defined inside of the Tree JSON file
-    for (const property in terrain.tree as typeof Tree){
+    for (const property in terrain.tree){
       // @ts-ignore
       this[property] = terrain.tree[property];
     }
@@ -28,7 +28,7 @@ export class Tree extends Entity {
     }
   }
 
-  draw() {
+  draw(): void {
     if (this.overlapRender && debug_toggle.checked){
       ctx.fillStyle = "#f00";
       ctx.fillRect(this.x + player.x + offsetX(),this.y + player.y + offsetY(),this.box.width,this.box.height);

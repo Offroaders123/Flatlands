@@ -71,7 +71,7 @@ hotbar.slots[player.hotbar.active].activate();
 // Trees
 export const treesArray: Tree[] = [];
 
-function handleTrees(){
+function handleTrees(): void {
   if (tick % 20 === 0){
     if (canvas.height / -2 - player.y - offsetX() < explored.top || canvas.height - player.y - offsetY() > explored.bottom){
       if (key.up && !key.down){
@@ -91,13 +91,13 @@ function handleTrees(){
 //for (let i = 0; i < 4; i++) treesArray.push(new Tree());
 
 // Update Game State
-function update(){
+function update(): void {
   player.update();
   tick++;
 }
 
 // Draw Game State to the renderer
-function draw(){
+function draw(): void {
   const { width, height } = canvas;
 
   // Reset for next frame
@@ -136,7 +136,7 @@ const timestep = 1000 / 60;
 
 window.requestAnimationFrame(loop);
 
-function loop(){
+function loop(): void {
   // Calculate the amount of time that hasn't been simulated since the last tick
   const time = Date.now() - timeOrigin;
   delta += time - lastFrameTime;

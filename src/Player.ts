@@ -1,9 +1,11 @@
 import { Entity } from "./Entity.js";
 import { hotbar, tick, treesArray } from "./app.js";
 import { ctx, offsetX, offsetY } from "./canvas.js";
-import type ItemSlot from "./ItemSlot.js";
 import { key, gamepads } from "./input.js";
 import { entity, item } from "./properties.js";
+
+import type ItemSlot from "./ItemSlot.js";
+import type { ItemID, UnionToIntersection } from "./properties.js";
 
 export class Player extends Entity {
   declare animation: {
@@ -23,9 +25,9 @@ export class Player extends Entity {
   };
 
   declare hotbar: {
-    slots: [string,string,string,string,string,string];
+    slots: [ItemID,ItemID,ItemID,ItemID,ItemID,ItemID];
     active: number;
-    readonly held_item: number;
+    readonly held_item: ItemID;
   }
 
   declare speed: number;
@@ -34,7 +36,7 @@ export class Player extends Entity {
     super();
 
     // Inherit all properties defined inside of the Player JSON file
-    for (const property in entity.player as typeof Player){
+    for (const property in entity.player){
       // @ts-ignore
       this[property] = entity.player[property];
     }
@@ -47,7 +49,7 @@ export class Player extends Entity {
     Object.defineProperty(this.hotbar,"held_item",{ get: () => this.hotbar.slots[this.hotbar.active] });
   }
 
-  getEntityOverlap() {
+  getEntityOverlap(): void {
     const rect1 = this.getBoundingClientRect();
     for (const tree of treesArray){
       const rect2 = tree.getBoundingClientRect();
@@ -60,7 +62,7 @@ export class Player extends Entity {
     }
   }
 
-  update() {
+  update(): void {
     this.getEntityOverlap();
     const gamepad = navigator.getGamepads()[gamepads[0]];
 
@@ -138,7 +140,7 @@ export class Player extends Entity {
     }
   }
 
-  draw() {
+  draw(): void {
     let scale = 1;
     let offset = 1;
     let itemScale = 1;
@@ -171,8 +173,8 @@ export class Player extends Entity {
     ctx.setTransform(1,0,0,1,0,0);
   }
 
-  drawItem(scale: number, itemScale: number) {
-    const definition = item[this.hotbar.held_item];
+  drawItem(scale: number, itemScale: number): void {
+    const definition = item[this.hotbar.held_item] as UnionToIntersection<typeof item[typeof this.hotbar.held_item]>;
     let { naturalWidth: width, naturalHeight: height } = definition.texture.image;
     if (definition.animation){
       height /= definition.animation.keyframes;
@@ -201,7 +203,7 @@ export class Player extends Entity {
     ctx.drawImage(definition.texture.image,0,keyframe,width,height,this.direction.vertical ? this.direction.vertical === "up" ? -2 : -1 : 0,1,width,height);
   }
 
-  drawCharacter(scale: number, offset: number) {
+  drawCharacter(scale: number, offset: number): void {
     ctx.setTransform(this.direction.horizontal === "left" && !this.direction.vertical ? -1 : 1,0,0,1,offsetX(),offsetY());
     ctx.transform(1,0,0,1,this.box.width / -2 + offset,this.box.height / -2);
     ctx.drawImage(entity.player.texture.image,this.box.width * (this.animation.column !== 0 ? this.animation.frame : 0),this.box.height * this.animation.column,this.box.width,this.box.height,0,0,this.box.width,this.box.height);

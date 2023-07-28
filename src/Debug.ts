@@ -9,7 +9,7 @@ export class Debug extends HTMLElement {
     this.append(this.#pre);
   }
 
-  update() {
+  update(): void {
     this.#pre.textContent =
 `Flatlands ${Flatlands.version}
 Time Origin: ${timeOrigin}

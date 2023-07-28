@@ -3,6 +3,8 @@ import { ctx } from "./canvas.js";
 export interface BaseDefinition {
   name: string;
   texture: {
+    width?: number;
+    height?: number;
     source: string;
     readonly image: HTMLImageElement;
     directional?: false;
@@ -39,7 +41,7 @@ export interface Player extends AnimatedDefinition {
     vertical: false | "down" | "up";
   };
   hotbar: {
-    slots: [string,string,string,string,string,string];
+    slots: [ItemID,ItemID,ItemID,ItemID,ItemID,ItemID];
     active: number;
   };
   speed: number;
@@ -97,12 +99,14 @@ export interface Item {
   spearsword: BaseDefinition;
 }
 
+export type ItemID = keyof Item;
+
 export interface Terrain {
   ground: Ground;
   tree: Tree;
 }
 
-type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
+export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
 
 const missingTextureSprite = new Image();
 missingTextureSprite.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAABIeJ9nAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAZQTFRF+QD/AAAASf/37wAAAAxJREFUeJxjcGBoAAABRADBOnocVgAAAABJRU5ErkJggg==";

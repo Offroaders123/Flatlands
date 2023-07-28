@@ -21,7 +21,7 @@ export class DPad extends HTMLElement {
     });    
   }
 
-  down(event: PointerEvent | TouchEvent) {
+  down(event: PointerEvent | TouchEvent): void {
     if (!(event.target instanceof HTMLElement)) return;
     event.preventDefault();
   
@@ -43,7 +43,7 @@ export class DPad extends HTMLElement {
     }
   }
 
-  up(event: PointerEvent | TouchEvent) {
+  up(event: PointerEvent | TouchEvent): void {
     if (!(event.target instanceof HTMLElement)) return;
 
     if (event.target.matches("button")){

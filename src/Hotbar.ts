@@ -1,5 +1,7 @@
 import { player } from "./app.js";
 
+import type ItemSlot from "./ItemSlot.js";
+
 export class Hotbar extends HTMLElement {
   constructor() {
     super();
@@ -13,13 +15,13 @@ export class Hotbar extends HTMLElement {
     },{ passive: false });
   }
 
-  setSlot(index: number) {
+  setSlot(index: number): void {
     const slot = this.slots[index];
     slot.activate();
     player.hotbar.active = index;
   }
 
-  get slots() {
+  get slots(): ItemSlot[] {
     return [...this.querySelectorAll("item-slot")];
   }
 }

@@ -1,11 +1,16 @@
 import { debug_toggle, hotbar } from "./app.js";
 import Flatlands from "./Flatlands.js";
 
-interface Key {
-  [name: string]: string | boolean;
+export type Key = string | boolean;
+
+export interface KeyState {
+  left: Key;
+  right: Key;
+  up: Key;
+  down: Key;
 }
 
-export const key: Key = {
+export const key: KeyState = {
   left: false,
   right: false,
   up: false,
