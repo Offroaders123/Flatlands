@@ -5,6 +5,7 @@ import { key, gamepads } from "./input.js";
 import { entity, item } from "./properties.js";
 
 import type ItemSlot from "./ItemSlot.js";
+import type { HotbarSlotIndex } from "./Hotbar.js";
 import type { ItemID, UnionToIntersection } from "./properties.js";
 
 export class Player extends Entity {
@@ -26,7 +27,7 @@ export class Player extends Entity {
 
   declare hotbar: {
     slots: [ItemID,ItemID,ItemID,ItemID,ItemID,ItemID];
-    active: number;
+    active: HotbarSlotIndex;
     readonly held_item: ItemID;
   }
 
@@ -64,6 +65,7 @@ export class Player extends Entity {
 
   update(): void {
     this.getEntityOverlap();
+    // @ts-expect-error - this might be causing the gamepad crashes
     const gamepad = navigator.getGamepads()[gamepads[0]];
 
     let [axisX,axisY] = (gamepad) ? gamepad.axes : [null,null,null,null], [left1,right1] = (gamepad) ? [gamepad.buttons[4].value,gamepad.buttons[5].value] : [null,null];
@@ -74,13 +76,13 @@ export class Player extends Entity {
       key.up = (Math.round(axisY as number * 1000) < 0);
       key.down = (Math.round(axisY as number * 1000) > 0);
 
-      let active = parseInt(hotbar.querySelector<ItemSlot>("item-slot[active]")!.getAttribute("slot") as string);
+      let active: HotbarSlotIndex = parseInt(hotbar.querySelector<ItemSlot>("item-slot[active]")!.getAttribute("slot") as string) as HotbarSlotIndex;
 
       if (left1 && !right1 && tick % 10 == 0){
-        hotbar.setSlot((active - 1 > 0) ? active - 1 : 6);
+        hotbar.setSlot(((active - 1 > 0) ? active - 1 : 6) as HotbarSlotIndex);
       }
       if (right1 && !left1 && tick % 10 == 0){
-        hotbar.setSlot((active + 1 < 7) ? active + 1 : 1);
+        hotbar.setSlot(((active + 1 < 7) ? active + 1 : 1) as HotbarSlotIndex);
       }
     }
 

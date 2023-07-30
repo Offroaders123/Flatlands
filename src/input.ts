@@ -1,6 +1,8 @@
 import { debug_toggle, hotbar } from "./app.js";
 import Flatlands from "./Flatlands.js";
 
+import type { HotbarSlotIndex } from "./Hotbar.js";
+
 export type Key = string | boolean;
 
 export interface KeyState {
@@ -53,7 +55,7 @@ document.addEventListener("keydown",event => {
 
   if (["Digit1","Digit2","Digit3","Digit4","Digit5","Digit6"].includes(event.code)){
     event.preventDefault();
-    hotbar.setSlot(Number(event.code.replace(/Digit/,"")) - 1);
+    hotbar.setSlot(Number(event.code.replace(/Digit/,"")) - 1 as HotbarSlotIndex);
   }
 
   if (["ArrowLeft","KeyA"].includes(event.code)){

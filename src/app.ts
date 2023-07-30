@@ -11,6 +11,8 @@ import { terrain } from "./properties.js";
 import { Player } from "./Player.js";
 import { Tree } from "./Tree.js";
 
+import type { HotbarSlotIndex } from "./Hotbar.js";
+
 // Service Worker
 Flatlands.serviceWorker.register();
 
@@ -63,7 +65,7 @@ export const player = new Player();
 
 // Loop over each hotbar slot and update it's state to match the player's state
 hotbar.slots.forEach((slot,i) => {
-  slot.value = player.hotbar.slots[i];
+  slot.value = player.hotbar.slots[i as HotbarSlotIndex];
 });
 
 hotbar.slots[player.hotbar.active].activate();

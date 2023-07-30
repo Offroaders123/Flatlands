@@ -2,6 +2,7 @@ import { hotbar } from "./app.js";
 import { item } from "./properties.js";
 
 import type { ItemID, UnionToIntersection } from "./properties.js";
+import type { HotbarSlotIndex } from "./Hotbar.js";
 
 export class ItemSlot extends HTMLElement {
   #itemRender = document.createElement("item-render");
@@ -21,8 +22,8 @@ export class ItemSlot extends HTMLElement {
     this.sprite = value;
   }
 
-  get index(): number {
-    return Number(this.getAttribute("index"));
+  get index(): HotbarSlotIndex {
+    return Number(this.getAttribute("index")) as HotbarSlotIndex;
   }
 
   get sprite(): ItemID {
