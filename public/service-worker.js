@@ -4,7 +4,7 @@
 var self = /** @type { ServiceWorkerGlobalScope } */ (/** @type { unknown } */ (globalThis));
 
 const Flatlands = {
-  version: "Flatlands v0.10.0",
+  version: "Flatlands v0.14.0",
   cache: true
 };
 
