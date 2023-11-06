@@ -205,7 +205,7 @@ export class Player extends Entity {
     ctx.drawImage(definition.texture.image,0,keyframe,width,height,this.direction.vertical ? this.direction.vertical === "up" ? -2 : -1 : 0,1,width,height);
   }
 
-  drawCharacter(scale: number, offset: number): void {
+  drawCharacter(_scale: number, offset: number): void {
     ctx.setTransform(this.direction.horizontal === "left" && !this.direction.vertical ? -1 : 1,0,0,1,offsetX(),offsetY());
     ctx.transform(1,0,0,1,this.box.width / -2 + offset,this.box.height / -2);
     ctx.drawImage(entity.player.texture.image,this.box.width * (this.animation.column !== 0 ? this.animation.frame : 0),this.box.height * this.animation.column,this.box.width,this.box.height,0,0,this.box.width,this.box.height);

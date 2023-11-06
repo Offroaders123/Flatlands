@@ -1,5 +1,5 @@
 export default class Flatlands {
-  static version = "v0.14.2";
+  static version = "v0.15.0";
 
   static environment = {
     get touchDevice(): boolean {
@@ -26,7 +26,7 @@ export default class Flatlands {
 
   static serviceWorker = {
     get supported(): boolean {
-      return "serviceWorker" in navigator;
+      return "serviceWorker" in navigator && !import.meta.env.DEV;
     },
 
     async register(): Promise<boolean> {

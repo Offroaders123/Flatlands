@@ -50,7 +50,7 @@ export const coordinates = document.querySelector("coordinates-panel")!;
 export const hotbar = document.querySelector("hotbar-panel")!;
 
 // D-Pad
-const dpad = document.querySelector("dpad-panel")!;
+// const dpad = document.querySelector("dpad-panel")!;
 
 // Environment
 export const explored = {
