@@ -1,7 +1,7 @@
 <table>
   <tr>
     <td>
-      <img width="64" src="./app-512.png">
+      <img width="64" src="./public/app-512.png">
     </td>
     <td>
       <h1>Flatlands</h1>
