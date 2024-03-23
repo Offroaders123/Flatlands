@@ -46,13 +46,6 @@ export interface Ground extends BaseDefinition {
   };
 }
 
-export interface Tree extends BaseDefinition {
-  box: {
-    width: number;
-    height: number;
-  };
-}
-
 export interface Definitions {
   entity: Entity;
   item: Item;
@@ -76,7 +69,6 @@ export type ItemID = keyof Item;
 
 export interface Terrain {
   ground: Ground;
-  tree: Tree;
 }
 
 export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
@@ -191,17 +183,17 @@ const definitions: Definitions = {
         pattern: {} as CanvasPattern
       }
     } satisfies Ground,
-    tree: {
-      name: "Tree",
-      box: {
-        width: 96,
-        height: 192
-      },
-      texture: {
-        source: "textures/terrain/tree.png",
-        image: missingTextureSprite
-      }
-    } satisfies Tree
+    // tree: {
+    //   name: "Tree",
+    //   box: {
+    //     width: 96,
+    //     height: 192
+    //   },
+    //   texture: {
+    //     source: "textures/terrain/tree.png",
+    //     image: missingTextureSprite
+    //   }
+    // } satisfies Tree
   } satisfies Terrain
 };
 

@@ -10,11 +10,11 @@ import type { AnimatedDefinition, BaseDefinition, ItemID, ReactiveAnimation, Uni
 
 export class Player extends Entity implements BaseDefinition, AnimatedDefinition {
   name = "Player";
-  override box = {
+  box = {
     width: 16,
     height: 32
   };
-  override texture = {
+  texture = {
     source: "textures/entity/player/guy.png",
     image: missingTextureSprite
   };

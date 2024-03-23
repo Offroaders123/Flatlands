@@ -9,16 +9,16 @@ export interface BoundingClientRect {
   height: number;
 }
 
-export class Entity {
+export abstract class Entity {
   x = 0;
   y = 0;
 
-  declare box: {
+  abstract box: {
     width: number;
     height: number;
   };
 
-  declare texture: {
+  abstract texture: {
     source: string;
   };
 
