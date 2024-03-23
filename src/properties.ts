@@ -144,15 +144,15 @@ const definitions: Definitions = {
         active: 4
       },
       speed: 2
-    },
+    } satisfies Player,
     shadow: {
       name: "Shadow",
       texture: {
         source: "textures/entity/shadow.png",
         image: missingTextureSprite
       }
-    }
-  },
+    } satisfies BaseDefinition
+  } satisfies Entity,
   item: {
     fire: {
       name: "Fire",
@@ -166,21 +166,21 @@ const definitions: Definitions = {
         duration: 750,
         keyframes: 4
       }
-    },
+    } satisfies Fire,
     hatchet: {
       name: "Hatchet",
       texture: {
         source: "textures/item/hatchet.png",
         image: missingTextureSprite
       }
-    },
+    } satisfies BaseDefinition,
     pickmatic: {
       name: "Pickmatic",
       texture: {
         source: "textures/item/pickmatic.png",
         image: missingTextureSprite
       }
-    },
+    } satisfies BaseDefinition,
     pizza: {
       name: "Pizza",
       texture: {
@@ -188,30 +188,31 @@ const definitions: Definitions = {
         image: missingTextureSprite,
         directional: false
       }
-    },
+    } satisfies BaseDefinition,
     spade: {
       name: "Spade",
       texture: {
         source: "textures/item/spade.png",
         image: missingTextureSprite
       }
-    },
+    } satisfies BaseDefinition,
     spearsword: {
       name: "Spearsword",
       texture: {
         source: "textures/item/spearsword.png",
         image: missingTextureSprite
       }
-    }
-  },
+    } satisfies BaseDefinition
+  } satisfies Item,
   terrain: {
     ground: {
       name: "Ground",
       texture: {
         source: "textures/terrain/ground.png",
-        image: missingTextureSprite
+        image: missingTextureSprite,
+        pattern: {} as CanvasPattern
       }
-    } as Ground,
+    } satisfies Ground,
     tree: {
       name: "Tree",
       box: {
@@ -222,8 +223,8 @@ const definitions: Definitions = {
         source: "textures/terrain/tree.png",
         image: missingTextureSprite
       }
-    }
-  }
+    } satisfies Tree
+  } satisfies Terrain
 };
 
 await Promise.all((Object.values(definitions) as Definitions[keyof Definitions][]).map(async definition => {
