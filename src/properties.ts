@@ -33,23 +33,6 @@ export interface RepeatAnimation {
   keyframes: number;
 }
 
-export interface Player extends AnimatedDefinition {
-  box: {
-    width: 16;
-    height: 32;
-  };
-  animation: ReactiveAnimation;
-  direction: {
-    horizontal: string;
-    vertical: false | "down" | "up";
-  };
-  hotbar: {
-    slots: [ItemID,ItemID,ItemID,ItemID,ItemID,ItemID];
-    active: number;
-  };
-  speed: number;
-}
-
 export interface Fire extends AnimatedDefinition {
   texture: BaseDefinition["texture"] & {
     directional: false;
@@ -76,12 +59,7 @@ export interface Definitions {
   terrain: Terrain;
 }
 
-export type DefinitionSrc = {
-  [K in keyof Definitions]: (Definitions[K][keyof Definitions[K]])[];
-};
-
 export interface Entity {
-  player: Player;
   shadow: BaseDefinition;
 }
 
@@ -103,48 +81,48 @@ export interface Terrain {
 
 export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
 
-const missingTextureSprite = new Image();
+export const missingTextureSprite = new Image();
 // const missingTextureSprite = new ImageData(new Uint8ClampedArray([249,0,255,255,0,0,0,255,0,0,0,255,249,0,255,255]),2,2);
 missingTextureSprite.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAABIeJ9nAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAZQTFRF+QD/AAAASf/37wAAAAxJREFUeJxjcGBoAAABRADBOnocVgAAAABJRU5ErkJggg==";
 
 const definitions: Definitions = {
   entity: {
-    player: {
-      name: "Player",
-      box: {
-        width: 16,
-        height: 32
-      },
-      texture: {
-        source: "textures/entity/player/guy.png",
-        image: missingTextureSprite
-      },
-      animation: {
-        type: "reactive",
-        duration: 24,
-        keyframes: 2,
-        columns: 4,
-        tick: 0,
-        frame: 0,
-        column: 0
-      },
-      direction: {
-        horizontal: "right",
-        vertical: false
-      },
-      hotbar: {
-        slots: [
-          "spearsword",
-          "pickmatic",
-          "hatchet",
-          "spade",
-          "fire",
-          "pizza"
-        ],
-        active: 4
-      },
-      speed: 2
-    } satisfies Player,
+    // player: {
+    //   name: "Player",
+    //   box: {
+    //     width: 16,
+    //     height: 32
+    //   },
+    //   texture: {
+    //     source: "textures/entity/player/guy.png",
+    //     image: missingTextureSprite
+    //   },
+    //   animation: {
+    //     type: "reactive",
+    //     duration: 24,
+    //     keyframes: 2,
+    //     columns: 4,
+    //     tick: 0,
+    //     frame: 0,
+    //     column: 0
+    //   },
+    //   direction: {
+    //     horizontal: "right",
+    //     vertical: false
+    //   },
+    //   hotbar: {
+    //     slots: [
+    //       "spearsword",
+    //       "pickmatic",
+    //       "hatchet",
+    //       "spade",
+    //       "fire",
+    //       "pizza"
+    //     ],
+    //     active: 4
+    //   },
+    //   speed: 2
+    // } satisfies Player,
     shadow: {
       name: "Shadow",
       texture: {
@@ -250,7 +228,7 @@ definitions.terrain.ground.texture.pattern = ctx.createPattern(definitions.terra
 
 export const { entity, item, terrain } = definitions;
 
-async function loadSprite(source: string): Promise<HTMLImageElement | null> {
+export async function loadSprite(source: string): Promise<HTMLImageElement | null> {
   return new Promise<HTMLImageElement | null>(resolve => {
     const sprite = new Image();
     sprite.addEventListener("load",() => resolve(sprite));

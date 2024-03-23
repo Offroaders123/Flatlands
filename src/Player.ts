@@ -2,45 +2,58 @@ import { Entity } from "./Entity.js";
 import { hotbar, tick, treesArray } from "./app.js";
 import { ctx, offsetX, offsetY } from "./canvas.js";
 import { key, gamepads } from "./input.js";
-import { entity, item } from "./properties.js";
+import { entity, item, loadSprite, missingTextureSprite } from "./properties.js";
 
 import type ItemSlot from "./ItemSlot.js";
 import type { HotbarSlotIndex } from "./Hotbar.js";
-import type { ItemID, UnionToIntersection } from "./properties.js";
+import type { AnimatedDefinition, BaseDefinition, ItemID, ReactiveAnimation, UnionToIntersection } from "./properties.js";
 
-export class Player extends Entity {
-  declare animation: {
-    type: string;
-    duration: number;
-    keyframes: number;
-    columns: number;
-
-    tick: number;
-    frame: number;
-    column: number;
+export class Player extends Entity implements BaseDefinition, AnimatedDefinition {
+  name = "Player";
+  override box = {
+    width: 16,
+    height: 32
   };
-  
-  declare direction: {
-    horizontal: string;
-    vertical: string | boolean;
+  override texture = {
+    source: "textures/entity/player/guy.png",
+    image: missingTextureSprite
   };
-
-  declare hotbar: {
+  animation = {
+    type: "reactive",
+    duration: 24,
+    keyframes: 2,
+    columns: 4,
+    tick: 0,
+    frame: 0,
+    column: 0
+  } as ReactiveAnimation;
+  direction = {
+    horizontal: "right",
+    vertical: false
+  } as {
+    horizontal: "left" | "right";
+    vertical: false | "down" | "up";
+  };
+  hotbar = {
+    slots: [
+      "spearsword",
+      "pickmatic",
+      "hatchet",
+      "spade",
+      "fire",
+      "pizza"
+    ],
+    active: 4,
+    held_item: "" as ItemID
+  } as {
     slots: [ItemID,ItemID,ItemID,ItemID,ItemID,ItemID];
     active: HotbarSlotIndex;
     readonly held_item: ItemID;
-  }
-
-  declare speed: number;
+  };
+  speed = 2;
 
   constructor() {
     super();
-
-    // Inherit all properties defined inside of the Player JSON file
-    for (const property in entity.player){
-      // @ts-ignore
-      this[property] = entity.player[property];
-    }
 
     // Define properties only used internally by the game that don't need to be in the source file
     this.animation.tick = 0;
@@ -48,6 +61,11 @@ export class Player extends Entity {
     this.animation.column = 0;
 
     Object.defineProperty(this.hotbar,"held_item",{ get: () => this.hotbar.slots[this.hotbar.active] });
+
+    loadSprite(this.texture.source).then(sprite => {
+      if (sprite === null) return;
+      this.texture.image = sprite;
+    });
   }
 
   getEntityOverlap(): void {
@@ -208,6 +226,6 @@ export class Player extends Entity {
   drawCharacter(_scale: number, offset: number): void {
     ctx.setTransform(this.direction.horizontal === "left" && !this.direction.vertical ? -1 : 1,0,0,1,offsetX(),offsetY());
     ctx.transform(1,0,0,1,this.box.width / -2 + offset,this.box.height / -2);
-    ctx.drawImage(entity.player.texture.image,this.box.width * (this.animation.column !== 0 ? this.animation.frame : 0),this.box.height * this.animation.column,this.box.width,this.box.height,0,0,this.box.width,this.box.height);
+    ctx.drawImage(this.texture.image,this.box.width * (this.animation.column !== 0 ? this.animation.frame : 0),this.box.height * this.animation.column,this.box.width,this.box.height,0,0,this.box.width,this.box.height);
   }
 }
