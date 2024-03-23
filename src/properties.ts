@@ -227,21 +227,24 @@ const definitions: Definitions = {
   } satisfies Terrain
 };
 
-await Promise.all(
-  (Object.values(definitions) as Definitions[keyof Definitions][])
-    .map(async definition => {
-      await Promise.all(
-        (Object.values(definition) as UnionToIntersection<typeof definition>[keyof UnionToIntersection<typeof definition>][])
-          .map(async feature => {
-            const { source } = feature.texture;
-            const image = await loadSprite(source);
-            if (image !== null){
-              feature.texture.image = image;
-            }
-          })
-      );
-    })
-);
+async function loadDefinitions(definitions: Definitions): Promise<void> {
+  await Promise.all<void[]>(
+    (Object.values(definitions) as Definitions[keyof Definitions][])
+      .map(definition => Promise.all<void>(
+        Object.values(definition)
+          .map(feature => loadFeature(feature))
+      ))
+  ) satisfies void[][];
+}
+
+async function loadFeature(feature: BaseDefinition): Promise<void> {
+  const { source } = feature.texture;
+  const image = await loadSprite(source);
+  if (image === null) return;
+  feature.texture.image = image;
+}
+
+await loadDefinitions(definitions);
 
 definitions.terrain.ground.texture.pattern = ctx.createPattern(definitions.terrain.ground.texture.image,"repeat")!;
 
