@@ -1,7 +1,5 @@
-/// <reference no-default-lib="true"/>
-/// <reference types="better-typescript/worker.d.ts"/>
-
 declare var self: ServiceWorkerGlobalScope;
+declare const clients: Clients;
 
 const NAME = "Flatlands";
 const VERSION = "v0.15.0";
@@ -54,3 +52,5 @@ async function cacheRequest(request: Request, response: Response): Promise<void>
   const cache = await caches.open(CACHE_NAME);
   await cache.put(request,response.clone());
 }
+
+export {};

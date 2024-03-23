@@ -4,7 +4,6 @@
     "target": "ESNext",
     "isolatedModules": true,
     "types": [
-      "new-javascript",
       "vite/client"
     ],
     "noEmit": true,
@@ -16,5 +15,8 @@
     "allowUnreachableCode": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true
-  }
+  },
+  "exclude": [
+    "./src/service-worker"
+  ]
 }
