@@ -1,5 +1,6 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
+import "./index.scss";
 
 const root = document.querySelector<HTMLDivElement>("#root")!;
 
