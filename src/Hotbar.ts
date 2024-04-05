@@ -38,4 +38,12 @@ declare global {
   }
 }
 
+declare module "solid-js" {
+  namespace JSX {
+    interface HTMLElementTags {
+      "hotbar-panel": HTMLAttributes<Hotbar>;
+    }
+  }
+}
+
 export default Hotbar;

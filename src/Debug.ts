@@ -32,4 +32,12 @@ declare global {
   }
 }
 
+declare module "solid-js" {
+  namespace JSX {
+    interface HTMLElementTags {
+      "debug-panel": HTMLAttributes<Debug>;
+    }
+  }
+}
+
 export default Debug;

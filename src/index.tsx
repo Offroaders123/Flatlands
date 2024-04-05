@@ -16,12 +16,12 @@ export function App() {
         <debug-panel></debug-panel>
         <coordinates-panel></coordinates-panel>
         <hotbar-panel>
-          <item-slot index="0"></item-slot>
-          <item-slot index="1"></item-slot>
-          <item-slot index="2"></item-slot>
-          <item-slot index="3"></item-slot>
-          <item-slot index="4"></item-slot>
-          <item-slot index="5"></item-slot>
+          <item-slot index={0}></item-slot>
+          <item-slot index={1}></item-slot>
+          <item-slot index={2}></item-slot>
+          <item-slot index={3}></item-slot>
+          <item-slot index={4}></item-slot>
+          <item-slot index={5}></item-slot>
         </hotbar-panel>
         <dpad-panel>
           <button data-left tabindex="-1"/>
@@ -32,4 +32,12 @@ export function App() {
       </hud-panel>
     </>
   );
+}
+
+declare module "solid-js" {
+  namespace JSX {
+    interface HTMLElementTags {
+      "hud-panel": HTMLAttributes<HTMLElement>;
+    }
+  }
 }

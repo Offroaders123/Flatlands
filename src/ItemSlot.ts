@@ -75,4 +75,12 @@ declare global {
   }
 }
 
+declare module "solid-js" {
+  namespace JSX {
+    interface HTMLElementTags {
+      "item-slot": HTMLAttributes<ItemSlot> & { index: number; };
+    }
+  }
+}
+
 export default ItemSlot;

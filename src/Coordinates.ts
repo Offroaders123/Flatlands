@@ -14,4 +14,12 @@ declare global {
   }
 }
 
+declare module "solid-js" {
+  namespace JSX {
+    interface HTMLElementTags {
+      "coordinates-panel": HTMLAttributes<Coordinates>;
+    }
+  }
+}
+
 export default Coordinates;

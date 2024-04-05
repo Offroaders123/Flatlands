@@ -73,4 +73,12 @@ declare global {
   }
 }
 
+declare module "solid-js" {
+  namespace JSX {
+    interface HTMLElementTags {
+      "dpad-panel": HTMLAttributes<DPad>;
+    }
+  }
+}
+
 export default DPad;
