@@ -1,19 +1,31 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
+import { createMemo } from "solid-js";
+
+import type { Accessor } from "solid-js";
+
 import "./index.scss";
 
 const root = document.querySelector<HTMLDivElement>("#root")!;
 
-render(() => <App />, root);
+// state hoisting
+export let player: Player | null = null;
 
-export function App() {
+render(() => <App getPlayerX={() => player?.x ?? 0} getPlayerY={() => player?.y ?? 0}/>, root);
+
+export interface AppProps {
+  getPlayerX: Accessor<number>;
+  getPlayerY: Accessor<number>;
+}
+
+export function App(props: AppProps) {
   return (
     <>
       <canvas id="canvas"></canvas>
       <hud-panel>
         <input id="debug_toggle" type="checkbox" tabindex="-1"/>
         <debug-panel></debug-panel>
-        <coordinates-panel></coordinates-panel>
+        <Coordinates getPlayerX={props.getPlayerX} getPlayerY={props.getPlayerY}/>
         <hotbar-panel>
           <item-slot index={0}></item-slot>
           <item-slot index={1}></item-slot>
@@ -79,24 +91,30 @@ export function offsetY(): number {
 
 // import { player } from "./app.js";
 
-export class Coordinates extends HTMLElement {
-  update(): void {
-    this.textContent = `(${Math.round(player.x / 16) * -1}, ${Math.round(player.y / 16)})`;
-  }
+export interface CoordinatesProps {
+  getPlayerX: Accessor<number>;
+  getPlayerY: Accessor<number>;
 }
 
-window.customElements.define("coordinates-panel",Coordinates);
+export function Coordinates(props: CoordinatesProps){
+  const displayX = createMemo<number>(() => Math.round(props.getPlayerX() / 16) * -1);
+  const displayY = createMemo<number>(() => Math.round(props.getPlayerY() / 16));
+
+  return (
+    <coordinates-panel>({displayX()}, {displayY()})</coordinates-panel>
+  );
+}
 
 declare global {
   interface HTMLElementTagNameMap {
-    "coordinates-panel": Coordinates;
+    "coordinates-panel": HTMLElement;
   }
 }
 
 declare module "solid-js" {
   namespace JSX {
     interface HTMLElementTags {
-      "coordinates-panel": HTMLAttributes<Coordinates>;
+      "coordinates-panel": HTMLAttributes<HTMLElement>;
     }
   }
 }
@@ -348,7 +366,7 @@ export class Hotbar extends HTMLElement {
   setSlot(index: HotbarSlotIndex): void {
     const slot = this.slots[index];
     slot.activate();
-    player.hotbar.active = index;
+    player!.hotbar.active = index;
   }
 
   get slots(): HotbarSlots {
@@ -730,7 +748,13 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
       this.animation.tick = 0;
       (this.animation.frame < this.animation.keyframes - 1) ? this.animation.frame++ : this.animation.frame = 0;
     }
+
+    this.onUpdateX?.(this.x);
+    this.onUpdateY?.(this.y);
   }
+
+  onUpdateX?: (x: number) => void;
+  onUpdateY?: (y: number) => void;
 
   draw(): void {
     let scale = 1;
@@ -1059,14 +1083,14 @@ export class Tree extends EntityAbstract {
   constructor() {
     super();
 
-    this.x = Math.floor(Math.random() * canvas.width) - Math.floor(canvas.width / 2) - player.x - 96 / 2;
-    //this.y = Math.floor(Math.random() * canvas.height) - canvas.height / 2 - player.y - 192 / 2;
+    this.x = Math.floor(Math.random() * canvas.width) - Math.floor(canvas.width / 2) - player!.x - 96 / 2;
+    //this.y = Math.floor(Math.random() * canvas.height) - canvas.height / 2 - player!.y - 192 / 2;
     if (key.up && !key.down){
-      this.y = - player.y - offsetY() - 192;
+      this.y = - player!.y - offsetY() - 192;
       if (explored.top > this.y) explored.top = this.y;
     }
     if (key.down && !key.up){
-      this.y = canvas.height - player.y - offsetY();
+      this.y = canvas.height - player!.y - offsetY();
       if (explored.bottom < this.y) explored.bottom = this.y;
     }
 
@@ -1079,9 +1103,9 @@ export class Tree extends EntityAbstract {
   draw(): void {
     if (this.overlapRender && debug_toggle.checked){
       ctx.fillStyle = "#f00";
-      ctx.fillRect(this.x + player.x + offsetX(),this.y + player.y + offsetY(),this.box.width,this.box.height);
+      ctx.fillRect(this.x + player!.x + offsetX(),this.y + player!.y + offsetY(),this.box.width,this.box.height);
     }
-    ctx.drawImage(this.texture.image,this.x + player.x + offsetX(),this.y + player.y + offsetY(),this.box.width,this.box.height);
+    ctx.drawImage(this.texture.image,this.x + player!.x + offsetX(),this.y + player!.y + offsetY(),this.box.width,this.box.height);
   }
 }
 
@@ -1133,21 +1157,21 @@ export const explored = {
 };
 
 // Player
-export const player = new Player();
+player = new Player();
 
 // Loop over each hotbar slot and update it's state to match the player's state
 hotbar.slots.forEach((slot,i) => {
-  slot.value = player.hotbar.slots[i as HotbarSlotIndex];
+  slot.value = player!.hotbar.slots[i as HotbarSlotIndex];
 });
 
-hotbar.slots[player.hotbar.active].activate();
+hotbar.slots[player!.hotbar.active].activate();
 
 // Trees
 export const treesArray: Tree[] = [];
 
 function handleTrees(): void {
   if (tick % 20 === 0){
-    if (canvas.height / -2 - player.y - offsetX() < explored.top || canvas.height - player.y - offsetY() > explored.bottom){
+    if (canvas.height / -2 - player!.y - offsetX() < explored.top || canvas.height - player!.y - offsetY() > explored.bottom){
       if (key.up && !key.down){
         treesArray.unshift(new Tree());
       }
@@ -1166,7 +1190,7 @@ function handleTrees(): void {
 
 // Update Game State
 function update(): void {
-  player.update();
+  player!.update();
   tick++;
 }
 
@@ -1182,7 +1206,7 @@ function draw(): void {
   // ctx.fillStyle = "#779c43";
   ctx.beginPath();
   ctx.rect(0,0,width,height);
-  ctx.setTransform(1,0,0,1,offsetX() + player.x,offsetY() + player.y);
+  ctx.setTransform(1,0,0,1,offsetX() + player!.x,offsetY() + player!.y);
   ctx.fill();
 
   // Draw Trees
@@ -1190,13 +1214,13 @@ function draw(): void {
   handleTrees();
 
   // Draw Player
-  player.draw();
+  player!.draw();
 
   // Set HUD Content
   if (debug_toggle.checked && !debug.matches(":hover")){
     debug.update();
   }
-  coordinates.update();
+  // coordinates.update();
 }
 
 // Game Loop
