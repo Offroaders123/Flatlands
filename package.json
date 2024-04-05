@@ -7,9 +7,13 @@
     "dev": "vite",
     "preview": "vite preview"
   },
+  "dependencies": {
+    "solid-js": "^1.8.16"
+  },
   "devDependencies": {
     "sass": "^1.74.1",
     "typescript": "^5.4.4",
-    "vite": "^5.2.8"
+    "vite": "^5.2.8",
+    "vite-plugin-solid": "^2.10.2"
   }
 }
