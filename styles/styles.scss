@@ -29,6 +29,9 @@ body {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
+#root {
+  display: contents;
+}
 button {
   color: inherit;
   font: inherit;
