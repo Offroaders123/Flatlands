@@ -63,14 +63,7 @@ export function App(props: AppProps) {
           getPlayerX={props.getPlayerX}
           getPlayerY={props.getPlayerY}
         />
-        <hotbar-panel>
-          <item-slot index={0}/>
-          <item-slot index={1}/>
-          <item-slot index={2}/>
-          <item-slot index={3}/>
-          <item-slot index={4}/>
-          <item-slot index={5}/>
-        </hotbar-panel>
+        <Hotbar/>
         <DPad/>
       </div>
     </>
@@ -348,45 +341,43 @@ setVersion(Flatlands.version);
 export type HotbarSlots = [ItemSlot,ItemSlot,ItemSlot,ItemSlot,ItemSlot,ItemSlot];
 export type HotbarSlotIndex = Extract<keyof HotbarSlots,`${number}`> extends `${infer U extends number}` ? U : never;
 
-export class Hotbar extends HTMLElement {
-  constructor() {
-    super();
+export function Hotbar() {
+  let ref: HTMLDivElement;
+  const cleanup = new AbortController();
 
-    this.addEventListener("touchstart",event => {
+  createEffect(() => {
+    ref.addEventListener("touchstart",event => {
       if (!(event.target instanceof Element)) return;
       event.preventDefault();
       const slot = event.target.closest("item-slot");
       if (slot === null) return;
-      this.setSlot(slot.index);
-    },{ passive: false });
-  }
+      setSlot(slot.index);
+    },{ signal: cleanup.signal, passive: false });
+  });
 
-  setSlot(index: HotbarSlotIndex): void {
-    const slot = this.slots[index];
+  onCleanup(() => cleanup.abort());
+
+  return (
+    <div class="hotbar-panel" ref={ref!}>
+      <item-slot index={0}/>
+      <item-slot index={1}/>
+      <item-slot index={2}/>
+      <item-slot index={3}/>
+      <item-slot index={4}/>
+      <item-slot index={5}/>
+    </div>
+  );
+}
+
+  function setSlot(index: HotbarSlotIndex): void {
+    const slot = slots()[index];
     slot.activate();
     player!.hotbar.active = index;
   }
 
-  get slots(): HotbarSlots {
-    return [...this.querySelectorAll("item-slot")] as HotbarSlots;
+  function slots(): HotbarSlots {
+    return [...hotbar.querySelectorAll("item-slot")] as HotbarSlots;
   }
-}
-
-window.customElements.define("hotbar-panel",Hotbar);
-
-declare global {
-  interface HTMLElementTagNameMap {
-    "hotbar-panel": Hotbar;
-  }
-}
-
-declare module "solid-js" {
-  namespace JSX {
-    interface HTMLElementTags {
-      "hotbar-panel": HTMLAttributes<Hotbar>;
-    }
-  }
-}
 
 // export default Hotbar;
 
@@ -464,7 +455,7 @@ document.addEventListener("keydown",event => {
 
   if (["Digit1","Digit2","Digit3","Digit4","Digit5","Digit6"].includes(event.code)){
     event.preventDefault();
-    hotbar.setSlot(Number(event.code.replace(/Digit/,"")) - 1 as HotbarSlotIndex);
+    setSlot(Number(event.code.replace(/Digit/,"")) - 1 as HotbarSlotIndex);
   }
 
   if (["ArrowLeft","KeyA"].includes(event.code)){
@@ -710,10 +701,10 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
       let active: HotbarSlotIndex = parseInt(hotbar.querySelector<ItemSlot>("item-slot[active]")!.getAttribute("slot") as string) as HotbarSlotIndex;
 
       if (left1 && !right1 && tick % 10 == 0){
-        hotbar.setSlot(((active - 1 > 0) ? active - 1 : 6) as HotbarSlotIndex);
+        setSlot(((active - 1 > 0) ? active - 1 : 6) as HotbarSlotIndex);
       }
       if (right1 && !left1 && tick % 10 == 0){
-        hotbar.setSlot(((active + 1 < 7) ? active + 1 : 1) as HotbarSlotIndex);
+        setSlot(((active + 1 < 7) ? active + 1 : 1) as HotbarSlotIndex);
       }
     }
 
@@ -1181,7 +1172,7 @@ const debug = document.querySelector<HTMLDivElement>(".debug-panel")!;
 export const coordinates = document.querySelector<HTMLDivElement>(".coordinates-panel")!;
 
 // Hotbar
-export const hotbar = document.querySelector("hotbar-panel")!;
+export const hotbar = document.querySelector<HTMLDivElement>(".hotbar-panel")!;
 
 // D-Pad
 // const dpad = document.querySelector<HTMLDivElement>(".dpad-panel")!;
@@ -1198,11 +1189,11 @@ export const explored = {
 player = new Player();
 
 // Loop over each hotbar slot and update it's state to match the player's state
-hotbar.slots.forEach((slot,i) => {
+slots().forEach((slot,i) => {
   slot.value = player!.hotbar.slots[i as HotbarSlotIndex];
 });
 
-hotbar.slots[player!.hotbar.active].activate();
+slots()[player!.hotbar.active].activate();
 
 // Trees
 export const treesArray: Tree[] = [];

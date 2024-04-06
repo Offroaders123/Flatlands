@@ -92,7 +92,7 @@ button {
 #debug_toggle:not(:checked) + .debug-panel {
   display: none;
 }
-hotbar-panel {
+.hotbar-panel {
   --hotbar-scale: 4;
   padding: 4px;
   position: absolute;
@@ -101,27 +101,27 @@ hotbar-panel {
   display: flex;
   transform: translateX(-50%);
 }
-hotbar-panel item-slot {
+.hotbar-panel item-slot {
   padding: 12px;
   position: relative;
   display: flex;
   background: url("../textures/interface/slot.png") no-repeat 50%;
   background-size: calc(100% - 8px);
 }
-hotbar-panel item-slot[active]::before {
+.hotbar-panel item-slot[active]::before {
   content: "";
   position: absolute;
   inset: 0;
   background: url("../textures/interface/slot_active.png") no-repeat;
   background-size: cover;
 }
-hotbar-panel item-render {
+.hotbar-panel item-render {
   width: 64px;
   aspect-ratio: 1 / 1;
   background: center no-repeat;
   background-size: contain;
 }
-hotbar-panel item-slot[animate] item-render {
+.hotbar-panel item-slot[animate] item-render {
   background-size: calc(var(--width) * var(--hotbar-scale)) calc(var(--height) * var(--keyframes) * var(--hotbar-scale));
   animation: animated-item-render var(--duration) step-end infinite;
 }
@@ -141,28 +141,28 @@ hotbar-panel item-slot[animate] item-render {
   }
 }
 @media (max-width: 894px), (max-height: 255px) {
-  hotbar-panel {
+  .hotbar-panel {
     --hotbar-scale: 3;
     padding: 3px;
   }
-  hotbar-panel item-slot {
+  .hotbar-panel item-slot {
     padding: 8px;
     background-size: calc(100% - 6px);
   }
-  hotbar-panel item-render {
+  .hotbar-panel item-render {
     width: 48px;
   }
 }
 @media (max-width: 749px), (max-height: 223px) {
-  hotbar-panel {
+  .hotbar-panel {
     --hotbar-scale: 2;
     padding: 2px;
   }
-  hotbar-panel item-slot {
+  .hotbar-panel item-slot {
     padding: 6px;
     background-size: calc(100% - 4px);
   }
-  hotbar-panel item-render {
+  .hotbar-panel item-render {
     width: 32px;
   }
 }
