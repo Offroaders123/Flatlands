@@ -637,7 +637,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
   };
   speed = 2;
 
-  constructor(private setPlayerX: Setter<number>, private setPlayerY: Setter<number>) {
+  constructor() {
     super();
 
     // Define properties only used internally by the game that don't need to be in the source file
@@ -743,9 +743,6 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
       this.animation.tick = 0;
       (this.animation.frame < this.animation.keyframes - 1) ? this.animation.frame++ : this.animation.frame = 0;
     }
-
-    this.setPlayerX(this.x);
-    this.setPlayerY(this.y);
   }
 
   draw(): void {
@@ -1149,7 +1146,7 @@ export const explored = {
 };
 
 // Player
-player = new Player(setPlayerX, setPlayerY);
+player = new Player();
 
 // Loop over each hotbar slot and update it's state to match the player's state
 hotbar.slots.forEach((slot,i) => {
@@ -1213,6 +1210,8 @@ function draw(): void {
     debug.update();
   }
   // coordinates.update();
+  setPlayerX(player!.x);
+  setPlayerY(player!.y);
 }
 
 // Game Loop
