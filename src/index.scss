@@ -43,7 +43,7 @@ button {
   height: 100%;
   z-index: 1;
 }
-hud-panel {
+.hud-panel {
   --padding: 12px;
   padding: calc(var(--safe-area-inset-top) + var(--padding)) calc(var(--safe-area-inset-right) + var(--padding)) calc(var(--safe-area-inset-bottom) + var(--padding)) calc(var(--safe-area-inset-left) + var(--padding));
   position: absolute;
@@ -58,7 +58,7 @@ hud-panel {
   text-shadow: 0.175ch 0.175ch 0 #000000;
   white-space: pre;
 }
-hud-panel > *:not(dpad-panel) {
+.hud-panel > *:not(dpad-panel) {
   z-index: 1;
 }
 #debug_toggle {

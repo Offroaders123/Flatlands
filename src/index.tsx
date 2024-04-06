@@ -25,7 +25,7 @@ export function App(props: AppProps) {
   return (
     <>
       <canvas id="canvas"></canvas>
-      <hud-panel>
+      <div class="hud-panel">
         <input id="debug_toggle" type="checkbox" tabindex="-1"/>
         <debug-panel></debug-panel>
         <Coordinates getPlayerX={props.getPlayerX} getPlayerY={props.getPlayerY}/>
@@ -43,17 +43,9 @@ export function App(props: AppProps) {
           <button data-up tabindex="-1"/>
           <button data-down tabindex="-1"/>
         </dpad-panel>
-      </hud-panel>
+      </div>
     </>
   );
-}
-
-declare module "solid-js" {
-  namespace JSX {
-    interface HTMLElementTags {
-      "hud-panel": HTMLAttributes<HTMLElement>;
-    }
-  }
 }
 
 // app.js (flat modules contained as well)
@@ -1132,7 +1124,7 @@ new ResizeObserver(() => {
 export let tick = 0;
 
 // HUD
-export const hud = document.querySelector("hud-panel")!;
+export const hud = document.querySelector<HTMLDivElement>(".hud-panel")!;
 
 // Debug
 export const debug_toggle = document.querySelector<HTMLInputElement>("#debug_toggle")!;
