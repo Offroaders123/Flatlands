@@ -1,8 +1,8 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
-import { createMemo, createSignal } from "solid-js";
+import { createMemo, createSignal, on } from "solid-js";
 
-import type { Accessor, Setter } from "solid-js";
+import type { Accessor } from "solid-js";
 
 import "./index.scss";
 
@@ -14,11 +14,24 @@ export let player: Player | null = null;
 const [getPlayerX, setPlayerX] = createSignal<number>(0);
 const [getPlayerY, setPlayerY] = createSignal<number>(0);
 
-render(() => <App getPlayerX={getPlayerX} getPlayerY={getPlayerY}/>, root);
+const [getVersion, setVersion] = createSignal<string>(`${null}`);
+const [getTimeOrigin, setTimeOrigin] = createSignal<number>(0);
+const [getTick, setTick] = createSignal<number>(0);
+const [getFrames, setFrames] = createSignal<number>(0);
+const [getDroppedFrames, setDroppedFrames] = createSignal<number>(0);
+const [getDelta, setDelta] = createSignal<number>(0);
+
+render(() => <App getPlayerX={getPlayerX} getPlayerY={getPlayerY} version={getVersion()} timeOrigin={getTimeOrigin()} getTick={getTick} getFrames={getFrames} getDroppedFrames={getDroppedFrames} getDelta={getDelta}/>, root);
 
 export interface AppProps {
   getPlayerX: Accessor<number>;
   getPlayerY: Accessor<number>;
+  version: string;
+  timeOrigin: number;
+  getTick: Accessor<number>;
+  getFrames: Accessor<number>;
+  getDroppedFrames: Accessor<number>;
+  getDelta: Accessor<number>;
 }
 
 export function App(props: AppProps) {
@@ -26,8 +39,8 @@ export function App(props: AppProps) {
     <>
       <canvas id="canvas"></canvas>
       <div class="hud-panel">
-        <input id="debug_toggle" type="checkbox" tabindex="-1"/>
-        <debug-panel></debug-panel>
+        <input id="debug_toggle" type="checkbox" tabindex="-1" checked/>
+        <Debug version={props.version} timeOrigin={props.timeOrigin} getTick={props.getTick} getFrames={props.getFrames} getDroppedFrames={props.getDroppedFrames} getDelta={props.getDelta}/>
         <Coordinates getPlayerX={props.getPlayerX} getPlayerY={props.getPlayerY}/>
         <hotbar-panel>
           <item-slot index={0}></item-slot>
@@ -121,41 +134,44 @@ declare module "solid-js" {
 // import Flatlands from "./Flatlands.js";
 // import { timeOrigin, tick, delta } from "./app.js";
 
-export class Debug extends HTMLElement {
-  #pre = document.createElement("pre");
-
-  constructor() {
-    super();
-    this.append(this.#pre);
-  }
-
-  update(): void {
-    this.#pre.textContent =
-`Flatlands ${Flatlands.version}
-Time Origin: ${timeOrigin}
-Current Time: ${new Date().toLocaleTimeString()}
-Game Time: ${Math.floor((Date.now() - timeOrigin) / 1000)}s
-Ticks: ${tick}
-Tick Time: ${Math.floor(tick / 60)}s
-Milliseconds: ${Math.floor(tick / 60 * 1000)}ms
-Frames: ${Flatlands.debug.frames}
-Dropped Frames: ${Flatlands.debug.droppedFrames}
-Frame Delta: ${Math.floor(delta).toString().padStart(2,"0")}`;
-  }
+export interface DebugProps {
+  version: string;
+  timeOrigin: number;
+  getTick: Accessor<number>;
+  getFrames: Accessor<number>;
+  getDroppedFrames: Accessor<number>;
+  getDelta: Accessor<number>;
 }
 
-window.customElements.define("debug-panel",Debug);
+export function Debug(props: DebugProps){
+  const getCurrentTime = createMemo<string>(on(props.getTick, () => new Date().toLocaleTimeString()));
+  const getGameTime = createMemo<number>(on(props.getTick, () => Math.floor((Date.now() - props.timeOrigin) / 1000)));
+  const getTickTime = createMemo<number>(() => Math.floor(props.getTick() / 60));
+  const getMilliseconds = createMemo<number>(() => Math.floor(props.getTick() / 60 * 1000));
+  const getFrameDelta = createMemo<string>(() => Math.floor(props.getDelta()).toString().padStart(2,"0"));
 
-declare global {
-  interface HTMLElementTagNameMap {
-    "debug-panel": Debug;
-  }
+  return (
+    <debug-panel>
+      <pre>
+        Flatlands {props.version}{"\n"}
+        Time Origin: {props.timeOrigin}{"\n"}
+        Current Time: {getCurrentTime()}{"\n"}
+        Game Time: {getGameTime()}s{"\n"}
+        Ticks: {props.getTick()}{"\n"}
+        Tick Time: {getTickTime()}s{"\n"}
+        Milliseconds: {getMilliseconds()}ms{"\n"}
+        Frames: {props.getFrames()}{"\n"}
+        Dropped Frames: {props.getDroppedFrames()}{"\n"}
+        Frame Delta: {getFrameDelta()}{"\n"}
+      </pre>
+    </debug-panel>
+  );
 }
 
 declare module "solid-js" {
   namespace JSX {
     interface HTMLElementTags {
-      "debug-panel": HTMLAttributes<Debug>;
+      "debug-panel": HTMLAttributes<HTMLElement>;
     }
   }
 }
@@ -334,6 +350,8 @@ export default class Flatlands {
     droppedFrames: 0
   }
 }
+
+setVersion(Flatlands.version);
 
 // Hotbar.js
 
@@ -1207,7 +1225,12 @@ function draw(): void {
 
   // Set HUD Content
   if (debug_toggle.checked && !debug.matches(":hover")){
-    debug.update();
+    // debug.update();
+    setTimeOrigin(timeOrigin);
+    setTick(tick);
+    setFrames(Flatlands.debug.frames);
+    setDroppedFrames(Flatlands.debug.droppedFrames);
+    setDelta(delta);
   }
   // coordinates.update();
   setPlayerX(player!.x);
