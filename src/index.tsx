@@ -1,8 +1,8 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
-import { createMemo } from "solid-js";
+import { createMemo, createSignal } from "solid-js";
 
-import type { Accessor } from "solid-js";
+import type { Accessor, Setter } from "solid-js";
 
 import "./index.scss";
 
@@ -11,7 +11,10 @@ const root = document.querySelector<HTMLDivElement>("#root")!;
 // state hoisting
 export let player: Player | null = null;
 
-render(() => <App getPlayerX={() => player?.x ?? 0} getPlayerY={() => player?.y ?? 0}/>, root);
+const [getPlayerX, setPlayerX] = createSignal<number>(0);
+const [getPlayerY, setPlayerY] = createSignal<number>(0);
+
+render(() => <App getPlayerX={getPlayerX} getPlayerY={getPlayerY}/>, root);
 
 export interface AppProps {
   getPlayerX: Accessor<number>;
@@ -642,7 +645,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
   };
   speed = 2;
 
-  constructor() {
+  constructor(private setPlayerX: Setter<number>, private setPlayerY: Setter<number>) {
     super();
 
     // Define properties only used internally by the game that don't need to be in the source file
@@ -749,12 +752,9 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
       (this.animation.frame < this.animation.keyframes - 1) ? this.animation.frame++ : this.animation.frame = 0;
     }
 
-    this.onUpdateX?.(this.x);
-    this.onUpdateY?.(this.y);
+    this.setPlayerX(this.x);
+    this.setPlayerY(this.y);
   }
-
-  onUpdateX?: (x: number) => void;
-  onUpdateY?: (y: number) => void;
 
   draw(): void {
     let scale = 1;
@@ -1157,7 +1157,7 @@ export const explored = {
 };
 
 // Player
-player = new Player();
+player = new Player(setPlayerX, setPlayerY);
 
 // Loop over each hotbar slot and update it's state to match the player's state
 hotbar.slots.forEach((slot,i) => {
