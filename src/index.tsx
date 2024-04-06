@@ -131,22 +131,8 @@ export function Coordinates(props: CoordinatesProps) {
   const displayY = createMemo<number>(() => Math.round(props.getPlayerY() / 16));
 
   return (
-    <coordinates-panel>({displayX()}, {displayY()})</coordinates-panel>
+    <div class="coordinates-panel">({displayX()}, {displayY()})</div>
   );
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    "coordinates-panel": HTMLElement;
-  }
-}
-
-declare module "solid-js" {
-  namespace JSX {
-    interface HTMLElementTags {
-      "coordinates-panel": HTMLAttributes<HTMLElement>;
-    }
-  }
 }
 
 // export default Coordinates;
@@ -173,7 +159,7 @@ export function Debug(props: DebugProps) {
   const getFrameDelta = createMemo<string>(() => Math.floor(props.getDelta()).toString().padStart(2,"0"));
 
   return (
-    <debug-panel>
+    <div class="debug-panel">
       <pre>
         Flatlands {props.version}{"\n"}
         Time Origin: {props.timeOrigin}{"\n"}
@@ -186,16 +172,8 @@ export function Debug(props: DebugProps) {
         Dropped Frames: {props.getDroppedFrames()}{"\n"}
         Frame Delta: {getFrameDelta()}{"\n"}
       </pre>
-    </debug-panel>
+    </div>
   );
-}
-
-declare module "solid-js" {
-  namespace JSX {
-    interface HTMLElementTags {
-      "debug-panel": HTMLAttributes<HTMLElement>;
-    }
-  }
 }
 
 // export default Debug;
@@ -205,7 +183,7 @@ declare module "solid-js" {
 // import { key } from "./input.js";
 
 export function DPad() {
-  let ref: HTMLElement;
+  let ref: HTMLDivElement;
   const cleanup = new AbortController();
 
   createEffect(() => {
@@ -218,12 +196,12 @@ export function DPad() {
   onCleanup(() => cleanup.abort());
 
   return (
-    <dpad-panel ref={ref!}>
+    <div class="dpad-panel" ref={ref!}>
       <button data-left tabindex={-1}/>
       <button data-right tabindex={-1}/>
       <button data-up tabindex={-1}/>
       <button data-down tabindex={-1}/>
-    </dpad-panel>
+    </div>
   );
 }
 
@@ -269,14 +247,6 @@ export function DPad() {
       key.down = false;
     }
   }
-
-declare module "solid-js" {
-  namespace JSX {
-    interface HTMLElementTags {
-      "dpad-panel": HTMLAttributes<HTMLElement>;
-    }
-  }
-}
 
 // export default DPad;
 
@@ -1205,16 +1175,16 @@ export const hud = document.querySelector<HTMLDivElement>(".hud-panel")!;
 // Debug
 export const debug_toggle = document.querySelector<HTMLInputElement>("#debug_toggle")!;
 
-const debug = document.querySelector("debug-panel")!;
+const debug = document.querySelector<HTMLDivElement>(".debug-panel")!;
 
 // Coordinates
-export const coordinates = document.querySelector("coordinates-panel")!;
+export const coordinates = document.querySelector<HTMLDivElement>(".coordinates-panel")!;
 
 // Hotbar
 export const hotbar = document.querySelector("hotbar-panel")!;
 
 // D-Pad
-// const dpad = document.querySelector("dpad-panel")!;
+// const dpad = document.querySelector<HTMLDivElement>(".dpad-panel")!;
 
 // Environment
 export const explored = {
