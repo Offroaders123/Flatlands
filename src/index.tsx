@@ -1,6 +1,6 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
-import { createMemo, createSignal, on } from "solid-js";
+import { createEffect, createMemo, createSignal, on, onCleanup } from "solid-js";
 
 import type { Accessor } from "solid-js";
 
@@ -39,7 +39,7 @@ export function App(props: AppProps) {
     <>
       <canvas id="canvas"></canvas>
       <div class="hud-panel">
-        <input id="debug_toggle" type="checkbox" tabindex="-1" checked/>
+        <input id="debug_toggle" type="checkbox" tabindex="-1"/>
         <Debug version={props.version} timeOrigin={props.timeOrigin} getTick={props.getTick} getFrames={props.getFrames} getDroppedFrames={props.getDroppedFrames} getDelta={props.getDelta}/>
         <Coordinates getPlayerX={props.getPlayerX} getPlayerY={props.getPlayerY}/>
         <hotbar-panel>
@@ -50,12 +50,7 @@ export function App(props: AppProps) {
           <item-slot index={4}></item-slot>
           <item-slot index={5}></item-slot>
         </hotbar-panel>
-        <dpad-panel>
-          <button data-left tabindex="-1"/>
-          <button data-right tabindex="-1"/>
-          <button data-up tabindex="-1"/>
-          <button data-down tabindex="-1"/>
-        </dpad-panel>
+        <DPad/>
       </div>
     </>
   );
@@ -104,7 +99,7 @@ export interface CoordinatesProps {
   getPlayerY: Accessor<number>;
 }
 
-export function Coordinates(props: CoordinatesProps){
+export function Coordinates(props: CoordinatesProps) {
   const displayX = createMemo<number>(() => Math.round(props.getPlayerX() / 16) * -1);
   const displayY = createMemo<number>(() => Math.round(props.getPlayerY() / 16));
 
@@ -143,7 +138,7 @@ export interface DebugProps {
   getDelta: Accessor<number>;
 }
 
-export function Debug(props: DebugProps){
+export function Debug(props: DebugProps) {
   const getCurrentTime = createMemo<string>(on(props.getTick, () => new Date().toLocaleTimeString()));
   const getGameTime = createMemo<number>(on(props.getTick, () => Math.floor((Date.now() - props.timeOrigin) / 1000)));
   const getTickTime = createMemo<number>(() => Math.floor(props.getTick() / 60));
@@ -182,28 +177,30 @@ declare module "solid-js" {
 
 // import { key } from "./input.js";
 
-export class DPad extends HTMLElement {
-  constructor() {
-    super();
+export function DPad() {
+  let ref: HTMLElement;
+  const cleanup = new AbortController();
 
-    this.addEventListener("touchstart",event => {
-      this.down(event);
-    },{ passive: false });
-    
-    this.addEventListener("touchend",event => {
-      this.up(event);
-    });
-    
-    this.addEventListener("pointerdown",event => {
-      this.down(event);
-    });
-    
-    this.addEventListener("pointerup",event => {
-      this.up(event);
-    });    
-  }
+  createEffect(() => {
+    ref.addEventListener("touchstart", dPadDown, { signal: cleanup.signal, passive: false });
+    ref.addEventListener("touchend", dPadUp, { signal: cleanup.signal });
+    ref.addEventListener("pointerdown", dPadDown, { signal: cleanup.signal });
+    ref.addEventListener("pointerup", dPadUp, { signal: cleanup.signal });
+  });
 
-  down(event: PointerEvent | TouchEvent): void {
+  onCleanup(() => cleanup.abort());
+
+  return (
+    <dpad-panel ref={ref!}>
+      <button data-left tabindex="-1"/>
+      <button data-right tabindex="-1"/>
+      <button data-up tabindex="-1"/>
+      <button data-down tabindex="-1"/>
+    </dpad-panel>
+  );
+}
+
+  function dPadDown(event: PointerEvent | TouchEvent): void {
     if (!(event.target instanceof HTMLElement)) return;
     event.preventDefault();
   
@@ -225,7 +222,7 @@ export class DPad extends HTMLElement {
     }
   }
 
-  up(event: PointerEvent | TouchEvent): void {
+  function dPadUp(event: PointerEvent | TouchEvent): void {
     if (!(event.target instanceof HTMLElement)) return;
 
     if (event.target.matches("button")){
@@ -245,20 +242,11 @@ export class DPad extends HTMLElement {
       key.down = false;
     }
   }
-}
-
-window.customElements.define("dpad-panel",DPad);
-
-declare global {
-  interface HTMLElementTagNameMap {
-    "dpad-panel": DPad;
-  }
-}
 
 declare module "solid-js" {
   namespace JSX {
     interface HTMLElementTags {
-      "dpad-panel": HTMLAttributes<DPad>;
+      "dpad-panel": HTMLAttributes<HTMLElement>;
     }
   }
 }
