@@ -21,7 +21,18 @@ const [getFrames, setFrames] = createSignal<number>(0);
 const [getDroppedFrames, setDroppedFrames] = createSignal<number>(0);
 const [getDelta, setDelta] = createSignal<number>(0);
 
-render(() => <App getPlayerX={getPlayerX} getPlayerY={getPlayerY} version={getVersion()} timeOrigin={getTimeOrigin()} getTick={getTick} getFrames={getFrames} getDroppedFrames={getDroppedFrames} getDelta={getDelta}/>, root);
+render(() => (
+  <App
+    getPlayerX={getPlayerX}
+    getPlayerY={getPlayerY}
+    version={getVersion()}
+    timeOrigin={getTimeOrigin()}
+    getTick={getTick}
+    getFrames={getFrames}
+    getDroppedFrames={getDroppedFrames}
+    getDelta={getDelta}
+  />
+), root);
 
 export interface AppProps {
   getPlayerX: Accessor<number>;
@@ -40,15 +51,25 @@ export function App(props: AppProps) {
       <canvas id="canvas"></canvas>
       <div class="hud-panel">
         <input id="debug_toggle" type="checkbox" tabindex="-1"/>
-        <Debug version={props.version} timeOrigin={props.timeOrigin} getTick={props.getTick} getFrames={props.getFrames} getDroppedFrames={props.getDroppedFrames} getDelta={props.getDelta}/>
-        <Coordinates getPlayerX={props.getPlayerX} getPlayerY={props.getPlayerY}/>
+        <Debug
+          version={props.version}
+          timeOrigin={props.timeOrigin}
+          getTick={props.getTick}
+          getFrames={props.getFrames}
+          getDroppedFrames={props.getDroppedFrames}
+          getDelta={props.getDelta}
+        />
+        <Coordinates
+          getPlayerX={props.getPlayerX}
+          getPlayerY={props.getPlayerY}
+        />
         <hotbar-panel>
-          <item-slot index={0}></item-slot>
-          <item-slot index={1}></item-slot>
-          <item-slot index={2}></item-slot>
-          <item-slot index={3}></item-slot>
-          <item-slot index={4}></item-slot>
-          <item-slot index={5}></item-slot>
+          <item-slot index={0}/>
+          <item-slot index={1}/>
+          <item-slot index={2}/>
+          <item-slot index={3}/>
+          <item-slot index={4}/>
+          <item-slot index={5}/>
         </hotbar-panel>
         <DPad/>
       </div>
@@ -65,7 +86,10 @@ export function App(props: AppProps) {
 // import "./ItemSlot.js";
 // import Flatlands from "./Flatlands.js";
 // import { canvas, ctx, scaling, offsetX, offsetY } from "./canvas.js";
-// /* Inconsistently implemented, app.js does not handle the gamepad and key logic, it is all used in Player.js. Ideally I would like to have user input placed located inside either app.js or it's own ES Module. */
+// /*
+//   Inconsistently implemented, app.js does not handle the gamepad and key logic, it is all used in Player.js.
+//   Ideally I would like to have user input placed located inside either app.js or it's own ES Module.
+// */
 // import { key } from "./input.js";
 // import { terrain } from "./properties.js";
 // import { Player } from "./Player.js";
@@ -87,7 +111,10 @@ export function offsetX(): number {
 }
 
 export function offsetY(): number {
-  return Math.round((canvas.offsetHeight + coordinates.offsetHeight - hotbar.offsetHeight - parseInt(getComputedStyle(hud).paddingBottom)) / scaling / 2);
+  return Math.round(
+    (canvas.offsetHeight + coordinates.offsetHeight - hotbar.offsetHeight - parseInt(getComputedStyle(hud).paddingBottom))
+    / scaling / 2
+  );
 }
 
 // Coordinates.js
@@ -192,10 +219,10 @@ export function DPad() {
 
   return (
     <dpad-panel ref={ref!}>
-      <button data-left tabindex="-1"/>
-      <button data-right tabindex="-1"/>
-      <button data-up tabindex="-1"/>
-      <button data-down tabindex="-1"/>
+      <button data-left tabindex={-1}/>
+      <button data-right tabindex={-1}/>
+      <button data-up tabindex={-1}/>
+      <button data-down tabindex={-1}/>
     </dpad-panel>
   );
 }
@@ -418,6 +445,18 @@ export const key: KeyState = {
 
 export const gamepads: number[] = [];
 
+declare global {
+  interface Document {
+    webkitExitFullscreen: Document["exitFullscreen"];
+    webkitFullscreenElement: Document["fullscreenElement"];
+    webkitFullscreenEnabled: Document["fullscreenEnabled"];
+  }
+
+  interface Element {
+    webkitRequestFullscreen: Element["requestFullscreen"];
+  }
+}
+
 window.addEventListener("gamepadconnected",event => {
   if (!event.gamepad.mapping) return;
   gamepads.push(event.gamepad.index);
@@ -443,9 +482,12 @@ document.addEventListener("keydown",event => {
 
   if (event.shiftKey && event.code === "KeyF"){
     event.preventDefault();
-    // @ts-ignore
-    if (document.webkitFullscreenEnabled && !document.fullscreenEnabled) (!document.webkitFullscreenElement) ? document.documentElement.webkitRequestFullscreen() : document.webkitExitFullscreen();
-    if (document.fullscreenEnabled) (!document.fullscreenElement) ? document.documentElement.requestFullscreen() : document.exitFullscreen();
+    if (document.webkitFullscreenEnabled && !document.fullscreenEnabled){
+      (!document.webkitFullscreenElement) ? document.documentElement.webkitRequestFullscreen() : document.webkitExitFullscreen();
+    }
+    if (document.fullscreenEnabled){
+      (!document.fullscreenElement) ? document.documentElement.requestFullscreen() : document.exitFullscreen();
+    }
   }
 
   if (event.shiftKey) return;
@@ -548,8 +590,17 @@ export class ItemSlot extends HTMLElement {
       this.style.setProperty("--keyframes",`${animation.keyframes}`);
     }
 
-    /* Another goal would be to add functionality to use the cached image itself (the line above, or `sprite`), rather than re-fetching it again in the CSS after being added as a style in `setSlotTexture()`. *edit: Super cool idea! Add canvases for each of the item renderers, rather than just an inline element, so then it can also eventually allow for item animations :O *edit2: or just use CSS instead :) (it's already implemented now!) */
-    /* It could make sense to make this a method of either the hotbar element, or the hud container once an in-game inventory is implemented. Then you could update all item slots for an item to have a certain texture *edit: Almost there! This comment used to be in `properties.js`, but now all of the slot rendering logic is part of the slot element itself :) */
+    /*
+      Another goal would be to add functionality to use the cached image itself (the line above, or `sprite`),
+      rather than re-fetching it again in the CSS after being added as a style in `setSlotTexture()`.
+      *edit: Super cool idea! Add canvases for each of the item renderers, rather than just an inline element,
+      so then it can also eventually allow for item animations :O *edit2: or just use CSS instead :) (it's already implemented now!)
+    */
+    /*
+      It could make sense to make this a method of either the hotbar element, or the hud container once an in-game inventory is implemented.
+      Then you could update all item slots for an item to have a certain texture *edit: Almost there!
+      This comment used to be in `properties.js`, but now all of the slot rendering logic is part of the slot element itself :)
+    */
     this.#itemRender.style.setProperty("background-image",`url("${source}")`);
   }
 
@@ -674,10 +725,11 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
 
   update(): void {
     this.getEntityOverlap();
-    // @ts-expect-error - this might be causing the gamepad crashes
-    const gamepad = navigator.getGamepads()[gamepads[0]];
+    //// @ts-expect-error - this might be causing the gamepad crashes
+    const gamepad = navigator.getGamepads()[gamepads[0]!];
 
-    let [axisX,axisY] = (gamepad) ? gamepad.axes : [null,null,null,null], [left1,right1] = (gamepad) ? [gamepad.buttons[4].value,gamepad.buttons[5].value] : [null,null];
+    let [axisX,axisY] = (gamepad) ? gamepad.axes : [null,null,null,null];
+    let [left1,right1] = (gamepad) ? [gamepad.buttons[4]!.value,gamepad.buttons[5]!.value] : [null,null];
 
     if (gamepad){
       key.left = (Math.round(axisX as number * 1000) < 0);
@@ -811,13 +863,33 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
       keyframe = Math.floor((current % duration) / duration * keyframes) * height;
     }
 
-    ctx.drawImage(definition.texture.image,0,keyframe,width,height,this.direction.vertical ? this.direction.vertical === "up" ? -2 : -1 : 0,1,width,height);
+    ctx.drawImage(
+      definition.texture.image,
+      0,
+      keyframe,
+      width,
+      height,
+      this.direction.vertical ? this.direction.vertical === "up" ? -2 : -1 : 0,
+      1,
+      width,
+      height
+    );
   }
 
   drawCharacter(_scale: number, offset: number): void {
     ctx.setTransform(this.direction.horizontal === "left" && !this.direction.vertical ? -1 : 1,0,0,1,offsetX(),offsetY());
     ctx.transform(1,0,0,1,this.box.width / -2 + offset,this.box.height / -2);
-    ctx.drawImage(this.texture.image,this.box.width * (this.animation.column !== 0 ? this.animation.frame : 0),this.box.height * this.animation.column,this.box.width,this.box.height,0,0,this.box.width,this.box.height);
+    ctx.drawImage(
+      this.texture.image,
+      this.box.width * (this.animation.column !== 0 ? this.animation.frame : 0),
+      this.box.height * this.animation.column,
+      this.box.width,
+      this.box.height,
+      0,
+      0,
+      this.box.width,
+      this.box.height
+    );
   }
 }
 
@@ -900,7 +972,8 @@ export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) ex
 
 export const missingTextureSprite = new Image();
 // const missingTextureSprite = new ImageData(new Uint8ClampedArray([249,0,255,255,0,0,0,255,0,0,0,255,249,0,255,255]),2,2);
-missingTextureSprite.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAABIeJ9nAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAZQTFRF+QD/AAAASf/37wAAAAxJREFUeJxjcGBoAAABRADBOnocVgAAAABJRU5ErkJggg==";
+missingTextureSprite.src = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAABIeJ9nAAAAAXNSR0IB2cksfwAAAAlwSFlz\
+AAALEwAACxMBAJqcGAAAAAZQTFRF+QD/AAAASf/37wAAAAxJREFUeJxjcGBoAAABRADBOnocVgAAAABJRU5ErkJggg==`;
 
 const definitions: Definitions = {
   entity: {
@@ -1226,7 +1299,10 @@ function draw(): void {
 }
 
 // Game Loop
-/* Rounding the time origin because some browsers do that by default, and some don't. Thought it would make sense to ensure it is consistently an integer */
+/*
+  Rounding the time origin because some browsers do that by default, and some don't.
+  Thought it would make sense to ensure it is consistently an integer
+*/
 export const timeOrigin = Math.round(performance.timeOrigin);
 export let delta = 0;
 let lastFrameTime = 0;
