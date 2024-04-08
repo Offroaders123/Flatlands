@@ -12,6 +12,9 @@ const root = document.querySelector<HTMLDivElement>("#root")!;
 export let player: Player | null = null;
 export let item: Item | null = null;
 
+export let hud: HTMLDivElement | null = null;
+export let canvas: HTMLCanvasElement | null = null;
+
 const [getDebugEnabled, setDebugEnabled] = createSignal<boolean>(false);
 
 const [getPlayerX, setPlayerX] = createSignal<number>(0);
@@ -65,8 +68,8 @@ export function App(props: AppProps) {
 
   return (
     <>
-      <canvas id="canvas"></canvas>
-      <div class="hud-panel">
+      <canvas id="canvas" ref={canvas!}/>
+      <div class="hud-panel" ref={hud!}>
         <input
           id="debug_toggle"
           type="checkbox"
@@ -87,6 +90,7 @@ export function App(props: AppProps) {
         <Coordinates
           getPlayerX={props.getPlayerX}
           getPlayerY={props.getPlayerY}
+          ref={coordinates}
         />
         <Hotbar
           getActive={getSlot}
@@ -97,6 +101,7 @@ export function App(props: AppProps) {
           getSlot3={getSlot3}
           getSlot4={getSlot4}
           getSlot5={getSlot5}
+          ref={hotbar}
         />
         <DPad/>
       </div>
@@ -128,18 +133,18 @@ export function App(props: AppProps) {
 
 // import { coordinates, hotbar, hud } from "./app.js";
 
-export const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
-export const ctx = canvas.getContext("2d",{ alpha: false })!;
+// export const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
+export const ctx = canvas!.getContext("2d",{ alpha: false })!;
 
 export let scaling = 4;
 
 export function offsetX(): number {
-  return Math.round(canvas.width / 2);
+  return Math.round(canvas!.width / 2);
 }
 
 export function offsetY(): number {
   return Math.round(
-    (canvas.offsetHeight + coordinates.offsetHeight - hotbar.offsetHeight - parseInt(getComputedStyle(hud).paddingBottom))
+    (canvas!.offsetHeight + (coordinates?.offsetHeight ?? 0) - (hotbar?.offsetHeight ?? 0) - (hud !== null ? parseInt(getComputedStyle(hud).paddingBottom) : 0))
     / scaling / 2
   );
 }
@@ -1145,14 +1150,14 @@ export class Tree extends EntityAbstract {
   constructor() {
     super();
 
-    this.x = Math.floor(Math.random() * canvas.width) - Math.floor(canvas.width / 2) - player!.x - 96 / 2;
-    //this.y = Math.floor(Math.random() * canvas.height) - canvas.height / 2 - player!.y - 192 / 2;
+    this.x = Math.floor(Math.random() * canvas!.width) - Math.floor(canvas!.width / 2) - player!.x - 96 / 2;
+    //this.y = Math.floor(Math.random() * canvas!.height) - canvas!.height / 2 - player!.y - 192 / 2;
     if (key.up && !key.down){
       this.y = - player!.y - offsetY() - 192;
       if (explored.top > this.y) explored.top = this.y;
     }
     if (key.down && !key.up){
-      this.y = canvas.height - player!.y - offsetY();
+      this.y = canvas!.height - player!.y - offsetY();
       if (explored.bottom < this.y) explored.bottom = this.y;
     }
 
@@ -1184,17 +1189,17 @@ if (Flatlands.environment.touchDevice){
 }
 
 new ResizeObserver(() => {
-  const { offsetWidth: width, offsetHeight: height } = canvas;
-  canvas.width = width / scaling;
-  canvas.height = height / scaling;
+  const { offsetWidth: width, offsetHeight: height } = canvas!;
+  canvas!.width = width / scaling;
+  canvas!.height = height / scaling;
   ctx.imageSmoothingEnabled = false;
   draw();
-}).observe(canvas);
+}).observe(canvas!);
 
 export let tick = 0;
 
 // HUD
-export const hud = document.querySelector<HTMLDivElement>(".hud-panel")!;
+// export const hud = document.querySelector<HTMLDivElement>(".hud-panel")!;
 
 // Debug
 // export const debug_toggle = document.querySelector<HTMLInputElement>("#debug_toggle")!;
@@ -1203,10 +1208,12 @@ let debug: HTMLDivElement | null = null;
 // const debug = document.querySelector<HTMLDivElement>(".debug-panel")!;
 
 // Coordinates
-export const coordinates = document.querySelector<HTMLDivElement>(".coordinates-panel")!;
+export let coordinates: HTMLDivElement | null = null;
+// export const coordinates = document.querySelector<HTMLDivElement>(".coordinates-panel")!;
 
 // Hotbar
-export const hotbar = document.querySelector<HTMLDivElement>(".hotbar-panel")!;
+export let hotbar: HTMLDivElement | null = null;
+// export const hotbar = document.querySelector<HTMLDivElement>(".hotbar-panel")!;
 
 // D-Pad
 // const dpad = document.querySelector<HTMLDivElement>(".dpad-panel")!;
@@ -1214,9 +1221,9 @@ export const hotbar = document.querySelector<HTMLDivElement>(".hotbar-panel")!;
 // Environment
 export const explored = {
   left: 0,
-  right: canvas.width,
+  right: canvas!.width,
   top: 0,
-  bottom: canvas.height
+  bottom: canvas!.height
 };
 
 // Player
@@ -1243,7 +1250,7 @@ export const treesArray: Tree[] = [];
 
 function handleTrees(): void {
   if (tick % 20 === 0){
-    if (canvas.height / -2 - player!.y - offsetX() < explored.top || canvas.height - player!.y - offsetY() > explored.bottom){
+    if (canvas!.height / -2 - player!.y - offsetX() < explored.top || canvas!.height - player!.y - offsetY() > explored.bottom){
       if (key.up && !key.down){
         treesArray.unshift(new Tree());
       }
@@ -1268,7 +1275,7 @@ function update(): void {
 
 // Draw Game State to the renderer
 function draw(): void {
-  const { width, height } = canvas;
+  const { width, height } = canvas!;
 
   // Reset for next frame
   ctx.clearRect(0,0,width,height);
