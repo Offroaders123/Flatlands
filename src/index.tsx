@@ -431,13 +431,16 @@ export function Hotbar(props: HotbarProps) {
 
 // import type { HotbarSlotIndex } from "./Hotbar.js";
 
-export type Key = string | boolean;
+export type KeyLeft = boolean | "ArrowLeft" | "KeyA" | "DPadLeft";
+export type KeyRight = boolean | "ArrowRight" | "KeyD" | "DPadRight";
+export type KeyUp = boolean | "ArrowUp" | "KeyW" | "DPadUp";
+export type KeyDown = boolean | "ArrowDown" | "KeyS" | "DPadDown";
 
 export interface KeyState {
-  left: Key;
-  right: Key;
-  up: Key;
-  down: Key;
+  left: KeyLeft;
+  right: KeyRight;
+  up: KeyUp;
+  down: KeyDown;
 }
 
 export const key: KeyState = {
@@ -450,6 +453,10 @@ export const key: KeyState = {
 export const gamepads: number[] = [];
 
 declare global {
+  interface Array<T extends string> {
+    includes(searchElement: string, fromIndex?: number): searchElement is T;
+  }
+
   interface Document {
     webkitExitFullscreen: Document["exitFullscreen"];
     webkitFullscreenElement: Document["fullscreenElement"];
@@ -501,19 +508,19 @@ document.addEventListener("keydown",event => {
     setSlot(Number(event.code.replace(/Digit/,"")) - 1 as HotbarSlotIndex);
   }
 
-  if (["ArrowLeft","KeyA"].includes(event.code)){
+  if (["ArrowLeft" as const, "KeyA" as const].includes(event.code)){
     event.preventDefault();
     key.left = event.code;
   }
-  if (["ArrowRight","KeyD"].includes(event.code)){
+  if (["ArrowRight" as const, "KeyD" as const].includes(event.code)){
     event.preventDefault();
     key.right = event.code;
   }
-  if (["ArrowUp","KeyW"].includes(event.code)){
+  if (["ArrowUp" as const, "KeyW" as const].includes(event.code)){
     event.preventDefault();
     key.up = event.code;
   }
-  if (["ArrowDown","KeyS"].includes(event.code)){
+  if (["ArrowDown" as const, "KeyS" as const].includes(event.code)){
     event.preventDefault();
     key.down = event.code;
   }
