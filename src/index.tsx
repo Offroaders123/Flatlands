@@ -644,15 +644,15 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
       "pickmatic",
       "hatchet",
       "spade",
-      "fire",
+      null,
       "pizza"
     ],
     active: 4,
-    held_item: "" as ItemID
+    held_item: null
   } as {
-    slots: [ItemID,ItemID,ItemID,ItemID,ItemID,ItemID];
+    slots: [ItemID | null, ItemID | null, ItemID | null, ItemID | null, ItemID | null, ItemID | null];
     active: HotbarSlotIndex;
-    readonly held_item: ItemID;
+    readonly held_item: ItemID | null;
   };
   speed = 2;
 
@@ -702,10 +702,12 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
       let active: HotbarSlotIndex = getSlot();
 
       if (left1 && !right1 && tick % 10 == 0){
-        setSlot(((active - 1 > 0) ? active - 1 : 6) as HotbarSlotIndex);
+        const previous: HotbarSlotIndex = active === 0 ? 5 : active - 1 as HotbarSlotIndex;
+        setSlot(previous);
       }
       if (right1 && !left1 && tick % 10 == 0){
-        setSlot(((active + 1 < 7) ? active + 1 : 1) as HotbarSlotIndex);
+        const next: HotbarSlotIndex = active === 5 ? 0 : active + 1 as HotbarSlotIndex;
+        setSlot(next);
       }
     }
 
@@ -799,6 +801,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
   }
 
   drawItem(scale: number, itemScale: number): void {
+    if (this.hotbar.held_item === null) return;
     const definition = item![this.hotbar.held_item] as UnionToIntersection<NonNullable<typeof item>[typeof this.hotbar.held_item]>;
     let { naturalWidth: width, naturalHeight: height } = definition.texture.image;
     if (definition.animation){
