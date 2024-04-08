@@ -1,6 +1,6 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
-import { createEffect, createMemo, createSignal, on, onCleanup } from "solid-js";
+import { Show, createEffect, createMemo, createSignal, on, onCleanup } from "solid-js";
 
 import type { Accessor, Setter } from "solid-js";
 
@@ -11,6 +11,8 @@ const root = document.querySelector<HTMLDivElement>("#root")!;
 // state hoisting
 export let player: Player | null = null;
 export let item: Item | null = null;
+
+const [getDebugEnabled, setDebugEnabled] = createSignal<boolean>(false);
 
 const [getPlayerX, setPlayerX] = createSignal<number>(0);
 const [getPlayerY, setPlayerY] = createSignal<number>(0);
@@ -65,7 +67,14 @@ export function App(props: AppProps) {
     <>
       <canvas id="canvas"></canvas>
       <div class="hud-panel">
-        <input id="debug_toggle" type="checkbox" tabindex="-1"/>
+        <input
+          id="debug_toggle"
+          type="checkbox"
+          tabindex="-1"
+          checked={getDebugEnabled()}
+          oninput={event => setDebugEnabled(event.currentTarget.checked)}
+        />
+        <Show when={getDebugEnabled()}>
         <Debug
           version={props.version}
           timeOrigin={props.timeOrigin}
@@ -74,6 +83,7 @@ export function App(props: AppProps) {
           getDroppedFrames={props.getDroppedFrames}
           getDelta={props.getDelta}
         />
+        </Show>
         <Coordinates
           getPlayerX={props.getPlayerX}
           getPlayerY={props.getPlayerY}
@@ -176,7 +186,7 @@ export function Debug(props: DebugProps) {
   const getFrameDelta = createMemo<string>(() => Math.floor(props.getDelta()).toString().padStart(2,"0"));
 
   return (
-    <div class="debug-panel">
+    <div class="debug-panel" ref={debug!}>
       <pre>
         Flatlands {props.version}{"\n"}
         Time Origin: {props.timeOrigin}{"\n"}
@@ -488,7 +498,8 @@ document.addEventListener("keydown",event => {
 
   if (event.shiftKey && event.code === "KeyD"){
     event.preventDefault();
-    debug_toggle.click();
+    setDebugEnabled(previous => !previous);
+    // debug_toggle.click();
   }
 
   if (event.shiftKey && event.code === "KeyF"){
@@ -1152,7 +1163,7 @@ export class Tree extends EntityAbstract {
   }
 
   draw(): void {
-    if (this.overlapRender && debug_toggle.checked){
+    if (this.overlapRender && getDebugEnabled()){
       ctx.fillStyle = "#f00";
       ctx.fillRect(this.x + player!.x + offsetX(),this.y + player!.y + offsetY(),this.box.width,this.box.height);
     }
@@ -1186,9 +1197,10 @@ export let tick = 0;
 export const hud = document.querySelector<HTMLDivElement>(".hud-panel")!;
 
 // Debug
-export const debug_toggle = document.querySelector<HTMLInputElement>("#debug_toggle")!;
+// export const debug_toggle = document.querySelector<HTMLInputElement>("#debug_toggle")!;
 
-const debug = document.querySelector<HTMLDivElement>(".debug-panel")!;
+let debug: HTMLDivElement | null = null;
+// const debug = document.querySelector<HTMLDivElement>(".debug-panel")!;
 
 // Coordinates
 export const coordinates = document.querySelector<HTMLDivElement>(".coordinates-panel")!;
@@ -1277,7 +1289,7 @@ function draw(): void {
   player!.draw();
 
   // Set HUD Content
-  if (debug_toggle.checked && !debug.matches(":hover")){
+  if (getDebugEnabled() && !debug!.matches(":hover")){
     // debug.update();
     setTimeOrigin(timeOrigin);
     setTick(tick);

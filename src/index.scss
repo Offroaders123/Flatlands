@@ -89,9 +89,9 @@ button {
 .debug-panel {
   font-size: 0.8em;
 }
-#debug_toggle:not(:checked) + .debug-panel {
-  display: none;
-}
+// #debug_toggle:not(:checked) + .debug-panel {
+//   display: none;
+// }
 .hotbar-panel {
   --hotbar-scale: 4;
   padding: 4px;
