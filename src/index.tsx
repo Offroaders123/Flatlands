@@ -2,7 +2,7 @@
 import { render } from "solid-js/web";
 import { createEffect, createMemo, createSignal, on, onCleanup } from "solid-js";
 
-import type { Accessor } from "solid-js";
+import type { Accessor, Setter } from "solid-js";
 
 import "./index.scss";
 
@@ -10,6 +10,7 @@ const root = document.querySelector<HTMLDivElement>("#root")!;
 
 // state hoisting
 export let player: Player | null = null;
+export let item: Item | null = null;
 
 const [getPlayerX, setPlayerX] = createSignal<number>(0);
 const [getPlayerY, setPlayerY] = createSignal<number>(0);
@@ -20,6 +21,14 @@ const [getTick, setTick] = createSignal<number>(0);
 const [getFrames, setFrames] = createSignal<number>(0);
 const [getDroppedFrames, setDroppedFrames] = createSignal<number>(0);
 const [getDelta, setDelta] = createSignal<number>(0);
+
+const [getSlot, setSlot] = createSignal<HotbarSlotIndex>(0);
+const [getSlot0, setSlot0] = createSignal<ItemID | null>(null);
+const [getSlot1, setSlot1] = createSignal<ItemID | null>(null);
+const [getSlot2, setSlot2] = createSignal<ItemID | null>(null);
+const [getSlot3, setSlot3] = createSignal<ItemID | null>(null);
+const [getSlot4, setSlot4] = createSignal<ItemID | null>(null);
+const [getSlot5, setSlot5] = createSignal<ItemID | null>(null);
 
 render(() => (
   <App
@@ -46,6 +55,12 @@ export interface AppProps {
 }
 
 export function App(props: AppProps) {
+  createEffect(() => {
+    const slot = getSlot();
+    if (player === null) return;
+    player.hotbar.active = slot;
+  });
+
   return (
     <>
       <canvas id="canvas"></canvas>
@@ -63,7 +78,16 @@ export function App(props: AppProps) {
           getPlayerX={props.getPlayerX}
           getPlayerY={props.getPlayerY}
         />
-        <Hotbar/>
+        <Hotbar
+          getActive={getSlot}
+          setActive={setSlot}
+          getSlot0={getSlot0}
+          getSlot1={getSlot1}
+          getSlot2={getSlot2}
+          getSlot3={getSlot3}
+          getSlot4={getSlot4}
+          getSlot5={getSlot5}
+        />
         <DPad/>
       </div>
     </>
@@ -337,11 +361,22 @@ setVersion(Flatlands.version);
 
 // import type ItemSlot from "./ItemSlot.js";
 
-// Future goal: Can I create this tuple from a map of the `Player["hotbar"]["slots"]` key type?
-export type HotbarSlots = [ItemSlot,ItemSlot,ItemSlot,ItemSlot,ItemSlot,ItemSlot];
-export type HotbarSlotIndex = Extract<keyof HotbarSlots,`${number}`> extends `${infer U extends number}` ? U : never;
+//// Future goal: Can I create this tuple from a map of the `Player["hotbar"]["slots"]` key type?
+// export type HotbarSlots = [ItemSlot,ItemSlot,ItemSlot,ItemSlot,ItemSlot,ItemSlot];
+export type HotbarSlotIndex = Extract<keyof Player["hotbar"]["slots"],`${number}`> extends `${infer U extends number}` ? U : never;
 
-export function Hotbar() {
+export interface HotbarProps {
+  getActive: Accessor<HotbarSlotIndex>;
+  setActive: Setter<HotbarSlotIndex>;
+  getSlot0: Accessor<ItemID | null>;
+  getSlot1: Accessor<ItemID | null>;
+  getSlot2: Accessor<ItemID | null>;
+  getSlot3: Accessor<ItemID | null>;
+  getSlot4: Accessor<ItemID | null>;
+  getSlot5: Accessor<ItemID | null>;
+}
+
+export function Hotbar(props: HotbarProps) {
   let ref: HTMLDivElement;
   const cleanup = new AbortController();
 
@@ -349,9 +384,10 @@ export function Hotbar() {
     ref.addEventListener("touchstart",event => {
       if (!(event.target instanceof Element)) return;
       event.preventDefault();
-      const slot = event.target.closest("item-slot");
+      const slot = event.target.closest<HTMLDivElement>(".item-slot");
       if (slot === null) return;
-      setSlot(slot.index);
+      const index: HotbarSlotIndex = Number(slot.getAttribute("data-index")!) as HotbarSlotIndex;
+      props.setActive(index);
     },{ signal: cleanup.signal, passive: false });
   });
 
@@ -359,25 +395,32 @@ export function Hotbar() {
 
   return (
     <div class="hotbar-panel" ref={ref!}>
-      <item-slot index={0}/>
-      <item-slot index={1}/>
-      <item-slot index={2}/>
-      <item-slot index={3}/>
-      <item-slot index={4}/>
-      <item-slot index={5}/>
+      {
+        Array.from({ length: 6 }).map((_, i) => {
+          const index = i as HotbarSlotIndex;
+          const isActive = createMemo(() => props.getActive() === index);
+          return (
+            <ItemSlot
+              value={props[`getSlot${index}`]}
+              index={index}
+              active={isActive}
+            />
+          );
+        })
+      }
     </div>
   );
 }
 
-  function setSlot(index: HotbarSlotIndex): void {
-    const slot = slots()[index];
-    slot.activate();
-    player!.hotbar.active = index;
-  }
+  // function setSlot(index: HotbarSlotIndex): void {
+  //   const slot = slots()[index];
+  //   slot.activate();
+  //   player!.hotbar.active = index;
+  // }
 
-  function slots(): HotbarSlots {
-    return [...hotbar.querySelectorAll("item-slot")] as HotbarSlots;
-  }
+  // function slots(): HotbarSlots {
+  //   return [...hotbar.querySelectorAll("item-slot")] as HotbarSlots;
+  // }
 
 // export default Hotbar;
 
@@ -509,46 +552,33 @@ document.addEventListener("contextmenu",event => {
 // import type { ItemID, UnionToIntersection } from "./properties.js";
 // import type { HotbarSlotIndex } from "./Hotbar.js";
 
-export class ItemSlot extends HTMLElement {
-  #itemRender = document.createElement("item-render");
+export interface ItemSlotProps {
+  value: Accessor<ItemID | null>;
+  index: number;
+  active: Accessor<boolean>;
+}
 
-  constructor() {
-    super();
-    this.append(this.#itemRender);
-  }
+export function ItemSlot(props: ItemSlotProps) {
+  let ref: HTMLDivElement;
+  let itemRenderRef: HTMLDivElement;
+  const isActive = createMemo<boolean>(() => getSlot() === props.index);
 
-  get value(): ItemID {
-    return this.getAttribute("value")! as ItemID;
-  }
-
-  set value(value: ItemID) {
-    if (this.value === value) return;
-    this.setAttribute("value",value);
-    this.sprite = value;
-  }
-
-  get index(): HotbarSlotIndex {
-    return Number(this.getAttribute("index")) as HotbarSlotIndex;
-  }
-
-  get sprite(): ItemID {
-    return this.getAttribute("sprite")! as ItemID;
-  }
-
-  set sprite(id: ItemID) {
+  createEffect(() => {
+    const id: ItemID = props.value()!;
+    if (item === null) return;
     const itemEntry = item[id];
     const { texture, animation } = itemEntry as UnionToIntersection<typeof item[typeof id]>;
     const { source, width = 16, height = 16 } = texture;
-    if (this.sprite === id) return;
+    // if (this.sprite === id) return;
 
-    this.setAttribute("sprite",id);
+    ref.setAttribute("data-sprite",id);
 
     if (animation){
-      this.setAttribute("animate","");
-      this.style.setProperty("--width",`${width}px`);
-      this.style.setProperty("--height",`${height}px`);
-      this.style.setProperty("--duration",`${animation.duration}ms`);
-      this.style.setProperty("--keyframes",`${animation.keyframes}`);
+      ref.setAttribute("data-animate","");
+      ref.style.setProperty("--width",`${width}px`);
+      ref.style.setProperty("--height",`${height}px`);
+      ref.style.setProperty("--duration",`${animation.duration}ms`);
+      ref.style.setProperty("--keyframes",`${animation.keyframes}`);
     }
 
     /*
@@ -562,39 +592,23 @@ export class ItemSlot extends HTMLElement {
       Then you could update all item slots for an item to have a certain texture *edit: Almost there!
       This comment used to be in `properties.js`, but now all of the slot rendering logic is part of the slot element itself :)
     */
-    this.#itemRender.style.setProperty("background-image",`url("${source}")`);
-  }
+    itemRenderRef.style.setProperty("background-image",`url("${source}")`);
+  });
 
-  render(): void {
-    this.sprite = this.value;
-  }
-
-  activate(): void {
-    for (const slot of hotbar.querySelectorAll<ItemSlot>("item-slot[active]")){
-      slot.deactivate();
-    }
-    this.setAttribute("active","");
-  }
-
-  deactivate(): void {
-    this.removeAttribute("active");
-  }
-}
-
-window.customElements.define("item-slot",ItemSlot);
-
-declare global {
-  interface HTMLElementTagNameMap {
-    "item-slot": ItemSlot;
-  }
-}
-
-declare module "solid-js" {
-  namespace JSX {
-    interface HTMLElementTags {
-      "item-slot": HTMLAttributes<ItemSlot> & { index: number; };
-    }
-  }
+  return (
+    <div
+      class="item-slot"
+      data-value={props.value()}
+      data-index={props.index}
+      data-active={isActive() ? "" : null}
+      ref={ref!}
+    >
+      <div
+        class="item-render"
+        ref={itemRenderRef!}
+      />
+    </div>
+  );
 }
 
 // export default ItemSlot;
@@ -698,7 +712,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
       key.up = (Math.round(axisY as number * 1000) < 0);
       key.down = (Math.round(axisY as number * 1000) > 0);
 
-      let active: HotbarSlotIndex = parseInt(hotbar.querySelector<ItemSlot>("item-slot[active]")!.getAttribute("slot") as string) as HotbarSlotIndex;
+      let active: HotbarSlotIndex = getSlot();
 
       if (left1 && !right1 && tick % 10 == 0){
         setSlot(((active - 1 > 0) ? active - 1 : 6) as HotbarSlotIndex);
@@ -798,7 +812,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
   }
 
   drawItem(scale: number, itemScale: number): void {
-    const definition = item[this.hotbar.held_item] as UnionToIntersection<typeof item[typeof this.hotbar.held_item]>;
+    const definition = item![this.hotbar.held_item] as UnionToIntersection<NonNullable<typeof item>[typeof this.hotbar.held_item]>;
     let { naturalWidth: width, naturalHeight: height } = definition.texture.image;
     if (definition.animation){
       height /= definition.animation.keyframes;
@@ -1077,7 +1091,8 @@ await loadDefinitions(definitions);
 
 definitions.terrain.ground.texture.pattern = ctx.createPattern(definitions.terrain.ground.texture.image,"repeat")!;
 
-export const { entity, item, terrain } = definitions;
+export const { entity, terrain } = definitions;
+item = definitions.item;
 
 export async function loadSprite(source: string): Promise<HTMLImageElement | null> {
   return new Promise<HTMLImageElement | null>(resolve => {
@@ -1188,12 +1203,21 @@ export const explored = {
 // Player
 player = new Player();
 
-// Loop over each hotbar slot and update it's state to match the player's state
-slots().forEach((slot,i) => {
-  slot.value = player!.hotbar.slots[i as HotbarSlotIndex];
-});
+setSlot0(player.hotbar.slots[0]);
+setSlot1(player.hotbar.slots[1]);
+setSlot2(player.hotbar.slots[2]);
+setSlot3(player.hotbar.slots[3]);
+setSlot4(player.hotbar.slots[4]);
+setSlot5(player.hotbar.slots[5]);
 
-slots()[player!.hotbar.active].activate();
+setSlot(player.hotbar.active);
+
+// // Loop over each hotbar slot and update it's state to match the player's state
+// slots().forEach((slot,i) => {
+//   slot.value = player!.hotbar.slots[i as HotbarSlotIndex];
+// });
+
+// slots()[player!.hotbar.active].activate();
 
 // Trees
 export const treesArray: Tree[] = [];

@@ -101,27 +101,27 @@ button {
   display: flex;
   transform: translateX(-50%);
 }
-.hotbar-panel item-slot {
+.hotbar-panel .item-slot {
   padding: 12px;
   position: relative;
   display: flex;
   background: url("../textures/interface/slot.png") no-repeat 50%;
   background-size: calc(100% - 8px);
 }
-.hotbar-panel item-slot[active]::before {
+.hotbar-panel .item-slot[data-active]::before {
   content: "";
   position: absolute;
   inset: 0;
   background: url("../textures/interface/slot_active.png") no-repeat;
   background-size: cover;
 }
-.hotbar-panel item-render {
+.hotbar-panel .item-render {
   width: 64px;
   aspect-ratio: 1 / 1;
   background: center no-repeat;
   background-size: contain;
 }
-.hotbar-panel item-slot[animate] item-render {
+.hotbar-panel .item-slot[data-animate] .item-render {
   background-size: calc(var(--width) * var(--hotbar-scale)) calc(var(--height) * var(--keyframes) * var(--hotbar-scale));
   animation: animated-item-render var(--duration) step-end infinite;
 }
@@ -145,11 +145,11 @@ button {
     --hotbar-scale: 3;
     padding: 3px;
   }
-  .hotbar-panel item-slot {
+  .hotbar-panel .item-slot {
     padding: 8px;
     background-size: calc(100% - 6px);
   }
-  .hotbar-panel item-render {
+  .hotbar-panel .item-render {
     width: 48px;
   }
 }
@@ -158,11 +158,11 @@ button {
     --hotbar-scale: 2;
     padding: 2px;
   }
-  .hotbar-panel item-slot {
+  .hotbar-panel .item-slot {
     padding: 6px;
     background-size: calc(100% - 4px);
   }
-  .hotbar-panel item-render {
+  .hotbar-panel .item-render {
     width: 32px;
   }
 }
