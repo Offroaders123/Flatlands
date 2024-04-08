@@ -8,6 +8,8 @@ import "./index.scss";
 
 const root = document.querySelector<HTMLDivElement>("#root")!;
 
+const isTouchDevice: boolean = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+
 // state hoisting
 export let player: Player | null = null;
 export let item: Item | null = null;
@@ -15,6 +17,7 @@ export let item: Item | null = null;
 export let hud: HTMLDivElement | null = null;
 export let canvas: HTMLCanvasElement | null = null;
 
+const [getTouchEnabled, setTouchEnabled] = createSignal<boolean>(false);
 const [getDebugEnabled, setDebugEnabled] = createSignal<boolean>(false);
 
 const [getPlayerX, setPlayerX] = createSignal<number>(0);
@@ -60,6 +63,15 @@ export interface AppProps {
 }
 
 export function App(props: AppProps) {
+  createEffect(() => {
+    const touchEnabled: boolean = getTouchEnabled();
+    if (touchEnabled){
+      document.documentElement.classList.add("touch");
+    } else {
+      document.documentElement.classList.remove("touch");
+    }
+  });
+
   createEffect(() => {
     const slot = getSlot();
     if (player === null) return;
@@ -193,7 +205,7 @@ export function Debug(props: DebugProps) {
   return (
     <div class="debug-panel" ref={debug!}>
       <pre>
-        Flatlands {props.version}{"\n"}
+        Flatlands v{props.version}{"\n"}
         Time Origin: {props.timeOrigin}{"\n"}
         Current Time: {getCurrentTime()}{"\n"}
         Game Time: {getGameTime()}s{"\n"}
@@ -318,57 +330,9 @@ export abstract class EntityAbstract {
 
 // Flatlands.js
 
-export default class Flatlands {
-  static version = "v0.15.0";
+import { version } from "../package.json";
 
-  static environment = {
-    get touchDevice(): boolean {
-      return "ontouchstart" in window || navigator.maxTouchPoints > 0;
-    }
-  }
-
-  static appearance = {
-    get touch(): boolean {
-      return document.documentElement.classList.contains("touch");
-    },
-
-    set touch(value: boolean) {
-      if (typeof value !== "boolean") return;
-      if (Flatlands.appearance.touch === value) return;
-
-      if (value){
-        document.documentElement.classList.add("touch");
-      } else {
-        document.documentElement.classList.remove("touch");
-      }
-    }
-  }
-
-  static serviceWorker = {
-    get supported(): boolean {
-      return "serviceWorker" in navigator && !import.meta.env.DEV;
-    },
-
-    async register(): Promise<boolean> {
-      if (!Flatlands.serviceWorker.supported) return false;
-
-      try {
-        await navigator.serviceWorker.register("service-worker.js");
-        return true;
-      } catch (error){
-        console.error(error);
-        return false;
-      }
-    }
-  }
-
-  static debug = {
-    frames: 0,
-    droppedFrames: 0
-  }
-}
-
-setVersion(Flatlands.version);
+setVersion(version);
 
 // Hotbar.js
 
@@ -497,7 +461,7 @@ window.addEventListener("gamepaddisconnected",event => {
 
 document.addEventListener("keydown",event => {
   if (event.repeat || document.activeElement != document.body) return;
-  Flatlands.appearance.touch = false;
+  setTouchEnabled(false);
 
   if (event.ctrlKey || event.metaKey || event.altKey) return;
 
@@ -560,7 +524,7 @@ document.addEventListener("keyup",event => {
 });
 
 document.addEventListener("touchstart",() => {
-  Flatlands.appearance.touch = true;
+  setTouchEnabled(true);
 });
 
 document.addEventListener("contextmenu",event => {
@@ -1177,15 +1141,17 @@ export class Tree extends EntityAbstract {
 }
 
 // Service Worker
-Flatlands.serviceWorker.register();
+if (window.isSecureContext && !import.meta.env.DEV){
+  await navigator.serviceWorker.register("./service-worker.js", { type: "module" });
+}
 
 // Touch Handling
 
 /* This is to allow for :active styling on iOS Safari */
 document.body.setAttribute("ontouchstart","");
 
-if (Flatlands.environment.touchDevice){
-  Flatlands.appearance.touch = true;
+if (isTouchDevice){
+  setTouchEnabled(true);
 }
 
 new ResizeObserver(() => {
@@ -1300,8 +1266,8 @@ function draw(): void {
     // debug.update();
     setTimeOrigin(timeOrigin);
     setTick(tick);
-    setFrames(Flatlands.debug.frames);
-    setDroppedFrames(Flatlands.debug.droppedFrames);
+    // setFrames(Flatlands.debug.frames);
+    // setDroppedFrames(Flatlands.debug.droppedFrames);
     setDelta(delta);
   }
   // coordinates.update();
@@ -1334,14 +1300,14 @@ function loop(): void {
     update();
     delta -= timestep;
     if (delta > timestep){
-      Flatlands.debug.droppedFrames++;
+      setDroppedFrames(previous => previous + 1);
     }
   }
 
   // Draw game state to the renderer
   draw();
   lastFrameTime = time;
-  Flatlands.debug.frames++;
+  setFrames(previous => previous + 1);
 
   // Request next render frame
   window.requestAnimationFrame(loop);
