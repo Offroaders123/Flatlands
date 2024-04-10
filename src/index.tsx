@@ -318,6 +318,7 @@ export abstract class EntityAbstract {
 
   abstract texture: {
     source: string;
+    image?: HTMLImageElement;
   };
 
   getBoundingClientRect(): BoundingClientRect {
@@ -618,10 +619,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
     width: 16,
     height: 32
   };
-  texture = {
-    source: "textures/entity/player/guy.png",
-    image: missingTextureSprite
-  };
+  texture = entity.player.texture;
   animation = {
     type: "reactive",
     duration: 24,
@@ -644,7 +642,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
       "pickmatic",
       "hatchet",
       "spade",
-      null,
+      "fire",
       "pizza"
     ],
     active: 4,
@@ -665,11 +663,6 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
     this.animation.column = 0;
 
     Object.defineProperty(this.hotbar,"held_item",{ get: () => this.hotbar.slots[this.hotbar.active] });
-
-    loadSprite(this.texture.source).then(sprite => {
-      if (sprite === null) return;
-      this.texture.image = sprite;
-    });
   }
 
   getEntityOverlap(): void {
@@ -788,7 +781,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
     ctx.setTransform(scale,0,0,1,offsetX(),offsetY());
     ctx.transform(1,0,0,1,-7,14);
 
-    ctx.drawImage(entity.shadow.texture.image,0,0,this.box.width - 2,4);
+    ctx.drawImage(entity.shadow.texture.image ?? missingTextureSprite,0,0,this.box.width - 2,4);
     if (this.direction.vertical === "down"){
       this.drawCharacter(scale,offset);
       this.drawItem(scale,itemScale);
@@ -803,7 +796,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
   drawItem(scale: number, itemScale: number): void {
     if (this.hotbar.held_item === null) return;
     const definition = item![this.hotbar.held_item] as UnionToIntersection<NonNullable<typeof item>[typeof this.hotbar.held_item]>;
-    let { naturalWidth: width, naturalHeight: height } = definition.texture.image;
+    let { naturalWidth: width, naturalHeight: height } = definition.texture.image ?? missingTextureSprite;
     if (definition.animation){
       height /= definition.animation.keyframes;
     }
@@ -829,7 +822,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
     }
 
     ctx.drawImage(
-      definition.texture.image,
+      definition.texture.image ?? missingTextureSprite,
       0,
       keyframe,
       width,
@@ -845,7 +838,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
     ctx.setTransform(this.direction.horizontal === "left" && !this.direction.vertical ? -1 : 1,0,0,1,offsetX(),offsetY());
     ctx.transform(1,0,0,1,this.box.width / -2 + offset,this.box.height / -2);
     ctx.drawImage(
-      this.texture.image,
+      this.texture.image ?? missingTextureSprite,
       this.box.width * (this.animation.column !== 0 ? this.animation.frame : 0),
       this.box.height * this.animation.column,
       this.box.width,
@@ -868,7 +861,7 @@ export interface BaseDefinition {
     width?: number;
     height?: number;
     source: string;
-    image: HTMLImageElement;
+    image?: HTMLImageElement;
     directional?: false;
   };
 }
@@ -915,6 +908,7 @@ export interface Definitions {
 }
 
 export interface Entity {
+  player: BaseDefinition;
   shadow: BaseDefinition;
 }
 
@@ -931,6 +925,7 @@ export type ItemID = keyof Item;
 
 export interface Terrain {
   ground: Ground;
+  tree: BaseDefinition;
 }
 
 export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
@@ -942,47 +937,16 @@ AAALEwAACxMBAJqcGAAAAAZQTFRF+QD/AAAASf/37wAAAAxJREFUeJxjcGBoAAABRADBOnocVgAAAABJ
 
 const definitions: Definitions = {
   entity: {
-    // player: {
-    //   name: "Player",
-    //   box: {
-    //     width: 16,
-    //     height: 32
-    //   },
-    //   texture: {
-    //     source: "textures/entity/player/guy.png",
-    //     image: missingTextureSprite
-    //   },
-    //   animation: {
-    //     type: "reactive",
-    //     duration: 24,
-    //     keyframes: 2,
-    //     columns: 4,
-    //     tick: 0,
-    //     frame: 0,
-    //     column: 0
-    //   },
-    //   direction: {
-    //     horizontal: "right",
-    //     vertical: false
-    //   },
-    //   hotbar: {
-    //     slots: [
-    //       "spearsword",
-    //       "pickmatic",
-    //       "hatchet",
-    //       "spade",
-    //       "fire",
-    //       "pizza"
-    //     ],
-    //     active: 4
-    //   },
-    //   speed: 2
-    // } satisfies Player,
+    player: {
+      name: "Player",
+      texture: {
+        source: "textures/entity/player/guy.png"
+      }
+    } satisfies BaseDefinition,
     shadow: {
       name: "Shadow",
       texture: {
-        source: "textures/entity/shadow.png",
-        image: missingTextureSprite
+        source: "textures/entity/shadow.png"
       }
     } satisfies BaseDefinition
   } satisfies Entity,
@@ -991,7 +955,6 @@ const definitions: Definitions = {
       name: "Fire",
       texture: {
         source: "textures/item/fire.png",
-        image: missingTextureSprite,
         directional: false
       },
       animation: {
@@ -1003,37 +966,32 @@ const definitions: Definitions = {
     hatchet: {
       name: "Hatchet",
       texture: {
-        source: "textures/item/hatchet.png",
-        image: missingTextureSprite
+        source: "textures/item/hatchet.png"
       }
     } satisfies BaseDefinition,
     pickmatic: {
       name: "Pickmatic",
       texture: {
-        source: "textures/item/pickmatic.png",
-        image: missingTextureSprite
+        source: "textures/item/pickmatic.png"
       }
     } satisfies BaseDefinition,
     pizza: {
       name: "Pizza",
       texture: {
         source: "textures/item/pizza.png",
-        image: missingTextureSprite,
         directional: false
       }
     } satisfies BaseDefinition,
     spade: {
       name: "Spade",
       texture: {
-        source: "textures/item/spade.png",
-        image: missingTextureSprite
+        source: "textures/item/spade.png"
       }
     } satisfies BaseDefinition,
     spearsword: {
       name: "Spearsword",
       texture: {
-        source: "textures/item/spearsword.png",
-        image: missingTextureSprite
+        source: "textures/item/spearsword.png"
       }
     } satisfies BaseDefinition
   } satisfies Item,
@@ -1042,21 +1000,15 @@ const definitions: Definitions = {
       name: "Ground",
       texture: {
         source: "textures/terrain/ground.png",
-        image: missingTextureSprite,
-        pattern: {} as CanvasPattern
+        pattern: ctx.createPattern(missingTextureSprite, "repeat")!
       }
     } satisfies Ground,
-    // tree: {
-    //   name: "Tree",
-    //   box: {
-    //     width: 96,
-    //     height: 192
-    //   },
-    //   texture: {
-    //     source: "textures/terrain/tree.png",
-    //     image: missingTextureSprite
-    //   }
-    // } satisfies Tree
+    tree: {
+      name: "Tree",
+      texture: {
+        source: "textures/terrain/tree.png"
+      }
+    } satisfies BaseDefinition
   } satisfies Terrain
 };
 
@@ -1075,11 +1027,11 @@ async function loadFeature(feature: BaseDefinition): Promise<void> {
   const image = await loadSprite(source);
   if (image === null) return;
   feature.texture.image = image;
+  if (feature.name !== "Ground") return;
+  (feature as Ground).texture.pattern = ctx.createPattern(image, "repeat")!;
 }
 
 await loadDefinitions(definitions);
-
-definitions.terrain.ground.texture.pattern = ctx.createPattern(definitions.terrain.ground.texture.image,"repeat")!;
 
 export const { entity, terrain } = definitions;
 item = definitions.item;
@@ -1107,10 +1059,7 @@ export class Tree extends EntityAbstract {
     width: 96,
     height: 192
   };
-  texture = {
-    source: "textures/terrain/tree.png",
-    image: missingTextureSprite
-  };
+  texture = terrain.tree.texture;
 
   overlapRender: boolean = false;
 
@@ -1127,11 +1076,6 @@ export class Tree extends EntityAbstract {
       this.y = canvas!.height - player!.y - offsetY();
       if (explored.bottom < this.y) explored.bottom = this.y;
     }
-
-    loadSprite(this.texture.source).then(sprite => {
-      if (sprite === null) return;
-      this.texture.image = sprite;
-    });
   }
 
   draw(): void {
@@ -1139,7 +1083,7 @@ export class Tree extends EntityAbstract {
       ctx.fillStyle = "#f00";
       ctx.fillRect(this.x + player!.x + offsetX(),this.y + player!.y + offsetY(),this.box.width,this.box.height);
     }
-    ctx.drawImage(this.texture.image,this.x + player!.x + offsetX(),this.y + player!.y + offsetY(),this.box.width,this.box.height);
+    ctx.drawImage(this.texture.image ?? missingTextureSprite,this.x + player!.x + offsetX(),this.y + player!.y + offsetY(),this.box.width,this.box.height);
   }
 }
 
