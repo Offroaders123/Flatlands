@@ -17,6 +17,26 @@ export let item: Item | null = null;
 export let hud: HTMLDivElement | null = null;
 export let canvas: HTMLCanvasElement | null = null;
 
+// HUD
+// export const hud = document.querySelector<HTMLDivElement>(".hud-panel")!;
+
+// Debug
+// export const debug_toggle = document.querySelector<HTMLInputElement>("#debug_toggle")!;
+
+let debug: HTMLDivElement | null = null;
+// const debug = document.querySelector<HTMLDivElement>(".debug-panel")!;
+
+// Coordinates
+export let coordinates: HTMLDivElement | null = null;
+// export const coordinates = document.querySelector<HTMLDivElement>(".coordinates-panel")!;
+
+// Hotbar
+export let hotbar: HTMLDivElement | null = null;
+// export const hotbar = document.querySelector<HTMLDivElement>(".hotbar-panel")!;
+
+// D-Pad
+// const dpad = document.querySelector<HTMLDivElement>(".dpad-panel")!;
+
 const [getTouchEnabled, setTouchEnabled] = createSignal<boolean>(false);
 const [getDebugEnabled, setDebugEnabled] = createSignal<boolean>(false);
 
@@ -48,6 +68,10 @@ render(() => (
     getFrames={getFrames}
     getDroppedFrames={getDroppedFrames}
     getDelta={getDelta}
+    canvas={ref => canvas = ref}
+    hud={ref => hud = ref}
+    coordinates={ref => coordinates = ref}
+    hotbar={ref => hotbar = ref}
   />
 ), root);
 
@@ -60,6 +84,10 @@ export interface AppProps {
   getFrames: Accessor<number>;
   getDroppedFrames: Accessor<number>;
   getDelta: Accessor<number>;
+  canvas(ref: HTMLCanvasElement): void;
+  hud(ref: HTMLDivElement): void;
+  coordinates(ref: HTMLDivElement): void;
+  hotbar(ref: HTMLDivElement): void;
 }
 
 export function App(props: AppProps) {
@@ -78,10 +106,17 @@ export function App(props: AppProps) {
     player.hotbar.active = slot;
   });
 
+  // createEffect(() => {
+  //   console.log(canvas);
+  //   console.log(hud);
+  //   console.log(coordinates);
+  //   console.log(hotbar);
+  // });
+
   return (
     <>
-      <canvas id="canvas" ref={canvas!}/>
-      <div class="hud-panel" ref={hud!}>
+      <canvas id="canvas" ref={props.canvas}/>
+      <div class="hud-panel" ref={props.hud}>
         <input
           id="debug_toggle"
           type="checkbox"
@@ -102,7 +137,7 @@ export function App(props: AppProps) {
         <Coordinates
           getPlayerX={props.getPlayerX}
           getPlayerY={props.getPlayerY}
-          ref={coordinates}
+          ref={props.coordinates}
         />
         <Hotbar
           getActive={getSlot}
@@ -113,7 +148,7 @@ export function App(props: AppProps) {
           getSlot3={getSlot3}
           getSlot4={getSlot4}
           getSlot5={getSlot5}
-          ref={hotbar}
+          ref={props.hotbar}
         />
         <DPad/>
       </div>
@@ -168,6 +203,7 @@ export function offsetY(): number {
 export interface CoordinatesProps {
   getPlayerX: Accessor<number>;
   getPlayerY: Accessor<number>;
+  ref(value: HTMLDivElement): void;
 }
 
 export function Coordinates(props: CoordinatesProps) {
@@ -175,7 +211,7 @@ export function Coordinates(props: CoordinatesProps) {
   const displayY = createMemo<number>(() => Math.round(props.getPlayerY() / 16));
 
   return (
-    <div class="coordinates-panel">({displayX()}, {displayY()})</div>
+    <div class="coordinates-panel" ref={props.ref}>({displayX()}, {displayY()})</div>
   );
 }
 
@@ -354,6 +390,7 @@ export interface HotbarProps {
   getSlot3: Accessor<ItemID | null>;
   getSlot4: Accessor<ItemID | null>;
   getSlot5: Accessor<ItemID | null>;
+  ref(value: HTMLDivElement): void;
 }
 
 export function Hotbar(props: HotbarProps) {
@@ -374,7 +411,7 @@ export function Hotbar(props: HotbarProps) {
   onCleanup(() => cleanup.abort());
 
   return (
-    <div class="hotbar-panel" ref={ref!}>
+    <div class="hotbar-panel" ref={refe => { props.ref(refe); ref = refe; }}>
       {
         Array.from({ length: 6 }).map((_, i) => {
           const index = i as HotbarSlotIndex;
@@ -1110,26 +1147,6 @@ new ResizeObserver(() => {
 }).observe(canvas!);
 
 export let tick = 0;
-
-// HUD
-// export const hud = document.querySelector<HTMLDivElement>(".hud-panel")!;
-
-// Debug
-// export const debug_toggle = document.querySelector<HTMLInputElement>("#debug_toggle")!;
-
-let debug: HTMLDivElement | null = null;
-// const debug = document.querySelector<HTMLDivElement>(".debug-panel")!;
-
-// Coordinates
-export let coordinates: HTMLDivElement | null = null;
-// export const coordinates = document.querySelector<HTMLDivElement>(".coordinates-panel")!;
-
-// Hotbar
-export let hotbar: HTMLDivElement | null = null;
-// export const hotbar = document.querySelector<HTMLDivElement>(".hotbar-panel")!;
-
-// D-Pad
-// const dpad = document.querySelector<HTMLDivElement>(".dpad-panel")!;
 
 // Environment
 export const explored = {
