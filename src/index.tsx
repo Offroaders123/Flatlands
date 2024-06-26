@@ -61,14 +61,6 @@ const [getFrames, setFrames] = createSignal<number>(0);
 const [getDroppedFrames, setDroppedFrames] = createSignal<number>(0);
 const [getDelta, setDelta] = createSignal<number>(0);
 
-const [getSlot, setSlot] = createSignal<HotbarSlotIndex>(0);
-const [getSlot0, setSlot0] = createSignal<ItemID | null>(null);
-const [getSlot1, setSlot1] = createSignal<ItemID | null>(null);
-const [getSlot2, setSlot2] = createSignal<ItemID | null>(null);
-const [getSlot3, setSlot3] = createSignal<ItemID | null>(null);
-const [getSlot4, setSlot4] = createSignal<ItemID | null>(null);
-const [getSlot5, setSlot5] = createSignal<ItemID | null>(null);
-
 // properties.js
 
 // import { ctx } from "./canvas.js";
@@ -352,7 +344,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
   };
   speed = 2;
 
-  constructor() {
+  constructor(private readonly getSlot: Accessor<HotbarSlotIndex>, private readonly setSlot: Setter<HotbarSlotIndex>) {
     super();
 
     // Define properties only used internally by the game that don't need to be in the source file
@@ -390,15 +382,15 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
       key.up = (Math.round(axisY as number * 1000) < 0);
       key.down = (Math.round(axisY as number * 1000) > 0);
 
-      let active: HotbarSlotIndex = getSlot();
+      let active: HotbarSlotIndex = this.getSlot();
 
       if (left1 && !right1 && tick % 10 == 0){
         const previous: HotbarSlotIndex = active === 0 ? 5 : active - 1 as HotbarSlotIndex;
-        setSlot(previous);
+        this.setSlot(previous);
       }
       if (right1 && !left1 && tick % 10 == 0){
         const next: HotbarSlotIndex = active === 5 ? 0 : active + 1 as HotbarSlotIndex;
-        setSlot(next);
+        this.setSlot(next);
       }
     }
 
@@ -585,6 +577,14 @@ export interface AppProps {
 }
 
 export function App(props: AppProps) {
+  const [getSlot, setSlot] = createSignal<HotbarSlotIndex>(0);
+  const [getSlot0, setSlot0] = createSignal<ItemID | null>(null);
+  const [getSlot1, setSlot1] = createSignal<ItemID | null>(null);
+  const [getSlot2, setSlot2] = createSignal<ItemID | null>(null);
+  const [getSlot3, setSlot3] = createSignal<ItemID | null>(null);
+  const [getSlot4, setSlot4] = createSignal<ItemID | null>(null);
+  const [getSlot5, setSlot5] = createSignal<ItemID | null>(null);
+  
   onMount(() => {
     setVersion(version);
 
@@ -685,7 +685,7 @@ export function App(props: AppProps) {
     }).observe(canvas!);
 
     // Player
-    player = new Player();
+    player = new Player(getSlot, setSlot);
 
     setSlot0(player.hotbar.slots[0]);
     setSlot1(player.hotbar.slots[1]);
@@ -759,6 +759,7 @@ export function App(props: AppProps) {
           ref={props.coordinates}
         />
         <Hotbar
+          getSlot={getSlot}
           getActive={getSlot}
           setActive={setSlot}
           getSlot0={getSlot0}
@@ -961,6 +962,7 @@ import { version } from "../package.json";
 export type HotbarSlotIndex = Extract<keyof Player["hotbar"]["slots"],`${number}`> extends `${infer U extends number}` ? U : never;
 
 export interface HotbarProps {
+  getSlot: Accessor<HotbarSlotIndex>;
   getActive: Accessor<HotbarSlotIndex>;
   setActive: Setter<HotbarSlotIndex>;
   getSlot0: Accessor<ItemID | null>;
@@ -1000,6 +1002,7 @@ export function Hotbar(props: HotbarProps) {
               value={props[`getSlot${index}`]}
               index={index}
               active={isActive}
+              getSlot={props.getSlot}
             />
           );
         })
@@ -1076,12 +1079,13 @@ export interface ItemSlotProps {
   value: Accessor<ItemID | null>;
   index: number;
   active: Accessor<boolean>;
+  getSlot: Accessor<HotbarSlotIndex>;
 }
 
 export function ItemSlot(props: ItemSlotProps) {
   let ref: HTMLDivElement;
   let itemRenderRef: HTMLDivElement;
-  const isActive = createMemo<boolean>(() => getSlot() === props.index);
+  const isActive = createMemo<boolean>(() => props.getSlot() === props.index);
 
   createEffect(() => {
     const id: ItemID = props.value()!;
