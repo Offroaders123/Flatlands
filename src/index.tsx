@@ -21,7 +21,7 @@ const root = document.querySelector<HTMLDivElement>("#root")!;
 const isTouchDevice: boolean = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
 // state hoisting
-export let player: Player | null = null;
+// export let player: Player | null = null;
 export let item: Item | null = null;
 
 export let hud: HTMLDivElement | null = null;
@@ -577,6 +577,8 @@ export interface AppProps {
 }
 
 export function App(props: AppProps) {
+  let player: Player;
+
   const [getSlot, setSlot] = createSignal<HotbarSlotIndex>(0);
   const [getSlot0, setSlot0] = createSignal<ItemID | null>(null);
   const [getSlot1, setSlot1] = createSignal<ItemID | null>(null);
@@ -701,10 +703,10 @@ export function App(props: AppProps) {
       if (getTick() % 20 === 0){
         if (canvas!.height / -2 - player!.y - offsetX() < explored.top || canvas!.height - player!.y - offsetY() > explored.bottom){
           if (key.up && !key.down){
-            treesArray.unshift(new Tree(explored));
+            treesArray.unshift(new Tree(player, explored));
           }
           if (key.down && !key.up){
-            treesArray.push(new Tree(explored));
+            treesArray.push(new Tree(player, explored));
           }
         }
       }
@@ -1268,17 +1270,17 @@ export class Tree extends EntityAbstract {
 
   overlapRender: boolean = false;
 
-  constructor(private readonly explored: { left: number; right: number; top: number; bottom: number; }) {
+  constructor(private readonly player: Player, private readonly explored: { left: number; right: number; top: number; bottom: number; }) {
     super();
 
-    this.x = Math.floor(Math.random() * canvas!.width) - Math.floor(canvas!.width / 2) - player!.x - 96 / 2;
+    this.x = Math.floor(Math.random() * canvas!.width) - Math.floor(canvas!.width / 2) - this.player!.x - 96 / 2;
     //this.y = Math.floor(Math.random() * canvas!.height) - canvas!.height / 2 - player!.y - 192 / 2;
     if (key.up && !key.down){
-      this.y = - player!.y - offsetY() - 192;
+      this.y = - this.player!.y - offsetY() - 192;
       if (this.explored.top > this.y) this.explored.top = this.y;
     }
     if (key.down && !key.up){
-      this.y = canvas!.height - player!.y - offsetY();
+      this.y = canvas!.height - this.player!.y - offsetY();
       if (this.explored.bottom < this.y) this.explored.bottom = this.y;
     }
   }
@@ -1286,9 +1288,9 @@ export class Tree extends EntityAbstract {
   draw(): void {
     if (this.overlapRender && getDebugEnabled()){
       ctx.fillStyle = "#f00";
-      ctx.fillRect(this.x + player!.x + offsetX(),this.y + player!.y + offsetY(),this.box.width,this.box.height);
+      ctx.fillRect(this.x + this.player!.x + offsetX(),this.y + this.player!.y + offsetY(),this.box.width,this.box.height);
     }
-    ctx.drawImage(this.texture.image ?? missingTextureSprite,this.x + player!.x + offsetX(),this.y + player!.y + offsetY(),this.box.width,this.box.height);
+    ctx.drawImage(this.texture.image ?? missingTextureSprite,this.x + this.player!.x + offsetX(),this.y + this.player!.y + offsetY(),this.box.width,this.box.height);
   }
 }
 
