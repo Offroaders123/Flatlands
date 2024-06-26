@@ -1,6 +1,6 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
-import { Show, createEffect, createMemo, createSignal, on, onCleanup } from "solid-js";
+import { Show, createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js";
 import playerTexture from "/textures/entity/player/guy.png";
 import shadowTexture from "/textures/entity/shadow.png";
 import fireTexture from "/textures/item/fire.png";
@@ -101,6 +101,10 @@ export interface AppProps {
 }
 
 export function App(props: AppProps) {
+  onMount(() => {
+    setVersion(version);
+  });
+
   createEffect(() => {
     const touchEnabled: boolean = getTouchEnabled();
     if (touchEnabled){
@@ -378,8 +382,6 @@ export abstract class EntityAbstract {
 // Flatlands.js
 
 import { version } from "../package.json";
-
-setVersion(version);
 
 // Hotbar.js
 
