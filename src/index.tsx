@@ -1,6 +1,16 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
 import { Show, createEffect, createMemo, createSignal, on, onCleanup } from "solid-js";
+import playerTexture from "/textures/entity/player/guy.png";
+import shadowTexture from "/textures/entity/shadow.png";
+import fireTexture from "/textures/item/fire.png";
+import hatchetTexture from "/textures/item/hatchet.png";
+import pickmaticTexture from "/textures/item/pickmatic.png";
+import pizzaTexture from "/textures/item/pizza.png";
+import spadeTexture from "/textures/item/spade.png";
+import spearswordTexture from "/textures/item/spearsword.png";
+import groundTexture from "/textures/terrain/ground.png";
+import treeTexture from "/textures/terrain/tree.png";
 
 import type { Accessor, Setter } from "solid-js";
 
@@ -977,13 +987,13 @@ const definitions: Definitions = {
     player: {
       name: "Player",
       texture: {
-        source: "textures/entity/player/guy.png"
+        source: playerTexture
       }
     } satisfies BaseDefinition,
     shadow: {
       name: "Shadow",
       texture: {
-        source: "textures/entity/shadow.png"
+        source: shadowTexture
       }
     } satisfies BaseDefinition
   } satisfies Entity,
@@ -991,7 +1001,7 @@ const definitions: Definitions = {
     fire: {
       name: "Fire",
       texture: {
-        source: "textures/item/fire.png",
+        source: fireTexture,
         directional: false
       },
       animation: {
@@ -1003,32 +1013,32 @@ const definitions: Definitions = {
     hatchet: {
       name: "Hatchet",
       texture: {
-        source: "textures/item/hatchet.png"
+        source: hatchetTexture
       }
     } satisfies BaseDefinition,
     pickmatic: {
       name: "Pickmatic",
       texture: {
-        source: "textures/item/pickmatic.png"
+        source: pickmaticTexture
       }
     } satisfies BaseDefinition,
     pizza: {
       name: "Pizza",
       texture: {
-        source: "textures/item/pizza.png",
+        source: pizzaTexture,
         directional: false
       }
     } satisfies BaseDefinition,
     spade: {
       name: "Spade",
       texture: {
-        source: "textures/item/spade.png"
+        source: spadeTexture
       }
     } satisfies BaseDefinition,
     spearsword: {
       name: "Spearsword",
       texture: {
-        source: "textures/item/spearsword.png"
+        source: spearswordTexture
       }
     } satisfies BaseDefinition
   } satisfies Item,
@@ -1036,14 +1046,14 @@ const definitions: Definitions = {
     ground: {
       name: "Ground",
       texture: {
-        source: "textures/terrain/ground.png",
+        source: groundTexture,
         pattern: ctx.createPattern(missingTextureSprite, "repeat")!
       }
     } satisfies Ground,
     tree: {
       name: "Tree",
       texture: {
-        source: "textures/terrain/tree.png"
+        source: treeTexture
       }
     } satisfies BaseDefinition
   } satisfies Terrain
