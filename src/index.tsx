@@ -72,8 +72,8 @@ render(() => (
   <App
     getPlayerX={getPlayerX}
     getPlayerY={getPlayerY}
-    version={getVersion()}
-    timeOrigin={getTimeOrigin()}
+    getVersion={getVersion}
+    getTimeOrigin={getTimeOrigin}
     getTick={getTick}
     getFrames={getFrames}
     getDroppedFrames={getDroppedFrames}
@@ -88,8 +88,8 @@ render(() => (
 export interface AppProps {
   getPlayerX: Accessor<number>;
   getPlayerY: Accessor<number>;
-  version: string;
-  timeOrigin: number;
+  getVersion: Accessor<string>;
+  getTimeOrigin: Accessor<number>;
   getTick: Accessor<number>;
   getFrames: Accessor<number>;
   getDroppedFrames: Accessor<number>;
@@ -187,6 +187,37 @@ export function App(props: AppProps) {
     document.addEventListener("contextmenu",event => {
       event.preventDefault();
     });
+
+    if (isTouchDevice){
+      setTouchEnabled(true);
+    }
+
+    new ResizeObserver(() => {
+      const { offsetWidth: width, offsetHeight: height } = canvas!;
+      canvas!.width = width / scaling;
+      canvas!.height = height / scaling;
+      ctx.imageSmoothingEnabled = false;
+      draw();
+    }).observe(canvas!);
+
+    // Player
+    player = new Player();
+
+    setSlot0(player.hotbar.slots[0]);
+    setSlot1(player.hotbar.slots[1]);
+    setSlot2(player.hotbar.slots[2]);
+    setSlot3(player.hotbar.slots[3]);
+    setSlot4(player.hotbar.slots[4]);
+    setSlot5(player.hotbar.slots[5]);
+
+    setSlot(player.hotbar.active);
+
+    // // Loop over each hotbar slot and update it's state to match the player's state
+    // slots().forEach((slot,i) => {
+    //   slot.value = player!.hotbar.slots[i as HotbarSlotIndex];
+    // });
+
+    // slots()[player!.hotbar.active].activate();
   });
 
   createEffect(() => {
@@ -224,8 +255,8 @@ export function App(props: AppProps) {
         />
         <Show when={getDebugEnabled()}>
         <Debug
-          version={props.version}
-          timeOrigin={props.timeOrigin}
+          version={props.getVersion()}
+          timeOrigin={props.getTimeOrigin()}
           getTick={props.getTick}
           getFrames={props.getFrames}
           getDroppedFrames={props.getDroppedFrames}
@@ -1146,18 +1177,6 @@ if (window.isSecureContext && !import.meta.env.DEV){
 /* This is to allow for :active styling on iOS Safari */
 document.body.setAttribute("ontouchstart","");
 
-if (isTouchDevice){
-  setTouchEnabled(true);
-}
-
-new ResizeObserver(() => {
-  const { offsetWidth: width, offsetHeight: height } = canvas!;
-  canvas!.width = width / scaling;
-  canvas!.height = height / scaling;
-  ctx.imageSmoothingEnabled = false;
-  draw();
-}).observe(canvas!);
-
 export let tick = 0;
 
 // Environment
@@ -1167,25 +1186,6 @@ export const explored = {
   top: 0,
   bottom: canvas!.height
 };
-
-// Player
-player = new Player();
-
-setSlot0(player.hotbar.slots[0]);
-setSlot1(player.hotbar.slots[1]);
-setSlot2(player.hotbar.slots[2]);
-setSlot3(player.hotbar.slots[3]);
-setSlot4(player.hotbar.slots[4]);
-setSlot5(player.hotbar.slots[5]);
-
-setSlot(player.hotbar.active);
-
-// // Loop over each hotbar slot and update it's state to match the player's state
-// slots().forEach((slot,i) => {
-//   slot.value = player!.hotbar.slots[i as HotbarSlotIndex];
-// });
-
-// slots()[player!.hotbar.active].activate();
 
 // Trees
 export const treesArray: Tree[] = [];
