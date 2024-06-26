@@ -103,6 +103,90 @@ export interface AppProps {
 export function App(props: AppProps) {
   onMount(() => {
     setVersion(version);
+
+    window.addEventListener("gamepadconnected",event => {
+      if (!event.gamepad.mapping) return;
+      gamepads.push(event.gamepad.index);
+      //console.log("Connected!\n",navigator.getGamepads()[event.gamepad.index]);
+    });
+
+    window.addEventListener("gamepaddisconnected",event => {
+      if (!event.gamepad.mapping) return;
+      //console.log("Disconnected.\n",event.gamepad.index);
+      gamepads.splice(gamepads.indexOf(event.gamepad.index));
+    });
+
+    document.addEventListener("keydown",event => {
+      if (event.repeat || document.activeElement != document.body) return;
+      setTouchEnabled(false);
+
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+      if (event.shiftKey && event.code === "KeyD"){
+        event.preventDefault();
+        setDebugEnabled(previous => !previous);
+        // debug_toggle.click();
+      }
+
+      if (event.shiftKey && event.code === "KeyF"){
+        event.preventDefault();
+        if (document.webkitFullscreenEnabled && !document.fullscreenEnabled){
+          (!document.webkitFullscreenElement) ? document.documentElement.webkitRequestFullscreen() : document.webkitExitFullscreen();
+        }
+        if (document.fullscreenEnabled){
+          (!document.fullscreenElement) ? document.documentElement.requestFullscreen() : document.exitFullscreen();
+        }
+      }
+
+      if (event.shiftKey) return;
+
+      if (["Digit1","Digit2","Digit3","Digit4","Digit5","Digit6"].includes(event.code)){
+        event.preventDefault();
+        setSlot(Number(event.code.replace(/Digit/,"")) - 1 as HotbarSlotIndex);
+      }
+
+      if (["ArrowLeft" as const, "KeyA" as const].includes(event.code)){
+        event.preventDefault();
+        key.left = event.code;
+      }
+      if (["ArrowRight" as const, "KeyD" as const].includes(event.code)){
+        event.preventDefault();
+        key.right = event.code;
+      }
+      if (["ArrowUp" as const, "KeyW" as const].includes(event.code)){
+        event.preventDefault();
+        key.up = event.code;
+      }
+      if (["ArrowDown" as const, "KeyS" as const].includes(event.code)){
+        event.preventDefault();
+        key.down = event.code;
+      }
+    });
+
+    document.addEventListener("keyup",event => {
+      if (document.activeElement != document.body) return;
+
+      if (["ArrowLeft","KeyA"].includes(event.code)){
+        key.left = false;
+      }
+      if (["ArrowRight","KeyD"].includes(event.code)){
+        key.right = false;
+      }
+      if (["ArrowUp","KeyW"].includes(event.code)){
+        key.up = false;
+      }
+      if (["ArrowDown","KeyS"].includes(event.code)){
+        key.down = false;
+      }
+    });
+
+    document.addEventListener("touchstart",() => {
+      setTouchEnabled(true);
+    });
+
+    document.addEventListener("contextmenu",event => {
+      event.preventDefault();
+    });
   });
 
   createEffect(() => {
@@ -496,90 +580,6 @@ declare global {
     webkitRequestFullscreen: Element["requestFullscreen"];
   }
 }
-
-window.addEventListener("gamepadconnected",event => {
-  if (!event.gamepad.mapping) return;
-  gamepads.push(event.gamepad.index);
-  //console.log("Connected!\n",navigator.getGamepads()[event.gamepad.index]);
-});
-
-window.addEventListener("gamepaddisconnected",event => {
-  if (!event.gamepad.mapping) return;
-  //console.log("Disconnected.\n",event.gamepad.index);
-  gamepads.splice(gamepads.indexOf(event.gamepad.index));
-});
-
-document.addEventListener("keydown",event => {
-  if (event.repeat || document.activeElement != document.body) return;
-  setTouchEnabled(false);
-
-  if (event.ctrlKey || event.metaKey || event.altKey) return;
-
-  if (event.shiftKey && event.code === "KeyD"){
-    event.preventDefault();
-    setDebugEnabled(previous => !previous);
-    // debug_toggle.click();
-  }
-
-  if (event.shiftKey && event.code === "KeyF"){
-    event.preventDefault();
-    if (document.webkitFullscreenEnabled && !document.fullscreenEnabled){
-      (!document.webkitFullscreenElement) ? document.documentElement.webkitRequestFullscreen() : document.webkitExitFullscreen();
-    }
-    if (document.fullscreenEnabled){
-      (!document.fullscreenElement) ? document.documentElement.requestFullscreen() : document.exitFullscreen();
-    }
-  }
-
-  if (event.shiftKey) return;
-
-  if (["Digit1","Digit2","Digit3","Digit4","Digit5","Digit6"].includes(event.code)){
-    event.preventDefault();
-    setSlot(Number(event.code.replace(/Digit/,"")) - 1 as HotbarSlotIndex);
-  }
-
-  if (["ArrowLeft" as const, "KeyA" as const].includes(event.code)){
-    event.preventDefault();
-    key.left = event.code;
-  }
-  if (["ArrowRight" as const, "KeyD" as const].includes(event.code)){
-    event.preventDefault();
-    key.right = event.code;
-  }
-  if (["ArrowUp" as const, "KeyW" as const].includes(event.code)){
-    event.preventDefault();
-    key.up = event.code;
-  }
-  if (["ArrowDown" as const, "KeyS" as const].includes(event.code)){
-    event.preventDefault();
-    key.down = event.code;
-  }
-});
-
-document.addEventListener("keyup",event => {
-  if (document.activeElement != document.body) return;
-
-  if (["ArrowLeft","KeyA"].includes(event.code)){
-    key.left = false;
-  }
-  if (["ArrowRight","KeyD"].includes(event.code)){
-    key.right = false;
-  }
-  if (["ArrowUp","KeyW"].includes(event.code)){
-    key.up = false;
-  }
-  if (["ArrowDown","KeyS"].includes(event.code)){
-    key.down = false;
-  }
-});
-
-document.addEventListener("touchstart",() => {
-  setTouchEnabled(true);
-});
-
-document.addEventListener("contextmenu",event => {
-  event.preventDefault();
-});
 
 // ItemSlot.js
 
