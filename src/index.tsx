@@ -68,396 +68,199 @@ const [getSlot3, setSlot3] = createSignal<ItemID | null>(null);
 const [getSlot4, setSlot4] = createSignal<ItemID | null>(null);
 const [getSlot5, setSlot5] = createSignal<ItemID | null>(null);
 
-render(() => (
-  <App
-    getPlayerX={getPlayerX}
-    getPlayerY={getPlayerY}
-    getVersion={getVersion}
-    getTimeOrigin={getTimeOrigin}
-    getTick={getTick}
-    getFrames={getFrames}
-    getDroppedFrames={getDroppedFrames}
-    getDelta={getDelta}
-    canvas={ref => canvas = ref}
-    hud={ref => hud = ref}
-    coordinates={ref => coordinates = ref}
-    hotbar={ref => hotbar = ref}
-  />
-), root);
+// properties.js
 
-export interface AppProps {
-  getPlayerX: Accessor<number>;
-  getPlayerY: Accessor<number>;
-  getVersion: Accessor<string>;
-  getTimeOrigin: Accessor<number>;
-  getTick: Accessor<number>;
-  getFrames: Accessor<number>;
-  getDroppedFrames: Accessor<number>;
-  getDelta: Accessor<number>;
-  canvas(ref: HTMLCanvasElement): void;
-  hud(ref: HTMLDivElement): void;
-  coordinates(ref: HTMLDivElement): void;
-  hotbar(ref: HTMLDivElement): void;
+// import { ctx } from "./canvas.js";
+
+export interface BaseDefinition {
+  name: string;
+  texture: {
+    width?: number;
+    height?: number;
+    source: string;
+    image?: HTMLImageElement;
+    directional?: false;
+  };
 }
 
-export function App(props: AppProps) {
-  onMount(() => {
-    setVersion(version);
+export interface AnimatedDefinition extends BaseDefinition {
+  animation: Animation;
+}
 
-    window.addEventListener("gamepadconnected",event => {
-      if (!event.gamepad.mapping) return;
-      gamepads.push(event.gamepad.index);
-      //console.log("Connected!\n",navigator.getGamepads()[event.gamepad.index]);
-    });
+export type Animation = ReactiveAnimation | RepeatAnimation;
 
-    window.addEventListener("gamepaddisconnected",event => {
-      if (!event.gamepad.mapping) return;
-      //console.log("Disconnected.\n",event.gamepad.index);
-      gamepads.splice(gamepads.indexOf(event.gamepad.index));
-    });
+export interface ReactiveAnimation {
+  type: "reactive";
+  duration: number;
+  keyframes: number;
+  columns: number;
+  tick: number;
+  frame: number;
+  column: number;
+}
 
-    document.addEventListener("keydown",event => {
-      if (event.repeat || document.activeElement != document.body) return;
-      setTouchEnabled(false);
+export interface RepeatAnimation {
+  type: "repeat";
+  duration: number;
+  keyframes: number;
+}
 
-      if (event.ctrlKey || event.metaKey || event.altKey) return;
+export interface Fire extends AnimatedDefinition {
+  texture: BaseDefinition["texture"] & {
+    directional: false;
+  };
+  animation: RepeatAnimation;
+}
 
-      if (event.shiftKey && event.code === "KeyD"){
-        event.preventDefault();
-        setDebugEnabled(previous => !previous);
-        // debug_toggle.click();
+export interface Ground extends BaseDefinition {
+  texture: BaseDefinition["texture"] & {
+    pattern: CanvasPattern;
+  };
+}
+
+export interface Definitions {
+  entity: Entity;
+  item: Item;
+  terrain: Terrain;
+}
+
+export interface Entity {
+  player: BaseDefinition;
+  shadow: BaseDefinition;
+}
+
+export interface Item {
+  fire: Fire;
+  hatchet: BaseDefinition;
+  pickmatic: BaseDefinition;
+  pizza: BaseDefinition;
+  spade: BaseDefinition;
+  spearsword: BaseDefinition;
+}
+
+export type ItemID = keyof Item;
+
+export interface Terrain {
+  ground: Ground;
+  tree: BaseDefinition;
+}
+
+export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
+
+export const missingTextureSprite = new Image();
+// const missingTextureSprite = new ImageData(new Uint8ClampedArray([249,0,255,255,0,0,0,255,0,0,0,255,249,0,255,255]),2,2);
+missingTextureSprite.src = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAABIeJ9nAAAAAXNSR0IB2cksfwAAAAlwSFlz\
+AAALEwAACxMBAJqcGAAAAAZQTFRF+QD/AAAASf/37wAAAAxJREFUeJxjcGBoAAABRADBOnocVgAAAABJRU5ErkJggg==`;
+
+const definitions: Definitions = {
+  entity: {
+    player: {
+      name: "Player",
+      texture: {
+        source: playerTexture
       }
-
-      if (event.shiftKey && event.code === "KeyF"){
-        event.preventDefault();
-        if (document.webkitFullscreenEnabled && !document.fullscreenEnabled){
-          (!document.webkitFullscreenElement) ? document.documentElement.webkitRequestFullscreen() : document.webkitExitFullscreen();
-        }
-        if (document.fullscreenEnabled){
-          (!document.fullscreenElement) ? document.documentElement.requestFullscreen() : document.exitFullscreen();
-        }
+    } satisfies BaseDefinition,
+    shadow: {
+      name: "Shadow",
+      texture: {
+        source: shadowTexture
       }
-
-      if (event.shiftKey) return;
-
-      if (["Digit1","Digit2","Digit3","Digit4","Digit5","Digit6"].includes(event.code)){
-        event.preventDefault();
-        setSlot(Number(event.code.replace(/Digit/,"")) - 1 as HotbarSlotIndex);
+    } satisfies BaseDefinition
+  } satisfies Entity,
+  item: {
+    fire: {
+      name: "Fire",
+      texture: {
+        source: fireTexture,
+        directional: false
+      },
+      animation: {
+        type: "repeat",
+        duration: 750,
+        keyframes: 4
       }
-
-      if (["ArrowLeft" as const, "KeyA" as const].includes(event.code)){
-        event.preventDefault();
-        key.left = event.code;
+    } satisfies Fire,
+    hatchet: {
+      name: "Hatchet",
+      texture: {
+        source: hatchetTexture
       }
-      if (["ArrowRight" as const, "KeyD" as const].includes(event.code)){
-        event.preventDefault();
-        key.right = event.code;
+    } satisfies BaseDefinition,
+    pickmatic: {
+      name: "Pickmatic",
+      texture: {
+        source: pickmaticTexture
       }
-      if (["ArrowUp" as const, "KeyW" as const].includes(event.code)){
-        event.preventDefault();
-        key.up = event.code;
+    } satisfies BaseDefinition,
+    pizza: {
+      name: "Pizza",
+      texture: {
+        source: pizzaTexture,
+        directional: false
       }
-      if (["ArrowDown" as const, "KeyS" as const].includes(event.code)){
-        event.preventDefault();
-        key.down = event.code;
+    } satisfies BaseDefinition,
+    spade: {
+      name: "Spade",
+      texture: {
+        source: spadeTexture
       }
-    });
-
-    document.addEventListener("keyup",event => {
-      if (document.activeElement != document.body) return;
-
-      if (["ArrowLeft","KeyA"].includes(event.code)){
-        key.left = false;
+    } satisfies BaseDefinition,
+    spearsword: {
+      name: "Spearsword",
+      texture: {
+        source: spearswordTexture
       }
-      if (["ArrowRight","KeyD"].includes(event.code)){
-        key.right = false;
+    } satisfies BaseDefinition
+  } satisfies Item,
+  terrain: {
+    ground: {
+      name: "Ground",
+      texture: {
+        source: groundTexture,
+        pattern: ctx.createPattern(missingTextureSprite, "repeat")!
       }
-      if (["ArrowUp","KeyW"].includes(event.code)){
-        key.up = false;
+    } satisfies Ground,
+    tree: {
+      name: "Tree",
+      texture: {
+        source: treeTexture
       }
-      if (["ArrowDown","KeyS"].includes(event.code)){
-        key.down = false;
-      }
-    });
+    } satisfies BaseDefinition
+  } satisfies Terrain
+};
 
-    document.addEventListener("touchstart",() => {
-      setTouchEnabled(true);
-    });
+async function loadDefinitions(definitions: Definitions): Promise<void> {
+  await Promise.all<void[]>(
+    (Object.values(definitions) as Definitions[keyof Definitions][])
+      .map(definition => Promise.all<void>(
+        Object.values(definition)
+          .map(feature => loadFeature(feature))
+      ))
+  ) satisfies void[][];
+}
 
-    document.addEventListener("contextmenu",event => {
-      event.preventDefault();
-    });
+async function loadFeature(feature: BaseDefinition): Promise<void> {
+  const { source } = feature.texture;
+  const image = await loadSprite(source);
+  if (image === null) return;
+  feature.texture.image = image;
+  if (feature.name !== "Ground") return;
+  (feature as Ground).texture.pattern = ctx.createPattern(image, "repeat")!;
+}
 
-    if (isTouchDevice){
-      setTouchEnabled(true);
-    }
+await loadDefinitions(definitions);
 
-    new ResizeObserver(() => {
-      const { offsetWidth: width, offsetHeight: height } = canvas!;
-      canvas!.width = width / scaling;
-      canvas!.height = height / scaling;
-      ctx.imageSmoothingEnabled = false;
-      draw();
-    }).observe(canvas!);
+export const { entity, terrain } = definitions;
+item = definitions.item;
 
-    // Player
-    player = new Player();
-
-    setSlot0(player.hotbar.slots[0]);
-    setSlot1(player.hotbar.slots[1]);
-    setSlot2(player.hotbar.slots[2]);
-    setSlot3(player.hotbar.slots[3]);
-    setSlot4(player.hotbar.slots[4]);
-    setSlot5(player.hotbar.slots[5]);
-
-    setSlot(player.hotbar.active);
-
-    // // Loop over each hotbar slot and update it's state to match the player's state
-    // slots().forEach((slot,i) => {
-    //   slot.value = player!.hotbar.slots[i as HotbarSlotIndex];
-    // });
-
-    // slots()[player!.hotbar.active].activate();
+export async function loadSprite(source: string): Promise<HTMLImageElement | null> {
+  return new Promise<HTMLImageElement | null>(resolve => {
+    const sprite = new Image();
+    sprite.addEventListener("load",() => resolve(sprite));
+    sprite.addEventListener("error",() => resolve(null));
+    sprite.src = source;
   });
-
-  createEffect(() => {
-    const touchEnabled: boolean = getTouchEnabled();
-    if (touchEnabled){
-      document.documentElement.classList.add("touch");
-    } else {
-      document.documentElement.classList.remove("touch");
-    }
-  });
-
-  createEffect(() => {
-    const slot = getSlot();
-    if (player === null) return;
-    player.hotbar.active = slot;
-  });
-
-  // createEffect(() => {
-  //   console.log(canvas);
-  //   console.log(hud);
-  //   console.log(coordinates);
-  //   console.log(hotbar);
-  // });
-
-  return (
-    <>
-      <canvas id="canvas" ref={props.canvas}/>
-      <div class="hud-panel" ref={props.hud}>
-        <input
-          id="debug_toggle"
-          type="checkbox"
-          tabindex="-1"
-          checked={getDebugEnabled()}
-          oninput={event => setDebugEnabled(event.currentTarget.checked)}
-        />
-        <Show when={getDebugEnabled()}>
-        <Debug
-          version={props.getVersion()}
-          timeOrigin={props.getTimeOrigin()}
-          getTick={props.getTick}
-          getFrames={props.getFrames}
-          getDroppedFrames={props.getDroppedFrames}
-          getDelta={props.getDelta}
-        />
-        </Show>
-        <Coordinates
-          getPlayerX={props.getPlayerX}
-          getPlayerY={props.getPlayerY}
-          ref={props.coordinates}
-        />
-        <Hotbar
-          getActive={getSlot}
-          setActive={setSlot}
-          getSlot0={getSlot0}
-          getSlot1={getSlot1}
-          getSlot2={getSlot2}
-          getSlot3={getSlot3}
-          getSlot4={getSlot4}
-          getSlot5={getSlot5}
-          ref={props.hotbar}
-        />
-        <DPad/>
-      </div>
-    </>
-  );
 }
-
-// app.js (flat modules contained as well)
-
-// import "./Coordinates.js";
-// import "./Debug.js";
-// import "./DPad.js";
-// import "./Hotbar.js";
-// import "./ItemSlot.js";
-// import Flatlands from "./Flatlands.js";
-// import { canvas, ctx, scaling, offsetX, offsetY } from "./canvas.js";
-// /*
-//   Inconsistently implemented, app.js does not handle the gamepad and key logic, it is all used in Player.js.
-//   Ideally I would like to have user input placed located inside either app.js or it's own ES Module.
-// */
-// import { key } from "./input.js";
-// import { terrain } from "./properties.js";
-// import { Player } from "./Player.js";
-// import { Tree } from "./Tree.js";
-
-// import type { HotbarSlotIndex } from "./Hotbar.js";
-
-// canvas.js
-
-// import { coordinates, hotbar, hud } from "./app.js";
-
-// export const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
-export const ctx = canvas!.getContext("2d",{ alpha: false })!;
-
-export let scaling = 4;
-
-export function offsetX(): number {
-  return Math.round(canvas!.width / 2);
-}
-
-export function offsetY(): number {
-  return Math.round(
-    (canvas!.offsetHeight + (coordinates?.offsetHeight ?? 0) - (hotbar?.offsetHeight ?? 0) - (hud !== null ? parseInt(getComputedStyle(hud).paddingBottom) : 0))
-    / scaling / 2
-  );
-}
-
-// Coordinates.js
-
-// import { player } from "./app.js";
-
-export interface CoordinatesProps {
-  getPlayerX: Accessor<number>;
-  getPlayerY: Accessor<number>;
-  ref(value: HTMLDivElement): void;
-}
-
-export function Coordinates(props: CoordinatesProps) {
-  const displayX = createMemo<number>(() => Math.round(props.getPlayerX() / 16) * -1);
-  const displayY = createMemo<number>(() => Math.round(props.getPlayerY() / 16));
-
-  return (
-    <div class="coordinates-panel" ref={props.ref}>({displayX()}, {displayY()})</div>
-  );
-}
-
-// export default Coordinates;
-
-// Debug.js
-
-// import Flatlands from "./Flatlands.js";
-// import { timeOrigin, tick, delta } from "./app.js";
-
-export interface DebugProps {
-  version: string;
-  timeOrigin: number;
-  getTick: Accessor<number>;
-  getFrames: Accessor<number>;
-  getDroppedFrames: Accessor<number>;
-  getDelta: Accessor<number>;
-}
-
-export function Debug(props: DebugProps) {
-  const getCurrentTime = createMemo<string>(on(props.getTick, () => new Date().toLocaleTimeString()));
-  const getGameTime = createMemo<number>(on(props.getTick, () => Math.floor((Date.now() - props.timeOrigin) / 1000)));
-  const getTickTime = createMemo<number>(() => Math.floor(props.getTick() / 60));
-  const getMilliseconds = createMemo<number>(() => Math.floor(props.getTick() / 60 * 1000));
-  const getFrameDelta = createMemo<string>(() => Math.floor(props.getDelta()).toString().padStart(2,"0"));
-
-  return (
-    <div class="debug-panel" ref={debug!}>
-      <pre>
-        Flatlands v{props.version}{"\n"}
-        Time Origin: {props.timeOrigin}{"\n"}
-        Current Time: {getCurrentTime()}{"\n"}
-        Game Time: {getGameTime()}s{"\n"}
-        Ticks: {props.getTick()}{"\n"}
-        Tick Time: {getTickTime()}s{"\n"}
-        Milliseconds: {getMilliseconds()}ms{"\n"}
-        Frames: {props.getFrames()}{"\n"}
-        Dropped Frames: {props.getDroppedFrames()}{"\n"}
-        Frame Delta: {getFrameDelta()}{"\n"}
-      </pre>
-    </div>
-  );
-}
-
-// export default Debug;
-
-// DPad.js
-
-// import { key } from "./input.js";
-
-export function DPad() {
-  let ref: HTMLDivElement;
-  const cleanup = new AbortController();
-
-  createEffect(() => {
-    ref.addEventListener("touchstart", dPadDown, { signal: cleanup.signal, passive: false });
-    ref.addEventListener("touchend", dPadUp, { signal: cleanup.signal });
-    ref.addEventListener("pointerdown", dPadDown, { signal: cleanup.signal });
-    ref.addEventListener("pointerup", dPadUp, { signal: cleanup.signal });
-  });
-
-  onCleanup(() => cleanup.abort());
-
-  return (
-    <div class="dpad-panel" ref={ref!}>
-      <button data-left tabindex={-1}/>
-      <button data-right tabindex={-1}/>
-      <button data-up tabindex={-1}/>
-      <button data-down tabindex={-1}/>
-    </div>
-  );
-}
-
-  function dPadDown(event: PointerEvent | TouchEvent): void {
-    if (!(event.target instanceof HTMLElement)) return;
-    event.preventDefault();
-  
-    if (event.target.matches("button")){
-      event.target.setAttribute("data-active","");
-    }
-  
-    if (event.target.matches("[data-left]")){
-      key.left = "DPadLeft";
-    }
-    if (event.target.matches("[data-right]")){
-      key.right = "DPadRight";
-    }
-    if (event.target.matches("[data-up]")){
-      key.up = "DPadUp";
-    }
-    if (event.target.matches("[data-down]")){
-      key.down = "DPadDown";
-    }
-  }
-
-  function dPadUp(event: PointerEvent | TouchEvent): void {
-    if (!(event.target instanceof HTMLElement)) return;
-
-    if (event.target.matches("button")){
-      event.target.removeAttribute("data-active");
-    }
-  
-    if (event.target.matches("[data-left]")){
-      key.left = false;
-    }
-    if (event.target.matches("[data-right]")){
-      key.right = false;
-    }
-    if (event.target.matches("[data-up]")){
-      key.up = false;
-    }
-    if (event.target.matches("[data-down]")){
-      key.down = false;
-    }
-  }
-
-// export default DPad;
 
 // Entity.js
 
@@ -493,193 +296,6 @@ export abstract class EntityAbstract {
     return { left, top, right, bottom, x, y, width, height };
   }
 }
-
-// Flatlands.js
-
-import { version } from "../package.json";
-
-// Hotbar.js
-
-// import { player } from "./app.js";
-
-// import type ItemSlot from "./ItemSlot.js";
-
-//// Future goal: Can I create this tuple from a map of the `Player["hotbar"]["slots"]` key type?
-// export type HotbarSlots = [ItemSlot,ItemSlot,ItemSlot,ItemSlot,ItemSlot,ItemSlot];
-export type HotbarSlotIndex = Extract<keyof Player["hotbar"]["slots"],`${number}`> extends `${infer U extends number}` ? U : never;
-
-export interface HotbarProps {
-  getActive: Accessor<HotbarSlotIndex>;
-  setActive: Setter<HotbarSlotIndex>;
-  getSlot0: Accessor<ItemID | null>;
-  getSlot1: Accessor<ItemID | null>;
-  getSlot2: Accessor<ItemID | null>;
-  getSlot3: Accessor<ItemID | null>;
-  getSlot4: Accessor<ItemID | null>;
-  getSlot5: Accessor<ItemID | null>;
-  ref(value: HTMLDivElement): void;
-}
-
-export function Hotbar(props: HotbarProps) {
-  let ref: HTMLDivElement;
-  const cleanup = new AbortController();
-
-  createEffect(() => {
-    ref.addEventListener("touchstart",event => {
-      if (!(event.target instanceof Element)) return;
-      event.preventDefault();
-      const slot = event.target.closest<HTMLDivElement>(".item-slot");
-      if (slot === null) return;
-      const index: HotbarSlotIndex = Number(slot.getAttribute("data-index")!) as HotbarSlotIndex;
-      props.setActive(index);
-    },{ signal: cleanup.signal, passive: false });
-  });
-
-  onCleanup(() => cleanup.abort());
-
-  return (
-    <div class="hotbar-panel" ref={refe => { props.ref(refe); ref = refe; }}>
-      {
-        Array.from({ length: 6 }).map((_, i) => {
-          const index = i as HotbarSlotIndex;
-          const isActive = createMemo(() => props.getActive() === index);
-          return (
-            <ItemSlot
-              value={props[`getSlot${index}`]}
-              index={index}
-              active={isActive}
-            />
-          );
-        })
-      }
-    </div>
-  );
-}
-
-  // function setSlot(index: HotbarSlotIndex): void {
-  //   const slot = slots()[index];
-  //   slot.activate();
-  //   player!.hotbar.active = index;
-  // }
-
-  // function slots(): HotbarSlots {
-  //   return [...hotbar.querySelectorAll("item-slot")] as HotbarSlots;
-  // }
-
-// export default Hotbar;
-
-// input.js
-
-// import { debug_toggle, hotbar } from "./app.js";
-// import Flatlands from "./Flatlands.js";
-
-// import type { HotbarSlotIndex } from "./Hotbar.js";
-
-export type KeyLeft = boolean | "ArrowLeft" | "KeyA" | "DPadLeft";
-export type KeyRight = boolean | "ArrowRight" | "KeyD" | "DPadRight";
-export type KeyUp = boolean | "ArrowUp" | "KeyW" | "DPadUp";
-export type KeyDown = boolean | "ArrowDown" | "KeyS" | "DPadDown";
-
-export interface KeyState {
-  left: KeyLeft;
-  right: KeyRight;
-  up: KeyUp;
-  down: KeyDown;
-}
-
-export const key: KeyState = {
-  left: false,
-  right: false,
-  up: false,
-  down: false
-};
-
-export const gamepads: number[] = [];
-
-declare global {
-  interface Array<T extends string> {
-    includes(searchElement: string, fromIndex?: number): searchElement is T;
-  }
-
-  interface Document {
-    webkitExitFullscreen: Document["exitFullscreen"];
-    webkitFullscreenElement: Document["fullscreenElement"];
-    webkitFullscreenEnabled: Document["fullscreenEnabled"];
-  }
-
-  interface Element {
-    webkitRequestFullscreen: Element["requestFullscreen"];
-  }
-}
-
-// ItemSlot.js
-
-// import { hotbar } from "./app.js";
-// import { item } from "./properties.js";
-
-// import type { ItemID, UnionToIntersection } from "./properties.js";
-// import type { HotbarSlotIndex } from "./Hotbar.js";
-
-export interface ItemSlotProps {
-  value: Accessor<ItemID | null>;
-  index: number;
-  active: Accessor<boolean>;
-}
-
-export function ItemSlot(props: ItemSlotProps) {
-  let ref: HTMLDivElement;
-  let itemRenderRef: HTMLDivElement;
-  const isActive = createMemo<boolean>(() => getSlot() === props.index);
-
-  createEffect(() => {
-    const id: ItemID = props.value()!;
-    if (item === null) return;
-    const itemEntry = item[id];
-    const { texture, animation } = itemEntry as UnionToIntersection<typeof item[typeof id]>;
-    const { source, width = 16, height = 16 } = texture;
-    // if (this.sprite === id) return;
-
-    ref.setAttribute("data-sprite",id);
-
-    if (animation){
-      ref.setAttribute("data-animate","");
-      ref.style.setProperty("--width",`${width}px`);
-      ref.style.setProperty("--height",`${height}px`);
-      ref.style.setProperty("--duration",`${animation.duration}ms`);
-      ref.style.setProperty("--keyframes",`${animation.keyframes}`);
-    }
-
-    /*
-      Another goal would be to add functionality to use the cached image itself (the line above, or `sprite`),
-      rather than re-fetching it again in the CSS after being added as a style in `setSlotTexture()`.
-      *edit: Super cool idea! Add canvases for each of the item renderers, rather than just an inline element,
-      so then it can also eventually allow for item animations :O *edit2: or just use CSS instead :) (it's already implemented now!)
-    */
-    /*
-      It could make sense to make this a method of either the hotbar element, or the hud container once an in-game inventory is implemented.
-      Then you could update all item slots for an item to have a certain texture *edit: Almost there!
-      This comment used to be in `properties.js`, but now all of the slot rendering logic is part of the slot element itself :)
-    */
-    itemRenderRef.style.setProperty("background-image",`url("${source}")`);
-  });
-
-  return (
-    <div
-      class="item-slot"
-      data-value={props.value()}
-      data-index={props.index}
-      data-active={isActive() ? "" : null}
-      ref={ref!}
-    >
-      <div
-        class="item-render"
-        ref={itemRenderRef!}
-      />
-    </div>
-  );
-}
-
-// export default ItemSlot;
 
 // Player.js
 
@@ -931,199 +547,583 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
   }
 }
 
-// properties.js
+render(() => (
+  <App
+    getPlayerX={getPlayerX}
+    getPlayerY={getPlayerY}
+    getVersion={getVersion}
+    getTimeOrigin={getTimeOrigin}
+    getTick={getTick}
+    getFrames={getFrames}
+    getDroppedFrames={getDroppedFrames}
+    getDelta={getDelta}
+    canvas={ref => canvas = ref}
+    hud={ref => hud = ref}
+    coordinates={ref => coordinates = ref}
+    hotbar={ref => hotbar = ref}
+  />
+), root);
 
-// import { ctx } from "./canvas.js";
+// export const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
+export const ctx = canvas!.getContext("2d",{ alpha: false })!;
 
-export interface BaseDefinition {
-  name: string;
-  texture: {
-    width?: number;
-    height?: number;
-    source: string;
-    image?: HTMLImageElement;
-    directional?: false;
-  };
+export interface AppProps {
+  getPlayerX: Accessor<number>;
+  getPlayerY: Accessor<number>;
+  getVersion: Accessor<string>;
+  getTimeOrigin: Accessor<number>;
+  getTick: Accessor<number>;
+  getFrames: Accessor<number>;
+  getDroppedFrames: Accessor<number>;
+  getDelta: Accessor<number>;
+  canvas(ref: HTMLCanvasElement): void;
+  hud(ref: HTMLDivElement): void;
+  coordinates(ref: HTMLDivElement): void;
+  hotbar(ref: HTMLDivElement): void;
 }
 
-export interface AnimatedDefinition extends BaseDefinition {
-  animation: Animation;
+export function App(props: AppProps) {
+  onMount(() => {
+    setVersion(version);
+
+    window.addEventListener("gamepadconnected",event => {
+      if (!event.gamepad.mapping) return;
+      gamepads.push(event.gamepad.index);
+      //console.log("Connected!\n",navigator.getGamepads()[event.gamepad.index]);
+    });
+
+    window.addEventListener("gamepaddisconnected",event => {
+      if (!event.gamepad.mapping) return;
+      //console.log("Disconnected.\n",event.gamepad.index);
+      gamepads.splice(gamepads.indexOf(event.gamepad.index));
+    });
+
+    document.addEventListener("keydown",event => {
+      if (event.repeat || document.activeElement != document.body) return;
+      setTouchEnabled(false);
+
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+      if (event.shiftKey && event.code === "KeyD"){
+        event.preventDefault();
+        setDebugEnabled(previous => !previous);
+        // debug_toggle.click();
+      }
+
+      if (event.shiftKey && event.code === "KeyF"){
+        event.preventDefault();
+        if (document.webkitFullscreenEnabled && !document.fullscreenEnabled){
+          (!document.webkitFullscreenElement) ? document.documentElement.webkitRequestFullscreen() : document.webkitExitFullscreen();
+        }
+        if (document.fullscreenEnabled){
+          (!document.fullscreenElement) ? document.documentElement.requestFullscreen() : document.exitFullscreen();
+        }
+      }
+
+      if (event.shiftKey) return;
+
+      if (["Digit1","Digit2","Digit3","Digit4","Digit5","Digit6"].includes(event.code)){
+        event.preventDefault();
+        setSlot(Number(event.code.replace(/Digit/,"")) - 1 as HotbarSlotIndex);
+      }
+
+      if (["ArrowLeft" as const, "KeyA" as const].includes(event.code)){
+        event.preventDefault();
+        key.left = event.code;
+      }
+      if (["ArrowRight" as const, "KeyD" as const].includes(event.code)){
+        event.preventDefault();
+        key.right = event.code;
+      }
+      if (["ArrowUp" as const, "KeyW" as const].includes(event.code)){
+        event.preventDefault();
+        key.up = event.code;
+      }
+      if (["ArrowDown" as const, "KeyS" as const].includes(event.code)){
+        event.preventDefault();
+        key.down = event.code;
+      }
+    });
+
+    document.addEventListener("keyup",event => {
+      if (document.activeElement != document.body) return;
+
+      if (["ArrowLeft","KeyA"].includes(event.code)){
+        key.left = false;
+      }
+      if (["ArrowRight","KeyD"].includes(event.code)){
+        key.right = false;
+      }
+      if (["ArrowUp","KeyW"].includes(event.code)){
+        key.up = false;
+      }
+      if (["ArrowDown","KeyS"].includes(event.code)){
+        key.down = false;
+      }
+    });
+
+    document.addEventListener("touchstart",() => {
+      setTouchEnabled(true);
+    });
+
+    document.addEventListener("contextmenu",event => {
+      event.preventDefault();
+    });
+
+    if (isTouchDevice){
+      setTouchEnabled(true);
+    }
+
+    new ResizeObserver(() => {
+      const { offsetWidth: width, offsetHeight: height } = canvas!;
+      canvas!.width = width / scaling;
+      canvas!.height = height / scaling;
+      ctx.imageSmoothingEnabled = false;
+      draw();
+    }).observe(canvas!);
+
+    // Player
+    player = new Player();
+
+    setSlot0(player.hotbar.slots[0]);
+    setSlot1(player.hotbar.slots[1]);
+    setSlot2(player.hotbar.slots[2]);
+    setSlot3(player.hotbar.slots[3]);
+    setSlot4(player.hotbar.slots[4]);
+    setSlot5(player.hotbar.slots[5]);
+
+    setSlot(player.hotbar.active);
+
+    // // Loop over each hotbar slot and update it's state to match the player's state
+    // slots().forEach((slot,i) => {
+    //   slot.value = player!.hotbar.slots[i as HotbarSlotIndex];
+    // });
+
+    // slots()[player!.hotbar.active].activate();
+  });
+
+  createEffect(() => {
+    const touchEnabled: boolean = getTouchEnabled();
+    if (touchEnabled){
+      document.documentElement.classList.add("touch");
+    } else {
+      document.documentElement.classList.remove("touch");
+    }
+  });
+
+  createEffect(() => {
+    const slot = getSlot();
+    if (player === null) return;
+    player.hotbar.active = slot;
+  });
+
+  // createEffect(() => {
+  //   console.log(canvas);
+  //   console.log(hud);
+  //   console.log(coordinates);
+  //   console.log(hotbar);
+  // });
+
+  return (
+    <>
+      <canvas id="canvas" ref={props.canvas}/>
+      <div class="hud-panel" ref={props.hud}>
+        <input
+          id="debug_toggle"
+          type="checkbox"
+          tabindex="-1"
+          checked={getDebugEnabled()}
+          oninput={event => setDebugEnabled(event.currentTarget.checked)}
+        />
+        <Show when={getDebugEnabled()}>
+        <Debug
+          version={props.getVersion()}
+          timeOrigin={props.getTimeOrigin()}
+          getTick={props.getTick}
+          getFrames={props.getFrames}
+          getDroppedFrames={props.getDroppedFrames}
+          getDelta={props.getDelta}
+        />
+        </Show>
+        <Coordinates
+          getPlayerX={props.getPlayerX}
+          getPlayerY={props.getPlayerY}
+          ref={props.coordinates}
+        />
+        <Hotbar
+          getActive={getSlot}
+          setActive={setSlot}
+          getSlot0={getSlot0}
+          getSlot1={getSlot1}
+          getSlot2={getSlot2}
+          getSlot3={getSlot3}
+          getSlot4={getSlot4}
+          getSlot5={getSlot5}
+          ref={props.hotbar}
+        />
+        <DPad/>
+      </div>
+    </>
+  );
 }
 
-export type Animation = ReactiveAnimation | RepeatAnimation;
+// app.js (flat modules contained as well)
 
-export interface ReactiveAnimation {
-  type: "reactive";
-  duration: number;
-  keyframes: number;
-  columns: number;
-  tick: number;
-  frame: number;
-  column: number;
+// import "./Coordinates.js";
+// import "./Debug.js";
+// import "./DPad.js";
+// import "./Hotbar.js";
+// import "./ItemSlot.js";
+// import Flatlands from "./Flatlands.js";
+// import { canvas, ctx, scaling, offsetX, offsetY } from "./canvas.js";
+// /*
+//   Inconsistently implemented, app.js does not handle the gamepad and key logic, it is all used in Player.js.
+//   Ideally I would like to have user input placed located inside either app.js or it's own ES Module.
+// */
+// import { key } from "./input.js";
+// import { terrain } from "./properties.js";
+// import { Player } from "./Player.js";
+// import { Tree } from "./Tree.js";
+
+// import type { HotbarSlotIndex } from "./Hotbar.js";
+
+// canvas.js
+
+// import { coordinates, hotbar, hud } from "./app.js";
+
+export let scaling = 4;
+
+export function offsetX(): number {
+  return Math.round(canvas!.width / 2);
 }
 
-export interface RepeatAnimation {
-  type: "repeat";
-  duration: number;
-  keyframes: number;
+export function offsetY(): number {
+  return Math.round(
+    (canvas!.offsetHeight + (coordinates?.offsetHeight ?? 0) - (hotbar?.offsetHeight ?? 0) - (hud !== null ? parseInt(getComputedStyle(hud).paddingBottom) : 0))
+    / scaling / 2
+  );
 }
 
-export interface Fire extends AnimatedDefinition {
-  texture: BaseDefinition["texture"] & {
-    directional: false;
-  };
-  animation: RepeatAnimation;
+// Coordinates.js
+
+// import { player } from "./app.js";
+
+export interface CoordinatesProps {
+  getPlayerX: Accessor<number>;
+  getPlayerY: Accessor<number>;
+  ref(value: HTMLDivElement): void;
 }
 
-export interface Ground extends BaseDefinition {
-  texture: BaseDefinition["texture"] & {
-    pattern: CanvasPattern;
-  };
+export function Coordinates(props: CoordinatesProps) {
+  const displayX = createMemo<number>(() => Math.round(props.getPlayerX() / 16) * -1);
+  const displayY = createMemo<number>(() => Math.round(props.getPlayerY() / 16));
+
+  return (
+    <div class="coordinates-panel" ref={props.ref}>({displayX()}, {displayY()})</div>
+  );
 }
 
-export interface Definitions {
-  entity: Entity;
-  item: Item;
-  terrain: Terrain;
+// export default Coordinates;
+
+// Debug.js
+
+// import Flatlands from "./Flatlands.js";
+// import { timeOrigin, tick, delta } from "./app.js";
+
+export interface DebugProps {
+  version: string;
+  timeOrigin: number;
+  getTick: Accessor<number>;
+  getFrames: Accessor<number>;
+  getDroppedFrames: Accessor<number>;
+  getDelta: Accessor<number>;
 }
 
-export interface Entity {
-  player: BaseDefinition;
-  shadow: BaseDefinition;
+export function Debug(props: DebugProps) {
+  const getCurrentTime = createMemo<string>(on(props.getTick, () => new Date().toLocaleTimeString()));
+  const getGameTime = createMemo<number>(on(props.getTick, () => Math.floor((Date.now() - props.timeOrigin) / 1000)));
+  const getTickTime = createMemo<number>(() => Math.floor(props.getTick() / 60));
+  const getMilliseconds = createMemo<number>(() => Math.floor(props.getTick() / 60 * 1000));
+  const getFrameDelta = createMemo<string>(() => Math.floor(props.getDelta()).toString().padStart(2,"0"));
+
+  return (
+    <div class="debug-panel" ref={debug!}>
+      <pre>
+        Flatlands v{props.version}{"\n"}
+        Time Origin: {props.timeOrigin}{"\n"}
+        Current Time: {getCurrentTime()}{"\n"}
+        Game Time: {getGameTime()}s{"\n"}
+        Ticks: {props.getTick()}{"\n"}
+        Tick Time: {getTickTime()}s{"\n"}
+        Milliseconds: {getMilliseconds()}ms{"\n"}
+        Frames: {props.getFrames()}{"\n"}
+        Dropped Frames: {props.getDroppedFrames()}{"\n"}
+        Frame Delta: {getFrameDelta()}{"\n"}
+      </pre>
+    </div>
+  );
 }
 
-export interface Item {
-  fire: Fire;
-  hatchet: BaseDefinition;
-  pickmatic: BaseDefinition;
-  pizza: BaseDefinition;
-  spade: BaseDefinition;
-  spearsword: BaseDefinition;
+// export default Debug;
+
+// DPad.js
+
+// import { key } from "./input.js";
+
+export function DPad() {
+  let ref: HTMLDivElement;
+  const cleanup = new AbortController();
+
+  createEffect(() => {
+    ref.addEventListener("touchstart", dPadDown, { signal: cleanup.signal, passive: false });
+    ref.addEventListener("touchend", dPadUp, { signal: cleanup.signal });
+    ref.addEventListener("pointerdown", dPadDown, { signal: cleanup.signal });
+    ref.addEventListener("pointerup", dPadUp, { signal: cleanup.signal });
+  });
+
+  onCleanup(() => cleanup.abort());
+
+  return (
+    <div class="dpad-panel" ref={ref!}>
+      <button data-left tabindex={-1}/>
+      <button data-right tabindex={-1}/>
+      <button data-up tabindex={-1}/>
+      <button data-down tabindex={-1}/>
+    </div>
+  );
 }
 
-export type ItemID = keyof Item;
+  function dPadDown(event: PointerEvent | TouchEvent): void {
+    if (!(event.target instanceof HTMLElement)) return;
+    event.preventDefault();
+  
+    if (event.target.matches("button")){
+      event.target.setAttribute("data-active","");
+    }
+  
+    if (event.target.matches("[data-left]")){
+      key.left = "DPadLeft";
+    }
+    if (event.target.matches("[data-right]")){
+      key.right = "DPadRight";
+    }
+    if (event.target.matches("[data-up]")){
+      key.up = "DPadUp";
+    }
+    if (event.target.matches("[data-down]")){
+      key.down = "DPadDown";
+    }
+  }
 
-export interface Terrain {
-  ground: Ground;
-  tree: BaseDefinition;
+  function dPadUp(event: PointerEvent | TouchEvent): void {
+    if (!(event.target instanceof HTMLElement)) return;
+
+    if (event.target.matches("button")){
+      event.target.removeAttribute("data-active");
+    }
+  
+    if (event.target.matches("[data-left]")){
+      key.left = false;
+    }
+    if (event.target.matches("[data-right]")){
+      key.right = false;
+    }
+    if (event.target.matches("[data-up]")){
+      key.up = false;
+    }
+    if (event.target.matches("[data-down]")){
+      key.down = false;
+    }
+  }
+
+// export default DPad;
+
+// Flatlands.js
+
+import { version } from "../package.json";
+
+// Hotbar.js
+
+// import { player } from "./app.js";
+
+// import type ItemSlot from "./ItemSlot.js";
+
+//// Future goal: Can I create this tuple from a map of the `Player["hotbar"]["slots"]` key type?
+// export type HotbarSlots = [ItemSlot,ItemSlot,ItemSlot,ItemSlot,ItemSlot,ItemSlot];
+export type HotbarSlotIndex = Extract<keyof Player["hotbar"]["slots"],`${number}`> extends `${infer U extends number}` ? U : never;
+
+export interface HotbarProps {
+  getActive: Accessor<HotbarSlotIndex>;
+  setActive: Setter<HotbarSlotIndex>;
+  getSlot0: Accessor<ItemID | null>;
+  getSlot1: Accessor<ItemID | null>;
+  getSlot2: Accessor<ItemID | null>;
+  getSlot3: Accessor<ItemID | null>;
+  getSlot4: Accessor<ItemID | null>;
+  getSlot5: Accessor<ItemID | null>;
+  ref(value: HTMLDivElement): void;
 }
 
-export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
+export function Hotbar(props: HotbarProps) {
+  let ref: HTMLDivElement;
+  const cleanup = new AbortController();
 
-export const missingTextureSprite = new Image();
-// const missingTextureSprite = new ImageData(new Uint8ClampedArray([249,0,255,255,0,0,0,255,0,0,0,255,249,0,255,255]),2,2);
-missingTextureSprite.src = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAABIeJ9nAAAAAXNSR0IB2cksfwAAAAlwSFlz\
-AAALEwAACxMBAJqcGAAAAAZQTFRF+QD/AAAASf/37wAAAAxJREFUeJxjcGBoAAABRADBOnocVgAAAABJRU5ErkJggg==`;
+  createEffect(() => {
+    ref.addEventListener("touchstart",event => {
+      if (!(event.target instanceof Element)) return;
+      event.preventDefault();
+      const slot = event.target.closest<HTMLDivElement>(".item-slot");
+      if (slot === null) return;
+      const index: HotbarSlotIndex = Number(slot.getAttribute("data-index")!) as HotbarSlotIndex;
+      props.setActive(index);
+    },{ signal: cleanup.signal, passive: false });
+  });
 
-const definitions: Definitions = {
-  entity: {
-    player: {
-      name: "Player",
-      texture: {
-        source: playerTexture
+  onCleanup(() => cleanup.abort());
+
+  return (
+    <div class="hotbar-panel" ref={refe => { props.ref(refe); ref = refe; }}>
+      {
+        Array.from({ length: 6 }).map((_, i) => {
+          const index = i as HotbarSlotIndex;
+          const isActive = createMemo(() => props.getActive() === index);
+          return (
+            <ItemSlot
+              value={props[`getSlot${index}`]}
+              index={index}
+              active={isActive}
+            />
+          );
+        })
       }
-    } satisfies BaseDefinition,
-    shadow: {
-      name: "Shadow",
-      texture: {
-        source: shadowTexture
-      }
-    } satisfies BaseDefinition
-  } satisfies Entity,
-  item: {
-    fire: {
-      name: "Fire",
-      texture: {
-        source: fireTexture,
-        directional: false
-      },
-      animation: {
-        type: "repeat",
-        duration: 750,
-        keyframes: 4
-      }
-    } satisfies Fire,
-    hatchet: {
-      name: "Hatchet",
-      texture: {
-        source: hatchetTexture
-      }
-    } satisfies BaseDefinition,
-    pickmatic: {
-      name: "Pickmatic",
-      texture: {
-        source: pickmaticTexture
-      }
-    } satisfies BaseDefinition,
-    pizza: {
-      name: "Pizza",
-      texture: {
-        source: pizzaTexture,
-        directional: false
-      }
-    } satisfies BaseDefinition,
-    spade: {
-      name: "Spade",
-      texture: {
-        source: spadeTexture
-      }
-    } satisfies BaseDefinition,
-    spearsword: {
-      name: "Spearsword",
-      texture: {
-        source: spearswordTexture
-      }
-    } satisfies BaseDefinition
-  } satisfies Item,
-  terrain: {
-    ground: {
-      name: "Ground",
-      texture: {
-        source: groundTexture,
-        pattern: ctx.createPattern(missingTextureSprite, "repeat")!
-      }
-    } satisfies Ground,
-    tree: {
-      name: "Tree",
-      texture: {
-        source: treeTexture
-      }
-    } satisfies BaseDefinition
-  } satisfies Terrain
+    </div>
+  );
+}
+
+  // function setSlot(index: HotbarSlotIndex): void {
+  //   const slot = slots()[index];
+  //   slot.activate();
+  //   player!.hotbar.active = index;
+  // }
+
+  // function slots(): HotbarSlots {
+  //   return [...hotbar.querySelectorAll("item-slot")] as HotbarSlots;
+  // }
+
+// export default Hotbar;
+
+// input.js
+
+// import { debug_toggle, hotbar } from "./app.js";
+// import Flatlands from "./Flatlands.js";
+
+// import type { HotbarSlotIndex } from "./Hotbar.js";
+
+export type KeyLeft = boolean | "ArrowLeft" | "KeyA" | "DPadLeft";
+export type KeyRight = boolean | "ArrowRight" | "KeyD" | "DPadRight";
+export type KeyUp = boolean | "ArrowUp" | "KeyW" | "DPadUp";
+export type KeyDown = boolean | "ArrowDown" | "KeyS" | "DPadDown";
+
+export interface KeyState {
+  left: KeyLeft;
+  right: KeyRight;
+  up: KeyUp;
+  down: KeyDown;
+}
+
+export const key: KeyState = {
+  left: false,
+  right: false,
+  up: false,
+  down: false
 };
 
-async function loadDefinitions(definitions: Definitions): Promise<void> {
-  await Promise.all<void[]>(
-    (Object.values(definitions) as Definitions[keyof Definitions][])
-      .map(definition => Promise.all<void>(
-        Object.values(definition)
-          .map(feature => loadFeature(feature))
-      ))
-  ) satisfies void[][];
+export const gamepads: number[] = [];
+
+declare global {
+  interface Array<T extends string> {
+    includes(searchElement: string, fromIndex?: number): searchElement is T;
+  }
+
+  interface Document {
+    webkitExitFullscreen: Document["exitFullscreen"];
+    webkitFullscreenElement: Document["fullscreenElement"];
+    webkitFullscreenEnabled: Document["fullscreenEnabled"];
+  }
+
+  interface Element {
+    webkitRequestFullscreen: Element["requestFullscreen"];
+  }
 }
 
-async function loadFeature(feature: BaseDefinition): Promise<void> {
-  const { source } = feature.texture;
-  const image = await loadSprite(source);
-  if (image === null) return;
-  feature.texture.image = image;
-  if (feature.name !== "Ground") return;
-  (feature as Ground).texture.pattern = ctx.createPattern(image, "repeat")!;
+// ItemSlot.js
+
+// import { hotbar } from "./app.js";
+// import { item } from "./properties.js";
+
+// import type { ItemID, UnionToIntersection } from "./properties.js";
+// import type { HotbarSlotIndex } from "./Hotbar.js";
+
+export interface ItemSlotProps {
+  value: Accessor<ItemID | null>;
+  index: number;
+  active: Accessor<boolean>;
 }
 
-await loadDefinitions(definitions);
+export function ItemSlot(props: ItemSlotProps) {
+  let ref: HTMLDivElement;
+  let itemRenderRef: HTMLDivElement;
+  const isActive = createMemo<boolean>(() => getSlot() === props.index);
 
-export const { entity, terrain } = definitions;
-item = definitions.item;
+  createEffect(() => {
+    const id: ItemID = props.value()!;
+    if (item === null) return;
+    const itemEntry = item[id];
+    const { texture, animation } = itemEntry as UnionToIntersection<typeof item[typeof id]>;
+    const { source, width = 16, height = 16 } = texture;
+    // if (this.sprite === id) return;
 
-export async function loadSprite(source: string): Promise<HTMLImageElement | null> {
-  return new Promise<HTMLImageElement | null>(resolve => {
-    const sprite = new Image();
-    sprite.addEventListener("load",() => resolve(sprite));
-    sprite.addEventListener("error",() => resolve(null));
-    sprite.src = source;
+    ref.setAttribute("data-sprite",id);
+
+    if (animation){
+      ref.setAttribute("data-animate","");
+      ref.style.setProperty("--width",`${width}px`);
+      ref.style.setProperty("--height",`${height}px`);
+      ref.style.setProperty("--duration",`${animation.duration}ms`);
+      ref.style.setProperty("--keyframes",`${animation.keyframes}`);
+    }
+
+    /*
+      Another goal would be to add functionality to use the cached image itself (the line above, or `sprite`),
+      rather than re-fetching it again in the CSS after being added as a style in `setSlotTexture()`.
+      *edit: Super cool idea! Add canvases for each of the item renderers, rather than just an inline element,
+      so then it can also eventually allow for item animations :O *edit2: or just use CSS instead :) (it's already implemented now!)
+    */
+    /*
+      It could make sense to make this a method of either the hotbar element, or the hud container once an in-game inventory is implemented.
+      Then you could update all item slots for an item to have a certain texture *edit: Almost there!
+      This comment used to be in `properties.js`, but now all of the slot rendering logic is part of the slot element itself :)
+    */
+    itemRenderRef.style.setProperty("background-image",`url("${source}")`);
   });
+
+  return (
+    <div
+      class="item-slot"
+      data-value={props.value()}
+      data-index={props.index}
+      data-active={isActive() ? "" : null}
+      ref={ref!}
+    >
+      <div
+        class="item-render"
+        ref={itemRenderRef!}
+      />
+    </div>
+  );
 }
+
+// export default ItemSlot;
 
 // Tree.js
 
