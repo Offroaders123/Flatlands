@@ -344,7 +344,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
   };
   speed = 2;
 
-  constructor(private readonly getSlot: Accessor<HotbarSlotIndex>, private readonly setSlot: Setter<HotbarSlotIndex>) {
+  constructor(private readonly getSlot: Accessor<HotbarSlotIndex>, private readonly setSlot: Setter<HotbarSlotIndex>, private readonly treesArray: Tree[]) {
     super();
 
     // Define properties only used internally by the game that don't need to be in the source file
@@ -357,7 +357,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
 
   getEntityOverlap(): void {
     const rect1 = this.getBoundingClientRect();
-    for (const tree of treesArray){
+    for (const tree of this.treesArray){
       const rect2 = tree.getBoundingClientRect();
       const overlap =
         (-rect1.top <= rect2.bottom &&
@@ -684,8 +684,40 @@ export function App(props: AppProps) {
       draw();
     }).observe(canvas!);
 
+    // export let tick = 0;
+
+    // Environment
+    const explored = {
+      left: 0,
+      right: canvas!.width,
+      top: 0,
+      bottom: canvas!.height
+    };
+
+    // Trees
+    const treesArray: Tree[] = [];
+
+    function handleTrees(): void {
+      if (getTick() % 20 === 0){
+        if (canvas!.height / -2 - player!.y - offsetX() < explored.top || canvas!.height - player!.y - offsetY() > explored.bottom){
+          if (key.up && !key.down){
+            treesArray.unshift(new Tree(explored));
+          }
+          if (key.down && !key.up){
+            treesArray.push(new Tree(explored));
+          }
+        }
+      }
+
+      for (const tree of treesArray){
+        tree.draw();
+      }
+    }
+
+    //for (let i = 0; i < 4; i++) treesArray.push(new Tree());
+
     // Player
-    player = new Player(getSlot, setSlot);
+    player = new Player(getSlot, setSlot, treesArray);
 
     setSlot0(player.hotbar.slots[0]);
     setSlot1(player.hotbar.slots[1]);
@@ -1236,18 +1268,18 @@ export class Tree extends EntityAbstract {
 
   overlapRender: boolean = false;
 
-  constructor() {
+  constructor(private readonly explored: { left: number; right: number; top: number; bottom: number; }) {
     super();
 
     this.x = Math.floor(Math.random() * canvas!.width) - Math.floor(canvas!.width / 2) - player!.x - 96 / 2;
     //this.y = Math.floor(Math.random() * canvas!.height) - canvas!.height / 2 - player!.y - 192 / 2;
     if (key.up && !key.down){
       this.y = - player!.y - offsetY() - 192;
-      if (explored.top > this.y) explored.top = this.y;
+      if (this.explored.top > this.y) this.explored.top = this.y;
     }
     if (key.down && !key.up){
       this.y = canvas!.height - player!.y - offsetY();
-      if (explored.bottom < this.y) explored.bottom = this.y;
+      if (this.explored.bottom < this.y) this.explored.bottom = this.y;
     }
   }
 
@@ -1269,35 +1301,3 @@ if (window.isSecureContext && !import.meta.env.DEV){
 
 /* This is to allow for :active styling on iOS Safari */
 document.body.setAttribute("ontouchstart","");
-
-// export let tick = 0;
-
-// Environment
-export const explored = {
-  left: 0,
-  right: canvas!.width,
-  top: 0,
-  bottom: canvas!.height
-};
-
-// Trees
-export const treesArray: Tree[] = [];
-
-function handleTrees(): void {
-  if (getTick() % 20 === 0){
-    if (canvas!.height / -2 - player!.y - offsetX() < explored.top || canvas!.height - player!.y - offsetY() > explored.bottom){
-      if (key.up && !key.down){
-        treesArray.unshift(new Tree());
-      }
-      if (key.down && !key.up){
-        treesArray.push(new Tree());
-      }
-    }
-  }
-
-  for (const tree of treesArray){
-    tree.draw();
-  }
-}
-
-//for (let i = 0; i < 4; i++) treesArray.push(new Tree());
