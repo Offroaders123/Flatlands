@@ -26,6 +26,7 @@ export let item: Item | null = null;
 
 export let hud: HTMLDivElement | null = null;
 export let canvas: HTMLCanvasElement | null = null;
+export let ctx: CanvasRenderingContext2D;
 
 // HUD
 // export const hud = document.querySelector<HTMLDivElement>(".hud-panel")!;
@@ -114,7 +115,7 @@ export interface Fire extends AnimatedDefinition {
 
 export interface Ground extends BaseDefinition {
   texture: BaseDefinition["texture"] & {
-    pattern: CanvasPattern;
+    pattern: CanvasPattern | null;
   };
 }
 
@@ -217,7 +218,7 @@ const definitions: Definitions = {
       name: "Ground",
       texture: {
         source: groundTexture,
-        pattern: ctx.createPattern(missingTextureSprite, "repeat")!
+        pattern: null // ctx.createPattern(missingTextureSprite, "repeat")!
       }
     } satisfies Ground,
     tree: {
@@ -245,6 +246,7 @@ async function loadFeature(feature: BaseDefinition): Promise<void> {
   if (image === null) return;
   feature.texture.image = image;
   if (feature.name !== "Ground") return;
+  if (ctx === undefined) return;
   (feature as Ground).texture.pattern = ctx.createPattern(image, "repeat")!;
 }
 
@@ -565,7 +567,7 @@ render(() => (
 ), root);
 
 // export const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
-export const ctx = canvas!.getContext("2d",{ alpha: false })!;
+// ctx = canvas!.getContext("2d",{ alpha: false })!;
 
 export interface AppProps {
   getPlayerX: Accessor<number>;
@@ -700,6 +702,12 @@ export function App(props: AppProps) {
     // });
 
     // slots()[player!.hotbar.active].activate();
+
+    ctx = canvas!.getContext("2d",{ alpha: false })!;
+
+    terrain.ground.texture.pattern = ctx.createPattern(missingTextureSprite, "repeat")!;
+    loadFeature(terrain.ground);
+    // terrain.ground.texture.pattern = ctx.createPattern(image, "repeat")!;
   });
 
   createEffect(() => {
@@ -1223,7 +1231,7 @@ function draw(): void {
   ctx.clearRect(0,0,width,height);
 
   // Draw Grass
-  ctx.fillStyle = terrain.ground.texture.pattern;
+  ctx.fillStyle = terrain.ground.texture.pattern!;
   // ctx.fillStyle = "#779c43";
   ctx.beginPath();
   ctx.rect(0,0,width,height);
