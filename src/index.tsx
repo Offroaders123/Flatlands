@@ -22,7 +22,7 @@ const isTouchDevice: boolean = "ontouchstart" in window || navigator.maxTouchPoi
 
 // state hoisting
 // export let player: Player | null = null;
-export let item: Item | null = null;
+// export let item: Item | null = null;
 
 export let hud: HTMLDivElement | null = null;
 export let canvas: HTMLCanvasElement | null = null;
@@ -244,8 +244,8 @@ async function loadFeature(feature: BaseDefinition): Promise<void> {
 
 await loadDefinitions(definitions);
 
-export const { entity, terrain } = definitions;
-item = definitions.item;
+export const { entity, item, terrain } = definitions;
+// item = definitions.item;
 
 export async function loadSprite(source: string): Promise<HTMLImageElement | null> {
   return new Promise<HTMLImageElement | null>(resolve => {
@@ -1204,7 +1204,7 @@ export function ItemSlot(props: ItemSlotProps) {
 
   createEffect(() => {
     const id: ItemID = props.value()!;
-    if (item === null) return;
+    // if (item === null) return;
     const itemEntry = item[id];
     const { texture, animation } = itemEntry as UnionToIntersection<typeof item[typeof id]>;
     const { source, width = 16, height = 16 } = texture;
