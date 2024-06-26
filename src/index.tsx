@@ -384,11 +384,11 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
 
       let active: HotbarSlotIndex = this.getSlot();
 
-      if (left1 && !right1 && tick % 10 == 0){
+      if (left1 && !right1 && getTick() % 10 == 0){
         const previous: HotbarSlotIndex = active === 0 ? 5 : active - 1 as HotbarSlotIndex;
         this.setSlot(previous);
       }
-      if (right1 && !left1 && tick % 10 == 0){
+      if (right1 && !left1 && getTick() % 10 == 0){
         const next: HotbarSlotIndex = active === 5 ? 0 : active + 1 as HotbarSlotIndex;
         this.setSlot(next);
       }
@@ -506,7 +506,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
 
     let keyframe = 0;
     if (definition.animation){
-      const current = tick / 60 * 1000;
+      const current = getTick() / 60 * 1000;
       const { duration, keyframes } = definition.animation;
       keyframe = Math.floor((current % duration) / duration * keyframes) * height;
     }
@@ -712,7 +712,8 @@ export function App(props: AppProps) {
     // Update Game State
     function update(): void {
       player!.update();
-      tick++;
+      // tick++;
+      setTick(previous => previous += 1);
     }
 
     // Draw Game State to the renderer
@@ -741,7 +742,7 @@ export function App(props: AppProps) {
       if (getDebugEnabled() && !debug!.matches(":hover")){
         // debug.update();
         setTimeOrigin(timeOrigin);
-        setTick(tick);
+        setTick(getTick);
         // setFrames(Flatlands.debug.frames);
         // setDroppedFrames(Flatlands.debug.droppedFrames);
         setDelta(delta);
@@ -1269,7 +1270,7 @@ if (window.isSecureContext && !import.meta.env.DEV){
 /* This is to allow for :active styling on iOS Safari */
 document.body.setAttribute("ontouchstart","");
 
-export let tick = 0;
+// export let tick = 0;
 
 // Environment
 export const explored = {
@@ -1283,7 +1284,7 @@ export const explored = {
 export const treesArray: Tree[] = [];
 
 function handleTrees(): void {
-  if (tick % 20 === 0){
+  if (getTick() % 20 === 0){
     if (canvas!.height / -2 - player!.y - offsetX() < explored.top || canvas!.height - player!.y - offsetY() > explored.bottom){
       if (key.up && !key.down){
         treesArray.unshift(new Tree());
