@@ -708,6 +708,86 @@ export function App(props: AppProps) {
     terrain.ground.texture.pattern = ctx.createPattern(missingTextureSprite, "repeat")!;
     loadFeature(terrain.ground);
     // terrain.ground.texture.pattern = ctx.createPattern(image, "repeat")!;
+
+    // Update Game State
+    function update(): void {
+      player!.update();
+      tick++;
+    }
+
+    // Draw Game State to the renderer
+    function draw(): void {
+      const { width, height } = canvas!;
+
+      // Reset for next frame
+      ctx.clearRect(0,0,width,height);
+
+      // Draw Grass
+      ctx.fillStyle = terrain.ground.texture.pattern!;
+      // ctx.fillStyle = "#779c43";
+      ctx.beginPath();
+      ctx.rect(0,0,width,height);
+      ctx.setTransform(1,0,0,1,offsetX() + player!.x,offsetY() + player!.y);
+      ctx.fill();
+
+      // Draw Trees
+      ctx.setTransform(1,0,0,1,0,0);
+      handleTrees();
+
+      // Draw Player
+      player!.draw();
+
+      // Set HUD Content
+      if (getDebugEnabled() && !debug!.matches(":hover")){
+        // debug.update();
+        setTimeOrigin(timeOrigin);
+        setTick(tick);
+        // setFrames(Flatlands.debug.frames);
+        // setDroppedFrames(Flatlands.debug.droppedFrames);
+        setDelta(delta);
+      }
+      // coordinates.update();
+      setPlayerX(player!.x);
+      setPlayerY(player!.y);
+    }
+
+    // Game Loop
+    /*
+      Rounding the time origin because some browsers do that by default, and some don't.
+      Thought it would make sense to ensure it is consistently an integer
+    */
+    const timeOrigin = Math.round(performance.timeOrigin);
+    let delta = 0;
+    let lastFrameTime = 0;
+
+    /* Eventually it would be key to make this align with the user's display refresh rate, rather than default to 60hz */
+    const timestep = 1000 / 60;
+
+    window.requestAnimationFrame(loop);
+
+    function loop(): void {
+      // Calculate the amount of time that hasn't been simulated since the last tick
+      const time = Date.now() - timeOrigin;
+      delta += time - lastFrameTime;
+      lastFrameTime = time;
+
+      // Update Game State
+      while (delta >= timestep){
+        update();
+        delta -= timestep;
+        if (delta > timestep){
+          setDroppedFrames(previous => previous + 1);
+        }
+      }
+
+      // Draw game state to the renderer
+      draw();
+      lastFrameTime = time;
+      setFrames(previous => previous + 1);
+
+      // Request next render frame
+      window.requestAnimationFrame(loop);
+    }
   });
 
   createEffect(() => {
@@ -1220,83 +1300,3 @@ function handleTrees(): void {
 }
 
 //for (let i = 0; i < 4; i++) treesArray.push(new Tree());
-
-// Update Game State
-function update(): void {
-  player!.update();
-  tick++;
-}
-
-// Draw Game State to the renderer
-function draw(): void {
-  const { width, height } = canvas!;
-
-  // Reset for next frame
-  ctx.clearRect(0,0,width,height);
-
-  // Draw Grass
-  ctx.fillStyle = terrain.ground.texture.pattern!;
-  // ctx.fillStyle = "#779c43";
-  ctx.beginPath();
-  ctx.rect(0,0,width,height);
-  ctx.setTransform(1,0,0,1,offsetX() + player!.x,offsetY() + player!.y);
-  ctx.fill();
-
-  // Draw Trees
-  ctx.setTransform(1,0,0,1,0,0);
-  handleTrees();
-
-  // Draw Player
-  player!.draw();
-
-  // Set HUD Content
-  if (getDebugEnabled() && !debug!.matches(":hover")){
-    // debug.update();
-    setTimeOrigin(timeOrigin);
-    setTick(tick);
-    // setFrames(Flatlands.debug.frames);
-    // setDroppedFrames(Flatlands.debug.droppedFrames);
-    setDelta(delta);
-  }
-  // coordinates.update();
-  setPlayerX(player!.x);
-  setPlayerY(player!.y);
-}
-
-// Game Loop
-/*
-  Rounding the time origin because some browsers do that by default, and some don't.
-  Thought it would make sense to ensure it is consistently an integer
-*/
-export const timeOrigin = Math.round(performance.timeOrigin);
-export let delta = 0;
-let lastFrameTime = 0;
-
-/* Eventually it would be key to make this align with the user's display refresh rate, rather than default to 60hz */
-const timestep = 1000 / 60;
-
-window.requestAnimationFrame(loop);
-
-function loop(): void {
-  // Calculate the amount of time that hasn't been simulated since the last tick
-  const time = Date.now() - timeOrigin;
-  delta += time - lastFrameTime;
-  lastFrameTime = time;
-
-  // Update Game State
-  while (delta >= timestep){
-    update();
-    delta -= timestep;
-    if (delta > timestep){
-      setDroppedFrames(previous => previous + 1);
-    }
-  }
-
-  // Draw game state to the renderer
-  draw();
-  lastFrameTime = time;
-  setFrames(previous => previous + 1);
-
-  // Request next render frame
-  window.requestAnimationFrame(loop);
-}
