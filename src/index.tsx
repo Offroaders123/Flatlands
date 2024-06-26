@@ -34,7 +34,7 @@ export let ctx: CanvasRenderingContext2D;
 // Debug
 // export const debug_toggle = document.querySelector<HTMLInputElement>("#debug_toggle")!;
 
-let debug: HTMLDivElement | null = null;
+// let debug: HTMLDivElement | null = null;
 // const debug = document.querySelector<HTMLDivElement>(".debug-panel")!;
 
 // Coordinates
@@ -578,6 +578,7 @@ export interface AppProps {
 
 export function App(props: AppProps) {
   let player: Player;
+  let debug: HTMLDivElement;
 
   const [getSlot, setSlot] = createSignal<HotbarSlotIndex>(0);
   const [getSlot0, setSlot0] = createSignal<ItemID | null>(null);
@@ -866,6 +867,7 @@ export function App(props: AppProps) {
           getFrames={props.getFrames}
           getDroppedFrames={props.getDroppedFrames}
           getDelta={props.getDelta}
+          ref={ref => debug = ref}
         />
         </Show>
         <Coordinates
@@ -961,6 +963,7 @@ export interface DebugProps {
   getFrames: Accessor<number>;
   getDroppedFrames: Accessor<number>;
   getDelta: Accessor<number>;
+  ref(ref: HTMLDivElement): void;
 }
 
 export function Debug(props: DebugProps) {
@@ -971,7 +974,7 @@ export function Debug(props: DebugProps) {
   const getFrameDelta = createMemo<string>(() => Math.floor(props.getDelta()).toString().padStart(2,"0"));
 
   return (
-    <div class="debug-panel" ref={debug!}>
+    <div class="debug-panel" ref={props.ref}>
       <pre>
         Flatlands v{props.version}{"\n"}
         Time Origin: {props.timeOrigin}{"\n"}
