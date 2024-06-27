@@ -1,5 +1,12 @@
 // ItemSlot.js
 
+import { createEffect, createMemo } from "solid-js";
+import { item } from "./properties.js";
+
+import type { Accessor } from "solid-js";
+import type { ItemID, UnionToIntersection } from "./properties.js";
+import type { HotbarSlotIndex } from "./Hotbar.js";
+
 // import { hotbar } from "./app.js";
 // import { item } from "./properties.js";
 
@@ -13,7 +20,7 @@ export interface ItemSlotProps {
   getSlot: Accessor<HotbarSlotIndex>;
 }
 
-export function ItemSlot(props: ItemSlotProps) {
+export default function ItemSlot(props: ItemSlotProps) {
   let ref: HTMLDivElement;
   let itemRenderRef: HTMLDivElement;
   const isActive = createMemo<boolean>(() => props.getSlot() === props.index);

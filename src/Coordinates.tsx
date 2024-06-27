@@ -1,5 +1,9 @@
 // Coordinates.js
 
+import { createMemo } from "solid-js";
+
+import type { Accessor } from "solid-js";
+
 // import { player } from "./app.js";
 
 export interface CoordinatesProps {
@@ -8,7 +12,7 @@ export interface CoordinatesProps {
   ref(value: HTMLDivElement): void;
 }
 
-export function Coordinates(props: CoordinatesProps) {
+export default function Coordinates(props: CoordinatesProps) {
   const displayX = createMemo<number>(() => Math.round(props.getPlayerX() / 16) * -1);
   const displayY = createMemo<number>(() => Math.round(props.getPlayerY() / 16));
 

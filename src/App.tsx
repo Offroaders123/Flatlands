@@ -1,9 +1,23 @@
+import { createEffect, createSignal, onMount, Show } from "solid-js";
+import { version } from "../package.json";
+import Coordinates from "./Coordinates.js";
+import Debug from "./Debug.js";
+import DPad from "./DPad.js";
+import Hotbar from "./Hotbar.js";
+import Player from "./Player.js";
+import { loadDefinitions, loadFeature, missingTextureSprite, terrain } from "./properties.js";
+import Tree from "./Tree.js";
+
+import type { HotbarSlotIndex } from "./Hotbar.js";
+import type { KeyState } from "./input.js";
+import type { ItemID } from "./properties.js";
+
 const isTouchDevice: boolean = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
 // export const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
 // ctx = canvas!.getContext("2d",{ alpha: false })!;
 
-export function App() {
+export default function App() {
   // state hoisting
   // export let player: Player | null = null;
   // export let item: Item | null = null;
@@ -79,7 +93,7 @@ export function App() {
     setVersion(version);
 
     ctx = canvas!.getContext("2d",{ alpha: false })!;
-    loadDefinitions(definitions, ctx);
+    loadDefinitions(ctx);
 
     window.addEventListener("gamepadconnected",event => {
       if (!event.gamepad.mapping) return;
@@ -419,7 +433,3 @@ export function App() {
 // import { Tree } from "./Tree.js";
 
 // import type { HotbarSlotIndex } from "./Hotbar.js";
-
-// Flatlands.js
-
-import { version } from "../package.json";

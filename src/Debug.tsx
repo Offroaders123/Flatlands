@@ -1,5 +1,9 @@
 // Debug.js
 
+import { createMemo, on } from "solid-js";
+
+import type { Accessor } from "solid-js";
+
 // import Flatlands from "./Flatlands.js";
 // import { timeOrigin, tick, delta } from "./app.js";
 
@@ -13,7 +17,7 @@ export interface DebugProps {
   ref(ref: HTMLDivElement): void;
 }
 
-export function Debug(props: DebugProps) {
+export default function Debug(props: DebugProps) {
   const getCurrentTime = createMemo<string>(on(props.getTick, () => new Date().toLocaleTimeString()));
   const getGameTime = createMemo<number>(on(props.getTick, () => Math.floor((Date.now() - props.timeOrigin) / 1000)));
   const getTickTime = createMemo<number>(() => Math.floor(props.getTick() / 60));

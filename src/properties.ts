@@ -170,7 +170,7 @@ const definitions: Definitions = {
   } satisfies Terrain
 };
 
-async function loadDefinitions(definitions: Definitions, ctx: CanvasRenderingContext2D): Promise<void> {
+export async function loadDefinitions(ctx: CanvasRenderingContext2D): Promise<void> {
   await Promise.all<void[]>(
     (Object.values(definitions) as Definitions[keyof Definitions][])
       .map(definition => Promise.all<void>(
@@ -180,7 +180,7 @@ async function loadDefinitions(definitions: Definitions, ctx: CanvasRenderingCon
   ) satisfies void[][];
 }
 
-async function loadFeature(feature: BaseDefinition, ctx: CanvasRenderingContext2D): Promise<void> {
+export async function loadFeature(feature: BaseDefinition, ctx: CanvasRenderingContext2D): Promise<void> {
   const { source } = feature.texture;
   const image = await loadSprite(source);
   if (image === null) return;

@@ -11,7 +11,7 @@ export interface BoundingClientRect {
   height: number;
 }
 
-export abstract class EntityAbstract {
+export default abstract class EntityAbstract {
   x = 0;
   y = 0;
 

@@ -1,12 +1,16 @@
 // DPad.js
 
+import { createEffect, onCleanup } from "solid-js";
+
+import type { KeyState } from "./input.js";
+
 // import { key } from "./input.js";
 
 export interface DPadProps {
   key: KeyState;
 }
 
-export function DPad(props: DPadProps) {
+export default function DPad(props: DPadProps) {
   let ref: HTMLDivElement;
   const cleanup = new AbortController();
 

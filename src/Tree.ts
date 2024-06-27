@@ -1,12 +1,19 @@
 // Tree.js
 
+import EntityAbstract from "./Entity.js";
+import { missingTextureSprite, terrain } from "./properties.js";
+
+import type { Accessor } from "solid-js";
+import type Player from "./Player.js";
+import type { KeyState } from "./input.js";
+
 // import { Entity } from "./Entity.js";
 // import { canvas, ctx, offsetX, offsetY } from "./canvas.js";
 // import { key } from "./input.js";
 // import { loadSprite, missingTextureSprite } from "./properties.js";
 // import { debug_toggle, explored, player } from "./app.js";
 
-export class Tree extends EntityAbstract {
+export default class Tree extends EntityAbstract {
   name = "Tree";
   box = {
     width: 96,
