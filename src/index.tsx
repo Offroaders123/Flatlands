@@ -568,6 +568,16 @@ export function App() {
   const [getSlot5, setSlot5] = createSignal<ItemID | null>(null);
   
   onMount(() => {
+    // Service Worker
+    if (window.isSecureContext && !import.meta.env.DEV){
+      navigator.serviceWorker.register("./service-worker.js", { type: "module" });
+    }
+
+    // Touch Handling
+
+    /* This is to allow for :active styling on iOS Safari */
+    document.body.setAttribute("ontouchstart","");
+
     setVersion(version);
 
     ctx = canvas!.getContext("2d",{ alpha: false })!;
@@ -1273,13 +1283,3 @@ export class Tree extends EntityAbstract {
     this.ctx.drawImage(this.texture.image ?? missingTextureSprite,this.x + this.player!.x + this.offsetX(),this.y + this.player!.y + this.offsetY(),this.box.width,this.box.height);
   }
 }
-
-// Service Worker
-if (window.isSecureContext && !import.meta.env.DEV){
-  await navigator.serviceWorker.register("./service-worker.js", { type: "module" });
-}
-
-// Touch Handling
-
-/* This is to allow for :active styling on iOS Safari */
-document.body.setAttribute("ontouchstart","");
