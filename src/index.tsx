@@ -181,17 +181,17 @@ const definitions: Definitions = {
   } satisfies Terrain
 };
 
-async function loadDefinitions(definitions: Definitions): Promise<void> {
+async function loadDefinitions(definitions: Definitions, ctx: CanvasRenderingContext2D): Promise<void> {
   await Promise.all<void[]>(
     (Object.values(definitions) as Definitions[keyof Definitions][])
       .map(definition => Promise.all<void>(
         Object.values(definition)
-          .map(feature => loadFeature(feature))
+          .map(feature => loadFeature(feature, ctx))
       ))
   ) satisfies void[][];
 }
 
-async function loadFeature(feature: BaseDefinition): Promise<void> {
+async function loadFeature(feature: BaseDefinition, ctx: CanvasRenderingContext2D): Promise<void> {
   const { source } = feature.texture;
   const image = await loadSprite(source);
   if (image === null) return;
@@ -201,7 +201,7 @@ async function loadFeature(feature: BaseDefinition): Promise<void> {
   (feature as Ground).texture.pattern = ctx.createPattern(image, "repeat")!;
 }
 
-await loadDefinitions(definitions);
+await loadDefinitions(definitions, ctx);
 
 export const { entity, item, terrain } = definitions;
 // item = definitions.item;
@@ -720,7 +720,7 @@ export function App() {
     ctx = canvas!.getContext("2d",{ alpha: false })!;
 
     terrain.ground.texture.pattern = ctx.createPattern(missingTextureSprite, "repeat")!;
-    loadFeature(terrain.ground);
+    loadFeature(terrain.ground, ctx);
     // terrain.ground.texture.pattern = ctx.createPattern(image, "repeat")!;
 
     // canvas.js
