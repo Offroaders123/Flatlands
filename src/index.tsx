@@ -344,7 +344,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
   };
   speed = 2;
 
-  constructor(private readonly getSlot: Accessor<HotbarSlotIndex>, private readonly setSlot: Setter<HotbarSlotIndex>, private readonly treesArray: Tree[], private readonly offsetX: () => number, private readonly offsetY: () => number) {
+  constructor(private readonly getSlot: Accessor<HotbarSlotIndex>, private readonly setSlot: Setter<HotbarSlotIndex>, private readonly treesArray: Tree[], private readonly offsetX: () => number, private readonly offsetY: () => number, private readonly key: KeyState, private readonly gamepads: number[]) {
     super();
 
     // Define properties only used internally by the game that don't need to be in the source file
@@ -371,16 +371,16 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
   update(): void {
     this.getEntityOverlap();
     //// @ts-expect-error - this might be causing the gamepad crashes
-    const gamepad = navigator.getGamepads()[gamepads[0]!];
+    const gamepad = navigator.getGamepads()[this.gamepads[0]!];
 
     let [axisX,axisY] = (gamepad) ? gamepad.axes : [null,null,null,null];
     let [left1,right1] = (gamepad) ? [gamepad.buttons[4]!.value,gamepad.buttons[5]!.value] : [null,null];
 
     if (gamepad){
-      key.left = (Math.round(axisX as number * 1000) < 0);
-      key.right = (Math.round(axisX as number * 1000) > 0);
-      key.up = (Math.round(axisY as number * 1000) < 0);
-      key.down = (Math.round(axisY as number * 1000) > 0);
+      this.key.left = (Math.round(axisX as number * 1000) < 0);
+      this.key.right = (Math.round(axisX as number * 1000) > 0);
+      this.key.up = (Math.round(axisY as number * 1000) < 0);
+      this.key.down = (Math.round(axisY as number * 1000) > 0);
 
       let active: HotbarSlotIndex = this.getSlot();
 
@@ -394,7 +394,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
       }
     }
 
-    const { left, right, up, down } = key;
+    const { left, right, up, down } = this.key;
     const cardinal = this.speed;
 
     /* Cardinals */
@@ -411,20 +411,20 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
       this.y -= cardinal * (axisY! || 1);
     }
 
-    if (key.left && !key.right){
+    if (this.key.left && !this.key.right){
       this.direction.horizontal = "left";
     }
-    if (key.right && !key.left){
+    if (this.key.right && !this.key.left){
       this.direction.horizontal = "right";
     }
 
-    if (key.down && !key.up && !key.left && !key.right){
+    if (this.key.down && !this.key.up && !this.key.left && !this.key.right){
       this.direction.vertical = "down";
     }
-    if (key.up && !key.down && !key.left && !key.right){
+    if (this.key.up && !this.key.down && !this.key.left && !this.key.right){
       this.direction.vertical = "up";
     }
-    if (!key.up && !key.down || key.left || key.right){
+    if (!this.key.up && !this.key.down || this.key.left || this.key.right){
       this.direction.vertical = false;
     }
 
@@ -438,7 +438,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
       this.animation.column = 1;
     }
 
-    if ((key.left && !key.right) || (key.right && !key.left) || (key.up && !key.down) || (key.down && !key.up)){
+    if ((this.key.left && !this.key.right) || (this.key.right && !this.key.left) || (this.key.up && !this.key.down) || (this.key.down && !this.key.up)){
       this.animation.tick++;
     } else {
       this.animation.column = 0;
@@ -580,6 +580,15 @@ export function App(props: AppProps) {
   let player: Player;
   let debug: HTMLDivElement;
 
+  const key: KeyState = {
+    left: false,
+    right: false,
+    up: false,
+    down: false
+  };
+
+  const gamepads: number[] = [];
+
   const [getSlot, setSlot] = createSignal<HotbarSlotIndex>(0);
   const [getSlot0, setSlot0] = createSignal<ItemID | null>(null);
   const [getSlot1, setSlot1] = createSignal<ItemID | null>(null);
@@ -704,10 +713,10 @@ export function App(props: AppProps) {
       if (getTick() % 20 === 0){
         if (canvas!.height / -2 - player!.y - offsetX() < explored.top || canvas!.height - player!.y - offsetY() > explored.bottom){
           if (key.up && !key.down){
-            treesArray.unshift(new Tree(player, explored, offsetX, offsetY));
+            treesArray.unshift(new Tree(player, explored, offsetX, offsetY, key));
           }
           if (key.down && !key.up){
-            treesArray.push(new Tree(player, explored, offsetX, offsetY));
+            treesArray.push(new Tree(player, explored, offsetX, offsetY, key));
           }
         }
       }
@@ -720,7 +729,7 @@ export function App(props: AppProps) {
     //for (let i = 0; i < 4; i++) treesArray.push(new Tree());
 
     // Player
-    player = new Player(getSlot, setSlot, treesArray, offsetX, offsetY);
+    player = new Player(getSlot, setSlot, treesArray, offsetX, offsetY, key, gamepads);
 
     setSlot0(player.hotbar.slots[0]);
     setSlot1(player.hotbar.slots[1]);
@@ -904,7 +913,9 @@ export function App(props: AppProps) {
           getSlot5={getSlot5}
           ref={props.hotbar}
         />
-        <DPad/>
+        <DPad
+          key={key}
+        />
       </div>
     </>
   );
@@ -997,15 +1008,19 @@ export function Debug(props: DebugProps) {
 
 // import { key } from "./input.js";
 
-export function DPad() {
+export interface DPadProps {
+  key: KeyState;
+}
+
+export function DPad(props: DPadProps) {
   let ref: HTMLDivElement;
   const cleanup = new AbortController();
 
   createEffect(() => {
-    ref.addEventListener("touchstart", dPadDown, { signal: cleanup.signal, passive: false });
-    ref.addEventListener("touchend", dPadUp, { signal: cleanup.signal });
-    ref.addEventListener("pointerdown", dPadDown, { signal: cleanup.signal });
-    ref.addEventListener("pointerup", dPadUp, { signal: cleanup.signal });
+    ref.addEventListener("touchstart", event => dPadDown(event, props.key), { signal: cleanup.signal, passive: false });
+    ref.addEventListener("touchend", event => dPadUp(event, props.key), { signal: cleanup.signal });
+    ref.addEventListener("pointerdown", event => dPadDown(event, props.key), { signal: cleanup.signal });
+    ref.addEventListener("pointerup", event => dPadUp(event, props.key), { signal: cleanup.signal });
   });
 
   onCleanup(() => cleanup.abort());
@@ -1020,7 +1035,7 @@ export function DPad() {
   );
 }
 
-  function dPadDown(event: PointerEvent | TouchEvent): void {
+  function dPadDown(event: PointerEvent | TouchEvent, key: KeyState): void {
     if (!(event.target instanceof HTMLElement)) return;
     event.preventDefault();
   
@@ -1042,7 +1057,7 @@ export function DPad() {
     }
   }
 
-  function dPadUp(event: PointerEvent | TouchEvent): void {
+  function dPadUp(event: PointerEvent | TouchEvent, key: KeyState): void {
     if (!(event.target instanceof HTMLElement)) return;
 
     if (event.target.matches("button")){
@@ -1160,15 +1175,6 @@ export interface KeyState {
   down: KeyDown;
 }
 
-export const key: KeyState = {
-  left: false,
-  right: false,
-  up: false,
-  down: false
-};
-
-export const gamepads: number[] = [];
-
 declare global {
   interface Array<T extends string> {
     includes(searchElement: string, fromIndex?: number): searchElement is T;
@@ -1273,16 +1279,16 @@ export class Tree extends EntityAbstract {
 
   overlapRender: boolean = false;
 
-  constructor(private readonly player: Player, private readonly explored: { left: number; right: number; top: number; bottom: number; }, private readonly offsetX: () => number, private readonly offsetY: () => number) {
+  constructor(private readonly player: Player, private readonly explored: { left: number; right: number; top: number; bottom: number; }, private readonly offsetX: () => number, private readonly offsetY: () => number, private readonly key: KeyState) {
     super();
 
     this.x = Math.floor(Math.random() * canvas!.width) - Math.floor(canvas!.width / 2) - this.player!.x - 96 / 2;
     //this.y = Math.floor(Math.random() * canvas!.height) - canvas!.height / 2 - player!.y - 192 / 2;
-    if (key.up && !key.down){
+    if (this.key.up && !this.key.down){
       this.y = - this.player!.y - this.offsetY() - 192;
       if (this.explored.top > this.y) this.explored.top = this.y;
     }
-    if (key.down && !key.up){
+    if (this.key.down && !this.key.up){
       this.y = canvas!.height - this.player!.y - this.offsetY();
       if (this.explored.bottom < this.y) this.explored.bottom = this.y;
     }
