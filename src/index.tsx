@@ -344,7 +344,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
   };
   speed = 2;
 
-  constructor(private readonly getSlot: Accessor<HotbarSlotIndex>, private readonly setSlot: Setter<HotbarSlotIndex>, private readonly treesArray: Tree[]) {
+  constructor(private readonly getSlot: Accessor<HotbarSlotIndex>, private readonly setSlot: Setter<HotbarSlotIndex>, private readonly treesArray: Tree[], private readonly offsetX: () => number, private readonly offsetY: () => number) {
     super();
 
     // Define properties only used internally by the game that don't need to be in the source file
@@ -468,7 +468,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
       itemScale = 2/3;
     }
 
-    ctx.setTransform(scale,0,0,1,offsetX(),offsetY());
+    ctx.setTransform(scale,0,0,1,this.offsetX(),this.offsetY());
     ctx.transform(1,0,0,1,-7,14);
 
     ctx.drawImage(entity.shadow.texture.image ?? missingTextureSprite,0,0,this.box.width - 2,4);
@@ -491,7 +491,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
       height /= definition.animation.keyframes;
     }
 
-    ctx.setTransform(scale,0,0,1,offsetX(),offsetY());
+    ctx.setTransform(scale,0,0,1,this.offsetX(),this.offsetY());
     ctx.transform(1,0,0,1,this.box.width / -2 + 1,this.box.height / -2);
     ctx.transform(1,0,0,1,10,5);
 
@@ -525,7 +525,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
   }
 
   drawCharacter(_scale: number, offset: number): void {
-    ctx.setTransform(this.direction.horizontal === "left" && !this.direction.vertical ? -1 : 1,0,0,1,offsetX(),offsetY());
+    ctx.setTransform(this.direction.horizontal === "left" && !this.direction.vertical ? -1 : 1,0,0,1,this.offsetX(),this.offsetY());
     ctx.transform(1,0,0,1,this.box.width / -2 + offset,this.box.height / -2);
     ctx.drawImage(
       this.texture.image ?? missingTextureSprite,
@@ -704,10 +704,10 @@ export function App(props: AppProps) {
       if (getTick() % 20 === 0){
         if (canvas!.height / -2 - player!.y - offsetX() < explored.top || canvas!.height - player!.y - offsetY() > explored.bottom){
           if (key.up && !key.down){
-            treesArray.unshift(new Tree(player, explored));
+            treesArray.unshift(new Tree(player, explored, offsetX, offsetY));
           }
           if (key.down && !key.up){
-            treesArray.push(new Tree(player, explored));
+            treesArray.push(new Tree(player, explored, offsetX, offsetY));
           }
         }
       }
@@ -720,7 +720,7 @@ export function App(props: AppProps) {
     //for (let i = 0; i < 4; i++) treesArray.push(new Tree());
 
     // Player
-    player = new Player(getSlot, setSlot, treesArray);
+    player = new Player(getSlot, setSlot, treesArray, offsetX, offsetY);
 
     setSlot0(player.hotbar.slots[0]);
     setSlot1(player.hotbar.slots[1]);
@@ -743,6 +743,23 @@ export function App(props: AppProps) {
     terrain.ground.texture.pattern = ctx.createPattern(missingTextureSprite, "repeat")!;
     loadFeature(terrain.ground);
     // terrain.ground.texture.pattern = ctx.createPattern(image, "repeat")!;
+
+    // canvas.js
+
+    // import { coordinates, hotbar, hud } from "./app.js";
+
+    let scaling = 4;
+
+    function offsetX(): number {
+      return Math.round(canvas!.width / 2);
+    }
+
+    function offsetY(): number {
+      return Math.round(
+        (canvas!.offsetHeight + (coordinates?.offsetHeight ?? 0) - (hotbar?.offsetHeight ?? 0) - (hud !== null ? parseInt(getComputedStyle(hud).paddingBottom) : 0))
+        / scaling / 2
+      );
+    }
 
     // Update Game State
     function update(): void {
@@ -912,23 +929,6 @@ export function App(props: AppProps) {
 // import { Tree } from "./Tree.js";
 
 // import type { HotbarSlotIndex } from "./Hotbar.js";
-
-// canvas.js
-
-// import { coordinates, hotbar, hud } from "./app.js";
-
-export let scaling = 4;
-
-export function offsetX(): number {
-  return Math.round(canvas!.width / 2);
-}
-
-export function offsetY(): number {
-  return Math.round(
-    (canvas!.offsetHeight + (coordinates?.offsetHeight ?? 0) - (hotbar?.offsetHeight ?? 0) - (hud !== null ? parseInt(getComputedStyle(hud).paddingBottom) : 0))
-    / scaling / 2
-  );
-}
 
 // Coordinates.js
 
@@ -1273,17 +1273,17 @@ export class Tree extends EntityAbstract {
 
   overlapRender: boolean = false;
 
-  constructor(private readonly player: Player, private readonly explored: { left: number; right: number; top: number; bottom: number; }) {
+  constructor(private readonly player: Player, private readonly explored: { left: number; right: number; top: number; bottom: number; }, private readonly offsetX: () => number, private readonly offsetY: () => number) {
     super();
 
     this.x = Math.floor(Math.random() * canvas!.width) - Math.floor(canvas!.width / 2) - this.player!.x - 96 / 2;
     //this.y = Math.floor(Math.random() * canvas!.height) - canvas!.height / 2 - player!.y - 192 / 2;
     if (key.up && !key.down){
-      this.y = - this.player!.y - offsetY() - 192;
+      this.y = - this.player!.y - this.offsetY() - 192;
       if (this.explored.top > this.y) this.explored.top = this.y;
     }
     if (key.down && !key.up){
-      this.y = canvas!.height - this.player!.y - offsetY();
+      this.y = canvas!.height - this.player!.y - this.offsetY();
       if (this.explored.bottom < this.y) this.explored.bottom = this.y;
     }
   }
@@ -1291,9 +1291,9 @@ export class Tree extends EntityAbstract {
   draw(): void {
     if (this.overlapRender && getDebugEnabled()){
       ctx.fillStyle = "#f00";
-      ctx.fillRect(this.x + this.player!.x + offsetX(),this.y + this.player!.y + offsetY(),this.box.width,this.box.height);
+      ctx.fillRect(this.x + this.player!.x + this.offsetX(),this.y + this.player!.y + this.offsetY(),this.box.width,this.box.height);
     }
-    ctx.drawImage(this.texture.image ?? missingTextureSprite,this.x + this.player!.x + offsetX(),this.y + this.player!.y + offsetY(),this.box.width,this.box.height);
+    ctx.drawImage(this.texture.image ?? missingTextureSprite,this.x + this.player!.x + this.offsetX(),this.y + this.player!.y + this.offsetY(),this.box.width,this.box.height);
   }
 }
 
