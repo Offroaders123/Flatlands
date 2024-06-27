@@ -20,47 +20,6 @@ const root = document.querySelector<HTMLDivElement>("#root")!;
 
 const isTouchDevice: boolean = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
-// state hoisting
-// export let player: Player | null = null;
-// export let item: Item | null = null;
-
-export let hud: HTMLDivElement | null = null;
-export let canvas: HTMLCanvasElement | null = null;
-export let ctx: CanvasRenderingContext2D;
-
-// HUD
-// export const hud = document.querySelector<HTMLDivElement>(".hud-panel")!;
-
-// Debug
-// export const debug_toggle = document.querySelector<HTMLInputElement>("#debug_toggle")!;
-
-// let debug: HTMLDivElement | null = null;
-// const debug = document.querySelector<HTMLDivElement>(".debug-panel")!;
-
-// Coordinates
-export let coordinates: HTMLDivElement | null = null;
-// export const coordinates = document.querySelector<HTMLDivElement>(".coordinates-panel")!;
-
-// Hotbar
-export let hotbar: HTMLDivElement | null = null;
-// export const hotbar = document.querySelector<HTMLDivElement>(".hotbar-panel")!;
-
-// D-Pad
-// const dpad = document.querySelector<HTMLDivElement>(".dpad-panel")!;
-
-const [getTouchEnabled, setTouchEnabled] = createSignal<boolean>(false);
-const [getDebugEnabled, setDebugEnabled] = createSignal<boolean>(false);
-
-const [getPlayerX, setPlayerX] = createSignal<number>(0);
-const [getPlayerY, setPlayerY] = createSignal<number>(0);
-
-const [getVersion, setVersion] = createSignal<string>(`${null}`);
-const [getTimeOrigin, setTimeOrigin] = createSignal<number>(0);
-const [getTick, setTick] = createSignal<number>(0);
-const [getFrames, setFrames] = createSignal<number>(0);
-const [getDroppedFrames, setDroppedFrames] = createSignal<number>(0);
-const [getDelta, setDelta] = createSignal<number>(0);
-
 // properties.js
 
 // import { ctx } from "./canvas.js";
@@ -344,7 +303,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
   };
   speed = 2;
 
-  constructor(private readonly getSlot: Accessor<HotbarSlotIndex>, private readonly setSlot: Setter<HotbarSlotIndex>, private readonly treesArray: Tree[], private readonly offsetX: () => number, private readonly offsetY: () => number, private readonly key: KeyState, private readonly gamepads: number[]) {
+  constructor(private readonly getSlot: Accessor<HotbarSlotIndex>, private readonly setSlot: Setter<HotbarSlotIndex>, private readonly treesArray: Tree[], private readonly offsetX: () => number, private readonly offsetY: () => number, private readonly key: KeyState, private readonly gamepads: number[], private readonly ctx: CanvasRenderingContext2D, private readonly getTick: Accessor<number>) {
     super();
 
     // Define properties only used internally by the game that don't need to be in the source file
@@ -384,11 +343,11 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
 
       let active: HotbarSlotIndex = this.getSlot();
 
-      if (left1 && !right1 && getTick() % 10 == 0){
+      if (left1 && !right1 && this.getTick() % 10 == 0){
         const previous: HotbarSlotIndex = active === 0 ? 5 : active - 1 as HotbarSlotIndex;
         this.setSlot(previous);
       }
-      if (right1 && !left1 && getTick() % 10 == 0){
+      if (right1 && !left1 && this.getTick() % 10 == 0){
         const next: HotbarSlotIndex = active === 5 ? 0 : active + 1 as HotbarSlotIndex;
         this.setSlot(next);
       }
@@ -468,10 +427,10 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
       itemScale = 2/3;
     }
 
-    ctx.setTransform(scale,0,0,1,this.offsetX(),this.offsetY());
-    ctx.transform(1,0,0,1,-7,14);
+    this.ctx.setTransform(scale,0,0,1,this.offsetX(),this.offsetY());
+    this.ctx.transform(1,0,0,1,-7,14);
 
-    ctx.drawImage(entity.shadow.texture.image ?? missingTextureSprite,0,0,this.box.width - 2,4);
+    this.ctx.drawImage(entity.shadow.texture.image ?? missingTextureSprite,0,0,this.box.width - 2,4);
     if (this.direction.vertical === "down"){
       this.drawCharacter(scale,offset);
       this.drawItem(scale,itemScale);
@@ -480,7 +439,7 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
       this.drawCharacter(scale,offset);
     }
 
-    ctx.setTransform(1,0,0,1,0,0);
+    this.ctx.setTransform(1,0,0,1,0,0);
   }
 
   drawItem(scale: number, itemScale: number): void {
@@ -491,27 +450,27 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
       height /= definition.animation.keyframes;
     }
 
-    ctx.setTransform(scale,0,0,1,this.offsetX(),this.offsetY());
-    ctx.transform(1,0,0,1,this.box.width / -2 + 1,this.box.height / -2);
-    ctx.transform(1,0,0,1,10,5);
+    this.ctx.setTransform(scale,0,0,1,this.offsetX(),this.offsetY());
+    this.ctx.transform(1,0,0,1,this.box.width / -2 + 1,this.box.height / -2);
+    this.ctx.transform(1,0,0,1,10,5);
 
     if (definition.texture.directional !== false){
-      ctx.scale(-1 * itemScale,1);
-      ctx.transform(1,0,0,1,-width,height);
-      ctx.rotate(Math.PI * -1 / 2);
+      this.ctx.scale(-1 * itemScale,1);
+      this.ctx.transform(1,0,0,1,-width,height);
+      this.ctx.rotate(Math.PI * -1 / 2);
     } else {
-      ctx.transform(1,0,0,1,-1,-1);
-      ctx.scale(itemScale,1);
+      this.ctx.transform(1,0,0,1,-1,-1);
+      this.ctx.scale(itemScale,1);
     }
 
     let keyframe = 0;
     if (definition.animation){
-      const current = getTick() / 60 * 1000;
+      const current = this.getTick() / 60 * 1000;
       const { duration, keyframes } = definition.animation;
       keyframe = Math.floor((current % duration) / duration * keyframes) * height;
     }
 
-    ctx.drawImage(
+    this.ctx.drawImage(
       definition.texture.image ?? missingTextureSprite,
       0,
       keyframe,
@@ -525,9 +484,9 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
   }
 
   drawCharacter(_scale: number, offset: number): void {
-    ctx.setTransform(this.direction.horizontal === "left" && !this.direction.vertical ? -1 : 1,0,0,1,this.offsetX(),this.offsetY());
-    ctx.transform(1,0,0,1,this.box.width / -2 + offset,this.box.height / -2);
-    ctx.drawImage(
+    this.ctx.setTransform(this.direction.horizontal === "left" && !this.direction.vertical ? -1 : 1,0,0,1,this.offsetX(),this.offsetY());
+    this.ctx.transform(1,0,0,1,this.box.width / -2 + offset,this.box.height / -2);
+    this.ctx.drawImage(
       this.texture.image ?? missingTextureSprite,
       this.box.width * (this.animation.column !== 0 ? this.animation.frame : 0),
       this.box.height * this.animation.column,
@@ -541,42 +500,53 @@ export class Player extends EntityAbstract implements BaseDefinition, AnimatedDe
   }
 }
 
-render(() => (
-  <App
-    getPlayerX={getPlayerX}
-    getPlayerY={getPlayerY}
-    getVersion={getVersion}
-    getTimeOrigin={getTimeOrigin}
-    getTick={getTick}
-    getFrames={getFrames}
-    getDroppedFrames={getDroppedFrames}
-    getDelta={getDelta}
-    canvas={ref => canvas = ref}
-    hud={ref => hud = ref}
-    coordinates={ref => coordinates = ref}
-    hotbar={ref => hotbar = ref}
-  />
-), root);
+render(() => <App/>, root);
 
 // export const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
 // ctx = canvas!.getContext("2d",{ alpha: false })!;
 
-export interface AppProps {
-  getPlayerX: Accessor<number>;
-  getPlayerY: Accessor<number>;
-  getVersion: Accessor<string>;
-  getTimeOrigin: Accessor<number>;
-  getTick: Accessor<number>;
-  getFrames: Accessor<number>;
-  getDroppedFrames: Accessor<number>;
-  getDelta: Accessor<number>;
-  canvas(ref: HTMLCanvasElement): void;
-  hud(ref: HTMLDivElement): void;
-  coordinates(ref: HTMLDivElement): void;
-  hotbar(ref: HTMLDivElement): void;
-}
+export function App() {
+  // state hoisting
+  // export let player: Player | null = null;
+  // export let item: Item | null = null;
 
-export function App(props: AppProps) {
+  let hud: HTMLDivElement | null = null;
+  let canvas: HTMLCanvasElement | null = null;
+  let ctx: CanvasRenderingContext2D;
+
+  // HUD
+  // export const hud = document.querySelector<HTMLDivElement>(".hud-panel")!;
+
+  // Debug
+  // export const debug_toggle = document.querySelector<HTMLInputElement>("#debug_toggle")!;
+
+  // let debug: HTMLDivElement | null = null;
+  // const debug = document.querySelector<HTMLDivElement>(".debug-panel")!;
+
+  // Coordinates
+  let coordinates: HTMLDivElement | null = null;
+  // export const coordinates = document.querySelector<HTMLDivElement>(".coordinates-panel")!;
+
+  // Hotbar
+  let hotbar: HTMLDivElement | null = null;
+  // export const hotbar = document.querySelector<HTMLDivElement>(".hotbar-panel")!;
+
+  // D-Pad
+  // const dpad = document.querySelector<HTMLDivElement>(".dpad-panel")!;
+
+  const [getTouchEnabled, setTouchEnabled] = createSignal<boolean>(false);
+  const [getDebugEnabled, setDebugEnabled] = createSignal<boolean>(false);
+
+  const [getPlayerX, setPlayerX] = createSignal<number>(0);
+  const [getPlayerY, setPlayerY] = createSignal<number>(0);
+
+  const [getVersion, setVersion] = createSignal<string>(`${null}`);
+  const [getTimeOrigin, setTimeOrigin] = createSignal<number>(0);
+  const [getTick, setTick] = createSignal<number>(0);
+  const [getFrames, setFrames] = createSignal<number>(0);
+  const [getDroppedFrames, setDroppedFrames] = createSignal<number>(0);
+  const [getDelta, setDelta] = createSignal<number>(0);
+
   let player: Player;
   let debug: HTMLDivElement;
 
@@ -713,10 +683,10 @@ export function App(props: AppProps) {
       if (getTick() % 20 === 0){
         if (canvas!.height / -2 - player!.y - offsetX() < explored.top || canvas!.height - player!.y - offsetY() > explored.bottom){
           if (key.up && !key.down){
-            treesArray.unshift(new Tree(player, explored, offsetX, offsetY, key));
+            treesArray.unshift(new Tree(player, explored, offsetX, offsetY, key, canvas!, ctx, getDebugEnabled));
           }
           if (key.down && !key.up){
-            treesArray.push(new Tree(player, explored, offsetX, offsetY, key));
+            treesArray.push(new Tree(player, explored, offsetX, offsetY, key, canvas!, ctx, getDebugEnabled));
           }
         }
       }
@@ -729,7 +699,7 @@ export function App(props: AppProps) {
     //for (let i = 0; i < 4; i++) treesArray.push(new Tree());
 
     // Player
-    player = new Player(getSlot, setSlot, treesArray, offsetX, offsetY, key, gamepads);
+    player = new Player(getSlot, setSlot, treesArray, offsetX, offsetY, key, gamepads, ctx, getTick);
 
     setSlot0(player.hotbar.slots[0]);
     setSlot1(player.hotbar.slots[1]);
@@ -876,8 +846,8 @@ export function App(props: AppProps) {
 
   return (
     <>
-      <canvas id="canvas" ref={props.canvas}/>
-      <div class="hud-panel" ref={props.hud}>
+      <canvas id="canvas" ref={ref => canvas = ref}/>
+      <div class="hud-panel" ref={ref => hud = ref}>
         <input
           id="debug_toggle"
           type="checkbox"
@@ -887,19 +857,19 @@ export function App(props: AppProps) {
         />
         <Show when={getDebugEnabled()}>
         <Debug
-          version={props.getVersion()}
-          timeOrigin={props.getTimeOrigin()}
-          getTick={props.getTick}
-          getFrames={props.getFrames}
-          getDroppedFrames={props.getDroppedFrames}
-          getDelta={props.getDelta}
+          version={getVersion()}
+          timeOrigin={getTimeOrigin()}
+          getTick={getTick}
+          getFrames={getFrames}
+          getDroppedFrames={getDroppedFrames}
+          getDelta={getDelta}
           ref={ref => debug = ref}
         />
         </Show>
         <Coordinates
-          getPlayerX={props.getPlayerX}
-          getPlayerY={props.getPlayerY}
-          ref={props.coordinates}
+          getPlayerX={getPlayerX}
+          getPlayerY={getPlayerY}
+          ref={ref => coordinates = ref}
         />
         <Hotbar
           getSlot={getSlot}
@@ -911,7 +881,7 @@ export function App(props: AppProps) {
           getSlot3={getSlot3}
           getSlot4={getSlot4}
           getSlot5={getSlot5}
-          ref={props.hotbar}
+          ref={ref => hotbar = ref}
         />
         <DPad
           key={key}
@@ -1279,27 +1249,27 @@ export class Tree extends EntityAbstract {
 
   overlapRender: boolean = false;
 
-  constructor(private readonly player: Player, private readonly explored: { left: number; right: number; top: number; bottom: number; }, private readonly offsetX: () => number, private readonly offsetY: () => number, private readonly key: KeyState) {
+  constructor(private readonly player: Player, private readonly explored: { left: number; right: number; top: number; bottom: number; }, private readonly offsetX: () => number, private readonly offsetY: () => number, private readonly key: KeyState, private readonly canvas: HTMLCanvasElement, private readonly ctx: CanvasRenderingContext2D, private readonly getDebugEnabled: Accessor<boolean>) {
     super();
 
-    this.x = Math.floor(Math.random() * canvas!.width) - Math.floor(canvas!.width / 2) - this.player!.x - 96 / 2;
-    //this.y = Math.floor(Math.random() * canvas!.height) - canvas!.height / 2 - player!.y - 192 / 2;
+    this.x = Math.floor(Math.random() * this.canvas!.width) - Math.floor(this.canvas!.width / 2) - this.player!.x - 96 / 2;
+    //this.y = Math.floor(Math.random() * this.canvas!.height) - this.canvas!.height / 2 - player!.y - 192 / 2;
     if (this.key.up && !this.key.down){
       this.y = - this.player!.y - this.offsetY() - 192;
       if (this.explored.top > this.y) this.explored.top = this.y;
     }
     if (this.key.down && !this.key.up){
-      this.y = canvas!.height - this.player!.y - this.offsetY();
+      this.y = this.canvas!.height - this.player!.y - this.offsetY();
       if (this.explored.bottom < this.y) this.explored.bottom = this.y;
     }
   }
 
   draw(): void {
-    if (this.overlapRender && getDebugEnabled()){
-      ctx.fillStyle = "#f00";
-      ctx.fillRect(this.x + this.player!.x + this.offsetX(),this.y + this.player!.y + this.offsetY(),this.box.width,this.box.height);
+    if (this.overlapRender && this.getDebugEnabled()){
+      this.ctx.fillStyle = "#f00";
+      this.ctx.fillRect(this.x + this.player!.x + this.offsetX(),this.y + this.player!.y + this.offsetY(),this.box.width,this.box.height);
     }
-    ctx.drawImage(this.texture.image ?? missingTextureSprite,this.x + this.player!.x + this.offsetX(),this.y + this.player!.y + this.offsetY(),this.box.width,this.box.height);
+    this.ctx.drawImage(this.texture.image ?? missingTextureSprite,this.x + this.player!.x + this.offsetX(),this.y + this.player!.y + this.offsetY(),this.box.width,this.box.height);
   }
 }
 
