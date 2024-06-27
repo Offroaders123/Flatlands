@@ -13,12 +13,14 @@ import type { HotbarSlotIndex } from "./Hotbar.js";
 import type { KeyState } from "./input.js";
 import type { ItemID } from "./properties.js";
 
-const isTouchDevice: boolean = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-
 // export const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
 // ctx = canvas!.getContext("2d",{ alpha: false })!;
 
-export default function App() {
+export interface AppProps {
+  isTouchDevice: boolean;
+}
+
+export default function App(props: AppProps) {
   // state hoisting
   // export let player: Player | null = null;
   // export let item: Item | null = null;
@@ -81,16 +83,6 @@ export default function App() {
   const [getSlot5, setSlot5] = createSignal<ItemID | null>(null);
   
   onMount(() => {
-    // Service Worker
-    if (window.isSecureContext && !import.meta.env.DEV){
-      navigator.serviceWorker.register("./service-worker.js", { type: "module" });
-    }
-
-    // Touch Handling
-
-    /* This is to allow for :active styling on iOS Safari */
-    document.body.setAttribute("ontouchstart","");
-
     setVersion(version);
 
     ctx = canvas!.getContext("2d",{ alpha: false })!;
@@ -180,7 +172,7 @@ export default function App() {
       event.preventDefault();
     });
 
-    if (isTouchDevice){
+    if (props.isTouchDevice){
       setTouchEnabled(true);
     }
 
