@@ -201,7 +201,7 @@ async function loadFeature(feature: BaseDefinition, ctx: CanvasRenderingContext2
   (feature as Ground).texture.pattern = ctx.createPattern(image, "repeat")!;
 }
 
-await loadDefinitions(definitions, ctx);
+// await loadDefinitions(definitions, ctx);
 
 export const { entity, item, terrain } = definitions;
 // item = definitions.item;
@@ -570,6 +570,9 @@ export function App() {
   onMount(() => {
     setVersion(version);
 
+    ctx = canvas!.getContext("2d",{ alpha: false })!;
+    loadDefinitions(definitions, ctx);
+
     window.addEventListener("gamepadconnected",event => {
       if (!event.gamepad.mapping) return;
       gamepads.push(event.gamepad.index);
@@ -716,8 +719,6 @@ export function App() {
     // });
 
     // slots()[player!.hotbar.active].activate();
-
-    ctx = canvas!.getContext("2d",{ alpha: false })!;
 
     terrain.ground.texture.pattern = ctx.createPattern(missingTextureSprite, "repeat")!;
     loadFeature(terrain.ground, ctx);
