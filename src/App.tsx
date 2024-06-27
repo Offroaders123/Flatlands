@@ -7,6 +7,7 @@ import Hotbar from "./Hotbar.js";
 import Player from "./Player.js";
 import { loadDefinitions, loadFeature, missingTextureSprite, terrain } from "./properties.js";
 import Tree from "./Tree.js";
+import "./App.scss";
 
 import type { HotbarSlotIndex } from "./Hotbar.js";
 import type { KeyState } from "./input.js";
