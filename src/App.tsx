@@ -53,10 +53,17 @@ export default function App(props: AppProps) {
   });
 
   return (
-    <Game
-      getDebugEnabled={getDebugEnabled}
-      setDebugEnabled={setDebugEnabled}
-      gamepads={gamepads}
-    />
+    <>
+      <Game
+        getDebugEnabled={getDebugEnabled}
+        setDebugEnabled={setDebugEnabled}
+        gamepads={gamepads}
+      />
+      <Game
+        getDebugEnabled={getDebugEnabled}
+        setDebugEnabled={setDebugEnabled}
+        gamepads={gamepads}
+      />
+    </>
   );
 }

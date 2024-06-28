@@ -5,6 +5,7 @@ import Hud from "./Hud.js";
 import Player from "./Player.js";
 import { loadDefinitions, loadFeature, missingTextureSprite, terrain } from "./properties.js";
 import Tree from "./Tree.js";
+import "./Game.scss";
 
 import type { Accessor, Setter } from "solid-js";
 import type { HotbarSlotIndex } from "./Hotbar.js";
@@ -280,7 +281,7 @@ export default function Game(props: GameProps) {
   // });
 
   return (
-    <>
+    <div class="Game">
       <Canvas
         ref={canvas!}
       />
@@ -308,6 +309,6 @@ export default function Game(props: GameProps) {
         hotbar={ref => hotbar = ref}
         key={key}
       />
-    </>
+    </div>
   );
 }
