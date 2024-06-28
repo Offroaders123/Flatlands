@@ -1,10 +1,6 @@
-// Coordinates.js
-
 import { createMemo } from "solid-js";
 
 import type { Accessor, Ref } from "solid-js";
-
-// import { player } from "./app.js";
 
 export interface CoordinatesProps {
   getPlayerX: Accessor<number>;
@@ -24,5 +20,3 @@ export default function Coordinates(props: CoordinatesProps) {
     </div>
   );
 }
-
-// export default Coordinates;

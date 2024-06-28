@@ -1,7 +1,3 @@
-// properties.js
-
-// import { ctx } from "./canvas.js";
-
 import playerTexture from "/textures/entity/player/guy.png";
 import shadowTexture from "/textures/entity/shadow.png";
 import fireTexture from "/textures/item/fire.png";
@@ -190,10 +186,7 @@ export async function loadFeature(feature: BaseDefinition, ctx: CanvasRenderingC
   (feature as Ground).texture.pattern = ctx.createPattern(image, "repeat")!;
 }
 
-// await loadDefinitions(definitions, ctx);
-
 export const { entity, item, terrain } = definitions;
-// item = definitions.item;
 
 export async function loadSprite(source: string): Promise<HTMLImageElement | null> {
   return new Promise<HTMLImageElement | null>(resolve => {

@@ -1,11 +1,6 @@
-// Debug.js
-
 import { createEffect, createMemo, createSignal, on } from "solid-js";
 
 import type { Accessor } from "solid-js";
-
-// import Flatlands from "./Flatlands.js";
-// import { timeOrigin, tick, delta } from "./app.js";
 
 export interface DebugProps {
   version: string;
@@ -14,7 +9,6 @@ export interface DebugProps {
   getFrames: Accessor<number>;
   getDroppedFrames: Accessor<number>;
   getDelta: Accessor<number>;
-  // ref(ref: HTMLDivElement): void;
 }
 
 export default function Debug(props: DebugProps) {
@@ -53,5 +47,3 @@ export default function Debug(props: DebugProps) {
     </div>
   );
 }
-
-// export default Debug;

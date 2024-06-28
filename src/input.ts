@@ -1,10 +1,3 @@
-// input.js
-
-// import { debug_toggle, hotbar } from "./app.js";
-// import Flatlands from "./Flatlands.js";
-
-// import type { HotbarSlotIndex } from "./Hotbar.js";
-
 export type KeyLeft = boolean | "ArrowLeft" | "KeyA" | "DPadLeft";
 export type KeyRight = boolean | "ArrowRight" | "KeyD" | "DPadRight";
 export type KeyUp = boolean | "ArrowUp" | "KeyW" | "DPadUp";

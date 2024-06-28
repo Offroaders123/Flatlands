@@ -11,41 +11,16 @@ import type { HotbarSlotIndex } from "./Hotbar.js";
 import type { KeyState } from "./input.js";
 import type { ItemID } from "./properties.js";
 
-// export const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
-// ctx = canvas!.getContext("2d",{ alpha: false })!;
-
 export interface AppProps {
   isTouchDevice: boolean;
 }
 
 export default function App(props: AppProps) {
-  // state hoisting
-  // export let player: Player | null = null;
-  // export let item: Item | null = null;
-
   let hud: HTMLDivElement;
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
-
-  // HUD
-  // export const hud = document.querySelector<HTMLDivElement>(".hud-panel")!;
-
-  // Debug
-  // export const debug_toggle = document.querySelector<HTMLInputElement>("#debug_toggle")!;
-
-  // let debug: HTMLDivElement | null = null;
-  // const debug = document.querySelector<HTMLDivElement>(".debug-panel")!;
-
-  // Coordinates
   let coordinates: HTMLDivElement;
-  // export const coordinates = document.querySelector<HTMLDivElement>(".coordinates-panel")!;
-
-  // Hotbar
   let hotbar: HTMLDivElement;
-  // export const hotbar = document.querySelector<HTMLDivElement>(".hotbar-panel")!;
-
-  // D-Pad
-  // const dpad = document.querySelector<HTMLDivElement>(".dpad-panel")!;
 
   const [getTouchEnabled, setTouchEnabled] = createSignal<boolean>(false);
   const [getDebugEnabled, setDebugEnabled] = createSignal<boolean>(false);
@@ -61,8 +36,11 @@ export default function App(props: AppProps) {
   const [getDelta, setDelta] = createSignal<number>(0);
 
   let player: Player;
-  // let debug: HTMLDivElement;
 
+  /*
+    Inconsistently implemented, app.js does not handle the gamepad and key logic, it is all used in Player.js.
+    Ideally I would like to have user input placed located inside either app.js or it's own ES Module.
+  */
   const key: KeyState = {
     left: false,
     right: false,
@@ -107,7 +85,6 @@ export default function App(props: AppProps) {
       if (event.shiftKey && event.code === "KeyD"){
         event.preventDefault();
         setDebugEnabled(previous => !previous);
-        // debug_toggle.click();
       }
 
       if (event.shiftKey && event.code === "KeyF"){
@@ -182,8 +159,6 @@ export default function App(props: AppProps) {
       draw();
     }).observe(canvas!);
 
-    // export let tick = 0;
-
     // Environment
     const explored = {
       left: 0,
@@ -226,20 +201,9 @@ export default function App(props: AppProps) {
 
     setSlot(player.hotbar.active);
 
-    // // Loop over each hotbar slot and update it's state to match the player's state
-    // slots().forEach((slot,i) => {
-    //   slot.value = player!.hotbar.slots[i as HotbarSlotIndex];
-    // });
-
-    // slots()[player!.hotbar.active].activate();
-
     terrain.ground.texture.pattern = ctx.createPattern(missingTextureSprite, "repeat")!;
     loadFeature(terrain.ground, ctx);
     // terrain.ground.texture.pattern = ctx.createPattern(image, "repeat")!;
-
-    // canvas.js
-
-    // import { coordinates, hotbar, hud } from "./app.js";
 
     let scaling = 4;
 
@@ -257,7 +221,6 @@ export default function App(props: AppProps) {
     // Update Game State
     function update(): void {
       player!.update();
-      // tick++;
       setTick(previous => previous += 1);
     }
 
@@ -284,15 +247,10 @@ export default function App(props: AppProps) {
       player!.draw();
 
       // Set HUD Content
-      // if (getDebugEnabled() && !debug!.matches(":hover")){
-        // debug.update();
         setTimeOrigin(timeOrigin);
         setTick(getTick);
-        // setFrames(Flatlands.debug.frames);
-        // setDroppedFrames(Flatlands.debug.droppedFrames);
         setDelta(delta);
-      // }
-      // coordinates.update();
+
       setPlayerX(player!.x);
       setPlayerY(player!.y);
     }
@@ -390,23 +348,3 @@ export default function App(props: AppProps) {
     </>
   );
 }
-
-// app.js (flat modules contained as well)
-
-// import "./Coordinates.js";
-// import "./Debug.js";
-// import "./DPad.js";
-// import "./Hotbar.js";
-// import "./ItemSlot.js";
-// import Flatlands from "./Flatlands.js";
-// import { canvas, ctx, scaling, offsetX, offsetY } from "./canvas.js";
-// /*
-//   Inconsistently implemented, app.js does not handle the gamepad and key logic, it is all used in Player.js.
-//   Ideally I would like to have user input placed located inside either app.js or it's own ES Module.
-// */
-// import { key } from "./input.js";
-// import { terrain } from "./properties.js";
-// import { Player } from "./Player.js";
-// import { Tree } from "./Tree.js";
-
-// import type { HotbarSlotIndex } from "./Hotbar.js";

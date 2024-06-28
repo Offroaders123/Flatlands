@@ -55,7 +55,6 @@ export default function Hud(props: HudProps) {
           getFrames={props.getFrames}
           getDroppedFrames={props.getDroppedFrames}
           getDelta={props.getDelta}
-          // ref={ref => debug = ref}
         />
       </Show>
       <Coordinates

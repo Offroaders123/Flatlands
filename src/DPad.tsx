@@ -1,11 +1,7 @@
-// DPad.js
-
 import { createEffect, onCleanup } from "solid-js";
 import "./DPad.scss";
 
 import type { KeyState } from "./input.js";
-
-// import { key } from "./input.js";
 
 export interface DPadProps {
   key: KeyState;
@@ -78,5 +74,3 @@ export default function DPad(props: DPadProps) {
       key.down = false;
     }
   }
-
-// export default DPad;

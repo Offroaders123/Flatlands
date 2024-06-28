@@ -1,5 +1,3 @@
-// Hotbar.js
-
 import { createEffect, createMemo, onCleanup } from "solid-js";
 import ItemSlot from "./ItemSlot.js";
 import "./Hotbar.scss";
@@ -8,12 +6,6 @@ import type { Accessor, Ref, Setter } from "solid-js";
 import type Player from "./Player.js";
 import type { ItemID } from "./properties.js";
 
-// import { player } from "./app.js";
-
-// import type ItemSlot from "./ItemSlot.js";
-
-//// Future goal: Can I create this tuple from a map of the `Player["hotbar"]["slots"]` key type?
-// export type HotbarSlots = [ItemSlot,ItemSlot,ItemSlot,ItemSlot,ItemSlot,ItemSlot];
 export type HotbarSlotIndex = Extract<keyof Player["hotbar"]["slots"],`${number}`> extends `${infer U extends number}` ? U : never;
 
 export interface HotbarProps {
@@ -67,15 +59,3 @@ export default function Hotbar(props: HotbarProps) {
     </div>
   );
 }
-
-  // function setSlot(index: HotbarSlotIndex): void {
-  //   const slot = slots()[index];
-  //   slot.activate();
-  //   player!.hotbar.active = index;
-  // }
-
-  // function slots(): HotbarSlots {
-  //   return [...hotbar.querySelectorAll("item-slot")] as HotbarSlots;
-  // }
-
-// export default Hotbar;

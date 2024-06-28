@@ -1,5 +1,3 @@
-// Entity.js
-
 export interface BoundingClientRect {
   left: number;
   top: number;

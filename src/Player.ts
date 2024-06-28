@@ -1,5 +1,3 @@
-// Player.js
-
 import EntityAbstract from "./Entity.js";
 import { entity, item, missingTextureSprite } from "./properties.js";
 
@@ -8,16 +6,6 @@ import type { HotbarSlotIndex } from "./Hotbar.js";
 import type Tree from "./Tree.js";
 import type { KeyState } from "./input.js";
 import type { AnimatedDefinition, BaseDefinition, ItemID, ReactiveAnimation, UnionToIntersection } from "./properties.js";
-
-// import { Entity } from "./Entity.js";
-// import { hotbar, tick, treesArray } from "./app.js";
-// import { ctx, offsetX, offsetY } from "./canvas.js";
-// import { key, gamepads } from "./input.js";
-// import { entity, item, loadSprite, missingTextureSprite } from "./properties.js";
-
-// import type ItemSlot from "./ItemSlot.js";
-// import type { HotbarSlotIndex } from "./Hotbar.js";
-// import type { AnimatedDefinition, BaseDefinition, ItemID, ReactiveAnimation, UnionToIntersection } from "./properties.js";
 
 export default class Player extends EntityAbstract implements BaseDefinition, AnimatedDefinition {
   name = "Player";
