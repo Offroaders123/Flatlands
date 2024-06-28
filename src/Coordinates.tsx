@@ -2,14 +2,14 @@
 
 import { createMemo } from "solid-js";
 
-import type { Accessor } from "solid-js";
+import type { Accessor, Ref } from "solid-js";
 
 // import { player } from "./app.js";
 
 export interface CoordinatesProps {
   getPlayerX: Accessor<number>;
   getPlayerY: Accessor<number>;
-  ref(value: HTMLDivElement): void;
+  ref: Ref<HTMLDivElement>;
 }
 
 export default function Coordinates(props: CoordinatesProps) {

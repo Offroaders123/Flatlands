@@ -1,10 +1,7 @@
-import { createEffect, createSignal, onMount, Show } from "solid-js";
+import { createEffect, createSignal, onMount } from "solid-js";
 import { version } from "../package.json";
 import Canvas from "./Canvas.js";
-import Coordinates from "./Coordinates.js";
-import Debug from "./Debug.js";
-import DPad from "./DPad.js";
-import Hotbar from "./Hotbar.js";
+import Hud from "./Hud.js";
 import Player from "./Player.js";
 import { loadDefinitions, loadFeature, missingTextureSprite, terrain } from "./properties.js";
 import Tree from "./Tree.js";
@@ -26,7 +23,7 @@ export default function App(props: AppProps) {
   // export let player: Player | null = null;
   // export let item: Item | null = null;
 
-  let hud: HTMLDivElement | null = null;
+  let hud: HTMLDivElement;
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
 
@@ -40,11 +37,11 @@ export default function App(props: AppProps) {
   // const debug = document.querySelector<HTMLDivElement>(".debug-panel")!;
 
   // Coordinates
-  let coordinates: HTMLDivElement | null = null;
+  let coordinates: HTMLDivElement;
   // export const coordinates = document.querySelector<HTMLDivElement>(".coordinates-panel")!;
 
   // Hotbar
-  let hotbar: HTMLDivElement | null = null;
+  let hotbar: HTMLDivElement;
   // export const hotbar = document.querySelector<HTMLDivElement>(".hotbar-panel")!;
 
   // D-Pad
@@ -366,48 +363,30 @@ export default function App(props: AppProps) {
       <Canvas
         ref={canvas!}
       />
-      <div
-        class="Hud"
-        ref={ref => hud = ref}>
-        <input
-          id="debug_toggle"
-          type="checkbox"
-          tabindex="-1"
-          checked={getDebugEnabled()}
-          oninput={event => setDebugEnabled(event.currentTarget.checked)}
-        />
-        <Show when={getDebugEnabled()}>
-          <Debug
-            version={getVersion()}
-            timeOrigin={getTimeOrigin()}
-            getTick={getTick}
-            getFrames={getFrames}
-            getDroppedFrames={getDroppedFrames}
-            getDelta={getDelta}
-            // ref={ref => debug = ref}
-          />
-        </Show>
-        <Coordinates
-          getPlayerX={getPlayerX}
-          getPlayerY={getPlayerY}
-          ref={ref => coordinates = ref}
-        />
-        <Hotbar
-          getSlot={getSlot}
-          getActive={getSlot}
-          setActive={setSlot}
-          getSlot0={getSlot0}
-          getSlot1={getSlot1}
-          getSlot2={getSlot2}
-          getSlot3={getSlot3}
-          getSlot4={getSlot4}
-          getSlot5={getSlot5}
-          ref={ref => hotbar = ref}
-        />
-        <DPad
-          key={key}
-        />
-      </div>
+      <Hud
+        getDebugEnabled={getDebugEnabled}
+        setDebugEnabled={setDebugEnabled}
+        getPlayerX={getPlayerX}
+        getPlayerY={getPlayerY}
+        getVersion={getVersion}
+        getTimeOrigin={getTimeOrigin}
+        getTick={getTick}
+        getFrames={getFrames}
+        getDroppedFrames={getDroppedFrames}
+        getDelta={getDelta}
+        getSlot={getSlot}
+        setSlot={setSlot}
+        getSlot0={getSlot0}
+        getSlot1={getSlot1}
+        getSlot2={getSlot2}
+        getSlot3={getSlot3}
+        getSlot4={getSlot4}
+        getSlot5={getSlot5}
+        ref={hud!}
+        coordinates={coordinates!}
+        hotbar={hotbar!}
+        key={key}
+      />
     </>
   );
 }

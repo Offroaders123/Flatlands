@@ -4,7 +4,7 @@ import { createEffect, createMemo, onCleanup } from "solid-js";
 import ItemSlot from "./ItemSlot.js";
 import "./Hotbar.scss";
 
-import type { Accessor, Setter } from "solid-js";
+import type { Accessor, Ref, Setter } from "solid-js";
 import type Player from "./Player.js";
 import type { ItemID } from "./properties.js";
 
@@ -26,7 +26,7 @@ export interface HotbarProps {
   getSlot3: Accessor<ItemID | null>;
   getSlot4: Accessor<ItemID | null>;
   getSlot5: Accessor<ItemID | null>;
-  ref(value: HTMLDivElement): void;
+  ref: Ref<HTMLDivElement>;
 }
 
 export default function Hotbar(props: HotbarProps) {
@@ -49,7 +49,7 @@ export default function Hotbar(props: HotbarProps) {
   return (
     <div
       class="Hotbar"
-      ref={refe => { props.ref(refe); ref = refe; }}>
+      ref={hotbar => props.ref = ref = hotbar}>
       {
         Array.from({ length: 6 }).map((_, i) => {
           const index = i as HotbarSlotIndex;
