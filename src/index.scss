@@ -19,10 +19,8 @@ html {
 
 body {
   position: fixed;
-  right: 0;
-  top: 0;
-  width: 100vh;
-  height: 100vw;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column-reverse;
   align-items: center;
@@ -33,8 +31,6 @@ body {
   user-select: none;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  transform: translateX(100%) rotate(90deg);
-  transform-origin: top left;
 }
 
 #root {
