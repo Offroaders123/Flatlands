@@ -13,7 +13,6 @@ import type { KeyState } from "./input.js";
 import type { ItemID } from "./properties.js";
 
 export interface GameProps {
-  flip?: boolean;
   getDebugEnabled: Accessor<boolean>;
   setDebugEnabled: Setter<boolean>;
   gamepads: number[];
@@ -282,7 +281,7 @@ export default function Game(props: GameProps) {
   // });
 
   return (
-    <div classList={{ "Game": true, "flip": props.flip }}>
+    <div class="Game">
       <Canvas
         ref={canvas!}
       />

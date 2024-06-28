@@ -1,6 +1,9 @@
 .Hud {
   --padding: 12px;
-  padding: calc(var(--safe-area-inset-top) + var(--padding)) calc(var(--safe-area-inset-right) + var(--padding)) calc(var(--safe-area-inset-bottom) + var(--padding)) calc(var(--safe-area-inset-left) + var(--padding));
+  padding-top: var(--padding);
+  padding-right: calc(var(--safe-area-inset-right) + var(--padding));
+  padding-bottom: var(--padding);
+  padding-left: calc(var(--safe-area-inset-left) + var(--padding));
   position: absolute;
   inset: 0;
   display: flex;
@@ -14,6 +17,14 @@
   white-space: pre;
 }
 
+.Game:first-child .Hud {
+  padding-top: calc(var(--safe-area-inset-top) + var(--padding));
+}
+
+.Game:last-child .Hud {
+  padding-bottom: calc(var(--safe-area-inset-bottom) + var(--padding));
+}
+
 .Hud > *:not(.DPad) {
   z-index: 1;
 }
@@ -24,13 +35,17 @@
   width: unset;
   height: unset;
   right: var(--safe-area-inset-right);
-  top: var(--safe-area-inset-top);
+  top: 0;
   color: inherit;
   font: inherit;
   font-size: 1.2em;
   text-shadow: inherit;
   border-radius: 0;
   appearance: none;
+}
+
+.Game:first-child #debug_toggle {
+  top: var(--safe-area-inset-top);
 }
 
 :root:not(.touch) #debug_toggle {

@@ -3,9 +3,13 @@
   padding: 4px;
   position: absolute;
   left: 50%;
-  bottom: var(--safe-area-inset-bottom);
+  bottom: 0;
   display: flex;
   transform: translateX(-50%);
+}
+
+.Game:last-child .Hotbar {
+  bottom: var(--safe-area-inset-bottom);
 }
 
 .Hotbar .ItemSlot {

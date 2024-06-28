@@ -2,7 +2,7 @@
   margin: 8px;
   position: absolute;
   left: var(--safe-area-inset-left);
-  bottom: var(--safe-area-inset-bottom);
+  bottom: 0;
   display: grid;
   grid-template-areas:
     ". up ."
@@ -14,6 +14,10 @@
 
 :root:not(.touch) .DPad {
   display: none;
+}
+
+.Game:last-child .DPad {
+  bottom: var(--safe-area-inset-bottom);
 }
 
 .DPad button {

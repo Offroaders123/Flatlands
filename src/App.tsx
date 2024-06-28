@@ -60,7 +60,16 @@ export default function App(props: AppProps) {
         gamepads={gamepads}
       />
       <Game
-        flip={true}
+        getDebugEnabled={getDebugEnabled}
+        setDebugEnabled={setDebugEnabled}
+        gamepads={gamepads}
+      />
+      <Game
+        getDebugEnabled={getDebugEnabled}
+        setDebugEnabled={setDebugEnabled}
+        gamepads={gamepads}
+      />
+      <Game
         getDebugEnabled={getDebugEnabled}
         setDebugEnabled={setDebugEnabled}
         gamepads={gamepads}
