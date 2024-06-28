@@ -19,10 +19,12 @@ html {
 
 body {
   position: fixed;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  top: 0;
+  width: 100vh;
+  height: 100vw;
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   align-items: center;
   font-family: ui-monospace, "Noto Sans Mono", "Cousine", monospace;
   image-rendering: pixelated;
@@ -31,6 +33,8 @@ body {
   user-select: none;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  transform: translateX(100%) rotate(90deg);
+  transform-origin: top left;
 }
 
 #root {
