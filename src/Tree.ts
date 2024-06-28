@@ -19,7 +19,7 @@ export default class Tree extends EntityAbstract {
     super();
 
     this.x = Math.floor(Math.random() * this.canvas.width) - Math.floor(this.canvas.width / 2) - this.player.x - 96 / 2;
-    //this.y = Math.floor(Math.random() * this.canvas.height) - this.canvas.height / 2 - player!.y - 192 / 2;
+    //this.y = Math.floor(Math.random() * this.canvas.height) - this.canvas.height / 2 - player.y - 192 / 2;
     if (this.key.up && !this.key.down){
       this.y = - this.player.y - this.offsetY() - 192;
       if (this.explored.top > this.y) this.explored.top = this.y;

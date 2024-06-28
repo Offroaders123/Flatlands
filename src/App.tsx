@@ -213,7 +213,7 @@ export default function App(props: AppProps) {
 
     function offsetY(): number {
       return Math.round(
-        (canvas.offsetHeight + (coordinates?.offsetHeight ?? 0) - (hotbar?.offsetHeight ?? 0) - (hud !== null ? parseInt(getComputedStyle(hud).paddingBottom) : 0))
+        (canvas.offsetHeight + coordinates.offsetHeight - hotbar.offsetHeight - parseInt(getComputedStyle(hud).paddingBottom))
         / scaling / 2
       );
     }
