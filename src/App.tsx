@@ -63,7 +63,7 @@ export default function App(props: AppProps) {
   const [getDelta, setDelta] = createSignal<number>(0);
 
   let player: Player;
-  let debug: HTMLDivElement;
+  // let debug: HTMLDivElement;
 
   const key: KeyState = {
     left: false,
@@ -286,14 +286,14 @@ export default function App(props: AppProps) {
       player!.draw();
 
       // Set HUD Content
-      if (getDebugEnabled() && !debug!.matches(":hover")){
+      // if (getDebugEnabled() && !debug!.matches(":hover")){
         // debug.update();
         setTimeOrigin(timeOrigin);
         setTick(getTick);
         // setFrames(Flatlands.debug.frames);
         // setDroppedFrames(Flatlands.debug.droppedFrames);
         setDelta(delta);
-      }
+      // }
       // coordinates.update();
       setPlayerX(player!.x);
       setPlayerY(player!.y);
@@ -379,7 +379,7 @@ export default function App(props: AppProps) {
           getFrames={getFrames}
           getDroppedFrames={getDroppedFrames}
           getDelta={getDelta}
-          ref={ref => debug = ref}
+          // ref={ref => debug = ref}
         />
         </Show>
         <Coordinates
