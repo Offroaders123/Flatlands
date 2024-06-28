@@ -8,7 +8,6 @@ export interface AppProps {
 
 export default function App(props: AppProps) {
   const [getTouchEnabled, setTouchEnabled] = createSignal<boolean>(false);
-  const [getDebugEnabled, setDebugEnabled] = createSignal<boolean>(false);
 
   const gamepads: number[] = [];
   
@@ -55,13 +54,9 @@ export default function App(props: AppProps) {
   return (
     <>
       <Game
-        getDebugEnabled={getDebugEnabled}
-        setDebugEnabled={setDebugEnabled}
         gamepads={gamepads}
       />
       <Game
-        getDebugEnabled={getDebugEnabled}
-        setDebugEnabled={setDebugEnabled}
         gamepads={gamepads}
       />
     </>

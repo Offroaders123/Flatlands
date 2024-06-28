@@ -7,14 +7,11 @@ import { loadDefinitions, loadFeature, missingTextureSprite, terrain } from "./p
 import Tree from "./Tree.js";
 import "./Game.scss";
 
-import type { Accessor, Setter } from "solid-js";
 import type { HotbarSlotIndex } from "./Hotbar.js";
 import type { KeyState } from "./input.js";
 import type { ItemID } from "./properties.js";
 
 export interface GameProps {
-  getDebugEnabled: Accessor<boolean>;
-  setDebugEnabled: Setter<boolean>;
   gamepads: number[];
 }
 
@@ -24,6 +21,8 @@ export default function Game(props: GameProps) {
   let ctx: CanvasRenderingContext2D;
   let coordinates: HTMLDivElement;
   let hotbar: HTMLDivElement;
+
+  const [getDebugEnabled, setDebugEnabled] = createSignal<boolean>(false);
 
   const [getPlayerX, setPlayerX] = createSignal<number>(0);
   const [getPlayerY, setPlayerY] = createSignal<number>(0);
@@ -67,7 +66,7 @@ export default function Game(props: GameProps) {
 
       if (event.shiftKey && event.code === "KeyD"){
         event.preventDefault();
-        props.setDebugEnabled(previous => !previous);
+        setDebugEnabled(previous => !previous);
       }
 
       if (event.shiftKey && event.code === "KeyF"){
@@ -147,10 +146,10 @@ export default function Game(props: GameProps) {
       if (getTick() % 20 === 0){
         if (canvas.height / -2 - player.y - offsetX() < explored.top || canvas.height - player.y - offsetY() > explored.bottom){
           if (key.up && !key.down){
-            treesArray.unshift(new Tree(player, explored, offsetX, offsetY, key, canvas, ctx, props.getDebugEnabled));
+            treesArray.unshift(new Tree(player, explored, offsetX, offsetY, key, canvas, ctx, getDebugEnabled));
           }
           if (key.down && !key.up){
-            treesArray.push(new Tree(player, explored, offsetX, offsetY, key, canvas, ctx, props.getDebugEnabled));
+            treesArray.push(new Tree(player, explored, offsetX, offsetY, key, canvas, ctx, getDebugEnabled));
           }
         }
       }
@@ -286,8 +285,8 @@ export default function Game(props: GameProps) {
         ref={canvas!}
       />
       <Hud
-        getDebugEnabled={props.getDebugEnabled}
-        setDebugEnabled={props.setDebugEnabled}
+        getDebugEnabled={getDebugEnabled}
+        setDebugEnabled={setDebugEnabled}
         getPlayerX={getPlayerX}
         getPlayerY={getPlayerY}
         getVersion={getVersion}
