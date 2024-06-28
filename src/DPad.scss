@@ -1,4 +1,4 @@
-.dpad-panel {
+.DPad {
   margin: 8px;
   position: absolute;
   left: var(--safe-area-inset-left);
@@ -12,11 +12,11 @@
   white-space: normal;
 }
 
-:root:not(.touch) .dpad-panel {
+:root:not(.touch) .DPad {
   display: none;
 }
 
-.dpad-panel button {
+.DPad button {
   width: 56px;
   height: 56px;
   display: flex;
@@ -29,59 +29,59 @@
   transition: opacity 250ms;
 }
 
-.dpad-panel button::before {
+.DPad button::before {
   content: "";
   border: 10px solid transparent;
 }
 
-.dpad-panel button[data-active] {
+.DPad button[data-active] {
   opacity: 0.6;
 }
 
-.dpad-panel [data-left] {
+.DPad [data-left] {
   margin-right: -2px;
   grid-area: left;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
 
-.dpad-panel [data-left]::before {
+.DPad [data-left]::before {
   border-left: none;
   border-right-color: currentColor;
 }
 
-.dpad-panel [data-right] {
+.DPad [data-right] {
   margin-left: -2px;
   grid-area: right;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
 
-.dpad-panel [data-right]::before {
+.DPad [data-right]::before {
   border-left-color: currentColor;
   border-right: none;
 }
 
-.dpad-panel [data-up] {
+.DPad [data-up] {
   margin-bottom: -2px;
   grid-area: up;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
 
-.dpad-panel [data-up]::before {
+.DPad [data-up]::before {
   border-top: none;
   border-bottom-color: currentColor;
 }
 
-.dpad-panel [data-down] {
+.DPad [data-down] {
   margin-top: -2px;
   grid-area: down;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
 
-.dpad-panel [data-down]::before {
+.DPad [data-down]::before {
   border-top-color: currentColor;
   border-bottom: none;
 }

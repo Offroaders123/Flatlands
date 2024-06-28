@@ -11,7 +11,7 @@ button {
   z-index: 1;
 }
 
-.hud-panel {
+.Hud {
   --padding: 12px;
   padding: calc(var(--safe-area-inset-top) + var(--padding)) calc(var(--safe-area-inset-right) + var(--padding)) calc(var(--safe-area-inset-bottom) + var(--padding)) calc(var(--safe-area-inset-left) + var(--padding));
   position: absolute;
@@ -27,7 +27,7 @@ button {
   white-space: pre;
 }
 
-.hud-panel > *:not(.dpad-panel) {
+.Hud > *:not(.DPad) {
   z-index: 1;
 }
 
@@ -59,10 +59,10 @@ button {
   align-items: center;
 }
 
-.debug-panel {
+.Debug {
   font-size: 0.8em;
 }
 
-// #debug_toggle:not(:checked) + .debug-panel {
+// #debug_toggle:not(:checked) + .Debug {
 //   display: none;
 // }

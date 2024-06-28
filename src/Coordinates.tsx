@@ -18,7 +18,7 @@ export default function Coordinates(props: CoordinatesProps) {
 
   return (
     <div
-      class="coordinates-panel"
+      class="Coordinates"
       ref={props.ref}>
       ({displayX()}, {displayY()})
     </div>

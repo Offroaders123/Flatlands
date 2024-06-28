@@ -26,7 +26,7 @@ export default function DPad(props: DPadProps) {
 
   return (
     <div
-      class="dpad-panel"
+      class="DPad"
       ref={ref!}>
       <button data-left tabindex={-1}/>
       <button data-right tabindex={-1}/>

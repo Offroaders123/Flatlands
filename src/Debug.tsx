@@ -36,7 +36,7 @@ export default function Debug(props: DebugProps) {
 
   return (
     <div
-      class="debug-panel"
+      class="Debug"
       ref={ref!}>
       <pre>
         Flatlands v{props.version}{"\n"}

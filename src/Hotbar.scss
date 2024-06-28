@@ -1,4 +1,4 @@
-.hotbar-panel {
+.Hotbar {
   --hotbar-scale: 4;
   padding: 4px;
   position: absolute;
@@ -8,7 +8,7 @@
   transform: translateX(-50%);
 }
 
-.hotbar-panel .item-slot {
+.Hotbar .ItemSlot {
   padding: 12px;
   position: relative;
   display: flex;
@@ -16,7 +16,7 @@
   background-size: calc(100% - 8px);
 }
 
-.hotbar-panel .item-slot[data-active]::before {
+.Hotbar .ItemSlot[data-active]::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -24,14 +24,14 @@
   background-size: cover;
 }
 
-.hotbar-panel .item-render {
+.Hotbar .ItemRender {
   width: 64px;
   aspect-ratio: 1 / 1;
   background: center no-repeat;
   background-size: contain;
 }
 
-.hotbar-panel .item-slot[data-animate] .item-render {
+.Hotbar .ItemSlot[data-animate] .ItemRender {
   background-size: calc(var(--width) * var(--hotbar-scale)) calc(var(--height) * var(--keyframes) * var(--hotbar-scale));
   animation: animated-item-render var(--duration) step-end infinite;
 }
@@ -53,29 +53,29 @@
 }
 
 @media (max-width: 894px), (max-height: 255px) {
-  .hotbar-panel {
+  .Hotbar {
     --hotbar-scale: 3;
     padding: 3px;
   }
-  .hotbar-panel .item-slot {
+  .Hotbar .ItemSlot {
     padding: 8px;
     background-size: calc(100% - 6px);
   }
-  .hotbar-panel .item-render {
+  .Hotbar .ItemRender {
     width: 48px;
   }
 }
 
 @media (max-width: 749px), (max-height: 223px) {
-  .hotbar-panel {
+  .Hotbar {
     --hotbar-scale: 2;
     padding: 2px;
   }
-  .hotbar-panel .item-slot {
+  .Hotbar .ItemSlot {
     padding: 6px;
     background-size: calc(100% - 4px);
   }
-  .hotbar-panel .item-render {
+  .Hotbar .ItemRender {
     width: 32px;
   }
 }

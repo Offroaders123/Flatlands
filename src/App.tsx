@@ -367,7 +367,7 @@ export default function App(props: AppProps) {
         ref={ref => canvas = ref}
       />
       <div
-        class="hud-panel"
+        class="Hud"
         ref={ref => hud = ref}>
         <input
           id="debug_toggle"

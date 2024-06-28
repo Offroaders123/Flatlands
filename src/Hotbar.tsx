@@ -48,7 +48,7 @@ export default function Hotbar(props: HotbarProps) {
 
   return (
     <div
-      class="hotbar-panel"
+      class="Hotbar"
       ref={refe => { props.ref(refe); ref = refe; }}>
       {
         Array.from({ length: 6 }).map((_, i) => {
