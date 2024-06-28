@@ -41,7 +41,7 @@ export default function Hud(props: HudProps) {
       class="Hud"
       ref={props.ref}>
       <input
-        id="debug_toggle"
+        class="DebugToggle"
         type="checkbox"
         tabindex="-1"
         checked={props.getDebugEnabled()}

@@ -18,7 +18,7 @@
   z-index: 1;
 }
 
-#debug_toggle {
+.DebugToggle {
   margin: 8px;
   position: absolute;
   width: unset;
@@ -33,11 +33,11 @@
   appearance: none;
 }
 
-:root:not(.touch) #debug_toggle {
+:root:not(.touch) .DebugToggle {
   display: none;
 }
 
-#debug_toggle::before {
+.DebugToggle::before {
   content: "⚙";
   width: 1em;
   height: 1em;
