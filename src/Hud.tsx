@@ -30,8 +30,8 @@ export interface HudProps {
   getSlot4: Accessor<ItemID | null>;
   getSlot5: Accessor<ItemID | null>;
   ref: Ref<HTMLDivElement>;
-  coordinates: Ref<HTMLDivElement>;
-  hotbar: Ref<HTMLDivElement>;
+  coordinates: (value: HTMLDivElement) => void;
+  hotbar: (value: HTMLDivElement) => void;
   key: KeyState;
 }
 

@@ -341,8 +341,8 @@ export default function App(props: AppProps) {
         getSlot4={getSlot4}
         getSlot5={getSlot5}
         ref={hud!}
-        coordinates={coordinates!}
-        hotbar={hotbar!}
+        coordinates={ref => coordinates = ref}
+        hotbar={ref => hotbar = ref}
         key={key}
       />
     </>
