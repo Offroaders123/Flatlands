@@ -25,7 +25,9 @@ export default function DPad(props: DPadProps) {
   onCleanup(() => cleanup.abort());
 
   return (
-    <div class="dpad-panel" ref={ref!}>
+    <div
+      class="dpad-panel"
+      ref={ref!}>
       <button data-left tabindex={-1}/>
       <button data-right tabindex={-1}/>
       <button data-up tabindex={-1}/>

@@ -17,7 +17,11 @@ export default function Coordinates(props: CoordinatesProps) {
   const displayY = createMemo<number>(() => Math.round(props.getPlayerY() / 16));
 
   return (
-    <div class="coordinates-panel" ref={props.ref}>({displayX()}, {displayY()})</div>
+    <div
+      class="coordinates-panel"
+      ref={props.ref}>
+      ({displayX()}, {displayY()})
+    </div>
   );
 }
 

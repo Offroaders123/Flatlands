@@ -3,17 +3,20 @@
   padding: 0;
   box-sizing: border-box;
 }
+
 :root {
   --safe-area-inset-left: env(safe-area-inset-left,0px);
   --safe-area-inset-right: env(safe-area-inset-right,0px);
   --safe-area-inset-top: env(safe-area-inset-top,0px);
   --safe-area-inset-bottom: env(safe-area-inset-bottom,0px);
 }
+
 html {
   width: 100%;
   height: calc(100% + var(--safe-area-inset-top));
   overflow: hidden;
 }
+
 body {
   position: fixed;
   width: 100%;
@@ -29,6 +32,7 @@ body {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
+
 #root {
   display: contents;
 }

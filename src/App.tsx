@@ -362,8 +362,13 @@ export default function App(props: AppProps) {
 
   return (
     <>
-      <canvas id="canvas" ref={ref => canvas = ref}/>
-      <div class="hud-panel" ref={ref => hud = ref}>
+      <canvas
+        id="canvas"
+        ref={ref => canvas = ref}
+      />
+      <div
+        class="hud-panel"
+        ref={ref => hud = ref}>
         <input
           id="debug_toggle"
           type="checkbox"
@@ -372,15 +377,15 @@ export default function App(props: AppProps) {
           oninput={event => setDebugEnabled(event.currentTarget.checked)}
         />
         <Show when={getDebugEnabled()}>
-        <Debug
-          version={getVersion()}
-          timeOrigin={getTimeOrigin()}
-          getTick={getTick}
-          getFrames={getFrames}
-          getDroppedFrames={getDroppedFrames}
-          getDelta={getDelta}
-          // ref={ref => debug = ref}
-        />
+          <Debug
+            version={getVersion()}
+            timeOrigin={getTimeOrigin()}
+            getTick={getTick}
+            getFrames={getFrames}
+            getDroppedFrames={getDroppedFrames}
+            getDelta={getDelta}
+            // ref={ref => debug = ref}
+          />
         </Show>
         <Coordinates
           getPlayerX={getPlayerX}

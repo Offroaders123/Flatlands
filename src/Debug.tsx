@@ -35,7 +35,9 @@ export default function Debug(props: DebugProps) {
   const getFrameDelta = createMemo<string>(on(getTick, () => Math.floor(props.getDelta()).toString().padStart(2,"0")));
 
   return (
-    <div class="debug-panel" ref={ref!}>
+    <div
+      class="debug-panel"
+      ref={ref!}>
       <pre>
         Flatlands v{props.version}{"\n"}
         Time Origin: {props.timeOrigin}{"\n"}

@@ -47,7 +47,9 @@ export default function Hotbar(props: HotbarProps) {
   onCleanup(() => cleanup.abort());
 
   return (
-    <div class="hotbar-panel" ref={refe => { props.ref(refe); ref = refe; }}>
+    <div
+      class="hotbar-panel"
+      ref={refe => { props.ref(refe); ref = refe; }}>
       {
         Array.from({ length: 6 }).map((_, i) => {
           const index = i as HotbarSlotIndex;

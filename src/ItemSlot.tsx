@@ -63,8 +63,7 @@ export default function ItemSlot(props: ItemSlotProps) {
       data-value={props.value()}
       data-index={props.index}
       data-active={isActive() ? "" : null}
-      ref={ref!}
-    >
+      ref={ref!}>
       <div
         class="item-render"
         ref={itemRenderRef!}
