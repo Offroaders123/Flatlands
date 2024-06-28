@@ -52,13 +52,8 @@ export default function App(props: AppProps) {
   });
 
   return (
-    <>
-      <Game
-        gamepads={gamepads}
-      />
-      <Game
-        gamepads={gamepads}
-      />
-    </>
+    <Game
+      gamepads={gamepads}
+    />
   );
 }
