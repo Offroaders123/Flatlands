@@ -1,5 +1,6 @@
 import { createEffect, createSignal, onMount, Show } from "solid-js";
 import { version } from "../package.json";
+import Canvas from "./Canvas.js";
 import Coordinates from "./Coordinates.js";
 import Debug from "./Debug.js";
 import DPad from "./DPad.js";
@@ -26,7 +27,7 @@ export default function App(props: AppProps) {
   // export let item: Item | null = null;
 
   let hud: HTMLDivElement | null = null;
-  let canvas: HTMLCanvasElement | null = null;
+  let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
 
   // HUD
@@ -362,9 +363,8 @@ export default function App(props: AppProps) {
 
   return (
     <>
-      <canvas
-        id="canvas"
-        ref={ref => canvas = ref}
+      <Canvas
+        ref={canvas!}
       />
       <div
         class="Hud"
