@@ -61,7 +61,7 @@ export default function App(props: AppProps) {
   onMount(() => {
     setVersion(version);
 
-    ctx = canvas!.getContext("2d",{ alpha: false })!;
+    ctx = canvas.getContext("2d",{ alpha: false })!;
     loadDefinitions(ctx);
 
     window.addEventListener("gamepadconnected",event => {
@@ -152,19 +152,19 @@ export default function App(props: AppProps) {
     }
 
     new ResizeObserver(() => {
-      const { offsetWidth: width, offsetHeight: height } = canvas!;
-      canvas!.width = width / scaling;
-      canvas!.height = height / scaling;
+      const { offsetWidth: width, offsetHeight: height } = canvas;
+      canvas.width = width / scaling;
+      canvas.height = height / scaling;
       ctx.imageSmoothingEnabled = false;
       draw();
-    }).observe(canvas!);
+    }).observe(canvas);
 
     // Environment
     const explored = {
       left: 0,
-      right: canvas!.width,
+      right: canvas.width,
       top: 0,
-      bottom: canvas!.height
+      bottom: canvas.height
     };
 
     // Trees
@@ -172,12 +172,12 @@ export default function App(props: AppProps) {
 
     function handleTrees(): void {
       if (getTick() % 20 === 0){
-        if (canvas!.height / -2 - player!.y - offsetX() < explored.top || canvas!.height - player!.y - offsetY() > explored.bottom){
+        if (canvas.height / -2 - player.y - offsetX() < explored.top || canvas.height - player.y - offsetY() > explored.bottom){
           if (key.up && !key.down){
-            treesArray.unshift(new Tree(player, explored, offsetX, offsetY, key, canvas!, ctx, getDebugEnabled));
+            treesArray.unshift(new Tree(player, explored, offsetX, offsetY, key, canvas, ctx, getDebugEnabled));
           }
           if (key.down && !key.up){
-            treesArray.push(new Tree(player, explored, offsetX, offsetY, key, canvas!, ctx, getDebugEnabled));
+            treesArray.push(new Tree(player, explored, offsetX, offsetY, key, canvas, ctx, getDebugEnabled));
           }
         }
       }
@@ -208,25 +208,25 @@ export default function App(props: AppProps) {
     let scaling = 4;
 
     function offsetX(): number {
-      return Math.round(canvas!.width / 2);
+      return Math.round(canvas.width / 2);
     }
 
     function offsetY(): number {
       return Math.round(
-        (canvas!.offsetHeight + (coordinates?.offsetHeight ?? 0) - (hotbar?.offsetHeight ?? 0) - (hud !== null ? parseInt(getComputedStyle(hud).paddingBottom) : 0))
+        (canvas.offsetHeight + (coordinates?.offsetHeight ?? 0) - (hotbar?.offsetHeight ?? 0) - (hud !== null ? parseInt(getComputedStyle(hud).paddingBottom) : 0))
         / scaling / 2
       );
     }
 
     // Update Game State
     function update(): void {
-      player!.update();
+      player.update();
       setTick(previous => previous += 1);
     }
 
     // Draw Game State to the renderer
     function draw(): void {
-      const { width, height } = canvas!;
+      const { width, height } = canvas;
 
       // Reset for next frame
       ctx.clearRect(0,0,width,height);
@@ -236,7 +236,7 @@ export default function App(props: AppProps) {
       // ctx.fillStyle = "#779c43";
       ctx.beginPath();
       ctx.rect(0,0,width,height);
-      ctx.setTransform(1,0,0,1,offsetX() + player!.x,offsetY() + player!.y);
+      ctx.setTransform(1,0,0,1,offsetX() + player.x,offsetY() + player.y);
       ctx.fill();
 
       // Draw Trees
@@ -244,15 +244,15 @@ export default function App(props: AppProps) {
       handleTrees();
 
       // Draw Player
-      player!.draw();
+      player.draw();
 
       // Set HUD Content
         setTimeOrigin(timeOrigin);
         setTick(getTick);
         setDelta(delta);
 
-      setPlayerX(player!.x);
-      setPlayerY(player!.y);
+      setPlayerX(player.x);
+      setPlayerY(player.y);
     }
 
     // Game Loop
