@@ -11,16 +11,18 @@ import treeTexture from "/textures/terrain/tree.png";
 
 export interface BaseDefinition {
   name: string;
-  texture: {
-    width?: number;
-    height?: number;
-    source: string;
-    image?: HTMLImageElement;
-    directional?: false;
-  };
+  texture: Texture;
 }
 
-export interface AnimatedDefinition extends BaseDefinition {
+export interface Texture {
+  width?: number;
+  height?: number;
+  source: string;
+  image?: HTMLImageElement;
+  directional?: false;
+}
+
+export interface AnimatedDefinition {
   animation: Animation;
 }
 
@@ -42,15 +44,15 @@ export interface RepeatAnimation {
   keyframes: number;
 }
 
-export interface Fire extends AnimatedDefinition {
-  texture: BaseDefinition["texture"] & {
+export interface Fire extends BaseDefinition, AnimatedDefinition {
+  texture: Texture & {
     directional: false;
   };
   animation: RepeatAnimation;
 }
 
 export interface Ground extends BaseDefinition {
-  texture: BaseDefinition["texture"] & {
+  texture: Texture & {
     pattern: CanvasPattern | null;
   };
 }
