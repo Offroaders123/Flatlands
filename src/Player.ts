@@ -7,14 +7,31 @@ import type Tree from "./Tree.js";
 import type { KeyState } from "./input.js";
 import type { AnimatedDefinition, BaseDefinition, ItemID, ReactiveAnimation, UnionToIntersection } from "./properties.js";
 
-export default class Player extends EntityAbstract implements BaseDefinition, AnimatedDefinition {
+export interface PlayerDirection {
+  horizontal: PlayerHorizontal;
+  vertical: PlayerVertical;
+}
+
+export type PlayerHorizontal = "left" | "right";
+
+export type PlayerVertical = false | "down" | "up";
+
+export interface PlayerHotbar {
+  slots: [SlotItem, SlotItem, SlotItem, SlotItem, SlotItem, SlotItem];
+  active: HotbarSlotIndex;
+  readonly held_item: SlotItem;
+}
+
+export type SlotItem = ItemID | null;
+
+export default class Player extends EntityAbstract implements BaseDefinition, AnimatedDefinition<ReactiveAnimation> {
   name = "Player";
   box = {
     width: 16,
     height: 32
   };
   texture = entity.player.texture;
-  animation = {
+  animation: ReactiveAnimation = {
     type: "reactive",
     duration: 24,
     keyframes: 2,
@@ -22,15 +39,12 @@ export default class Player extends EntityAbstract implements BaseDefinition, An
     tick: 0,
     frame: 0,
     column: 0
-  } as ReactiveAnimation;
-  direction = {
+  };
+  direction: PlayerDirection = {
     horizontal: "right",
     vertical: false
-  } as {
-    horizontal: "left" | "right";
-    vertical: false | "down" | "up";
   };
-  hotbar = {
+  hotbar: PlayerHotbar = {
     slots: [
       "spearsword",
       "pickmatic",
@@ -41,10 +55,6 @@ export default class Player extends EntityAbstract implements BaseDefinition, An
     ],
     active: 4,
     held_item: null
-  } as {
-    slots: [ItemID | null, ItemID | null, ItemID | null, ItemID | null, ItemID | null, ItemID | null];
-    active: HotbarSlotIndex;
-    readonly held_item: ItemID | null;
   };
   speed = 2;
 
@@ -155,7 +165,7 @@ export default class Player extends EntityAbstract implements BaseDefinition, An
   }
 
   draw(): void {
-    let scale = 1;
+    let scale: 1 | -1 = 1;
     let offset = 1;
     let itemScale = 1;
 

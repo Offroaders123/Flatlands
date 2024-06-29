@@ -22,8 +22,8 @@ export interface Texture {
   directional?: false;
 }
 
-export interface AnimatedDefinition {
-  animation: Animation;
+export interface AnimatedDefinition<T extends Animation> {
+  animation: T;
 }
 
 export type Animation = ReactiveAnimation | RepeatAnimation;
@@ -44,11 +44,10 @@ export interface RepeatAnimation {
   keyframes: number;
 }
 
-export interface Fire extends BaseDefinition, AnimatedDefinition {
+export interface Fire extends BaseDefinition, AnimatedDefinition<RepeatAnimation> {
   texture: Texture & {
     directional: false;
   };
-  animation: RepeatAnimation;
 }
 
 export interface Ground extends BaseDefinition {
