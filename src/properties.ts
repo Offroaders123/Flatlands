@@ -56,18 +56,12 @@ export interface Ground extends BaseDefinition {
   };
 }
 
-export interface Definitions {
-  entity: Entity;
-  item: Item;
-  terrain: Terrain;
-}
-
-export interface Entity {
+export interface EntityNameMap {
   player: BaseDefinition;
   shadow: BaseDefinition;
 }
 
-export interface Item {
+export interface ItemNameMap {
   fire: Fire;
   hatchet: BaseDefinition;
   pickmatic: BaseDefinition;
@@ -76,9 +70,9 @@ export interface Item {
   spearsword: BaseDefinition;
 }
 
-export type ItemID = keyof Item;
+export type ItemID = keyof ItemNameMap;
 
-export interface Terrain {
+export interface TerrainNameMap {
   ground: Ground;
   tree: BaseDefinition;
 }
@@ -90,8 +84,7 @@ export const missingTextureSprite = new Image();
 missingTextureSprite.src = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAABIeJ9nAAAAAXNSR0IB2cksfwAAAAlwSFlz\
 AAALEwAACxMBAJqcGAAAAAZQTFRF+QD/AAAASf/37wAAAAxJREFUeJxjcGBoAAABRADBOnocVgAAAABJRU5ErkJggg==`;
 
-const definitions: Definitions = {
-  entity: {
+export const entity: EntityNameMap = {
     player: {
       name: "Player",
       texture: {
@@ -104,8 +97,9 @@ const definitions: Definitions = {
         source: shadowTexture
       }
     } satisfies BaseDefinition
-  } satisfies Entity,
-  item: {
+  };
+
+export const item: ItemNameMap = {
     fire: {
       name: "Fire",
       texture: {
@@ -149,8 +143,9 @@ const definitions: Definitions = {
         source: spearswordTexture
       }
     } satisfies BaseDefinition
-  } satisfies Item,
-  terrain: {
+  };
+
+export const terrain: TerrainNameMap = {
     ground: {
       name: "Ground",
       texture: {
@@ -164,14 +159,13 @@ const definitions: Definitions = {
         source: treeTexture
       }
     } satisfies BaseDefinition
-  } satisfies Terrain
-};
+  };
 
 export async function loadDefinitions(ctx: CanvasRenderingContext2D): Promise<void> {
   await Promise.all<void[]>(
-    (Object.values(definitions) as Definitions[keyof Definitions][])
+    ([entity, item, terrain])
       .map(definition => Promise.all<void>(
-        Object.values(definition)
+        (Object.values(definition) as (EntityNameMap[keyof EntityNameMap] | ItemNameMap[keyof ItemNameMap] | TerrainNameMap[keyof TerrainNameMap])[])
           .map(feature => loadFeature(feature, ctx))
       ))
   ) satisfies void[][];
@@ -186,8 +180,6 @@ export async function loadFeature(feature: BaseDefinition, ctx: CanvasRenderingC
   if (ctx === undefined) return;
   (feature as Ground).texture.pattern = ctx.createPattern(image, "repeat")!;
 }
-
-export const { entity, item, terrain } = definitions;
 
 export async function loadSprite(source: string): Promise<HTMLImageElement | null> {
   return new Promise<HTMLImageElement | null>(resolve => {
