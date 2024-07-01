@@ -44,11 +44,25 @@ export interface RepeatAnimation {
   keyframes: number;
 }
 
+export interface Player extends BaseDefinition {}
+
+export interface Shadow extends BaseDefinition {}
+
 export interface Fire extends BaseDefinition, AnimatedDefinition<RepeatAnimation> {
   texture: Texture & {
     directional: false;
   };
 }
+
+export interface Hatchet extends BaseDefinition {}
+
+export interface Pickmatic extends BaseDefinition {}
+
+export interface Pizza extends BaseDefinition {}
+
+export interface Spade extends BaseDefinition {}
+
+export interface Spearsword extends BaseDefinition {}
 
 export interface Ground extends BaseDefinition {
   texture: Texture & {
@@ -56,25 +70,27 @@ export interface Ground extends BaseDefinition {
   };
 }
 
+export interface Tree extends BaseDefinition {}
+
 export interface EntityNameMap {
-  player: BaseDefinition;
-  shadow: BaseDefinition;
+  player: Player;
+  shadow: Shadow;
 }
 
 export interface ItemNameMap {
   fire: Fire;
-  hatchet: BaseDefinition;
-  pickmatic: BaseDefinition;
-  pizza: BaseDefinition;
-  spade: BaseDefinition;
-  spearsword: BaseDefinition;
+  hatchet: Hatchet;
+  pickmatic: Pickmatic;
+  pizza: Pizza;
+  spade: Spade;
+  spearsword: Spearsword;
 }
 
 export type ItemID = keyof ItemNameMap;
 
 export interface TerrainNameMap {
   ground: Ground;
-  tree: BaseDefinition;
+  tree: Tree;
 }
 
 export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
@@ -90,13 +106,13 @@ export const entity: EntityNameMap = {
       texture: {
         source: playerTexture
       }
-    } satisfies BaseDefinition,
+    },
     shadow: {
       name: "Shadow",
       texture: {
         source: shadowTexture
       }
-    } satisfies BaseDefinition
+    }
   };
 
 export const item: ItemNameMap = {
@@ -111,38 +127,38 @@ export const item: ItemNameMap = {
         duration: 750,
         keyframes: 4
       }
-    } satisfies Fire,
+    },
     hatchet: {
       name: "Hatchet",
       texture: {
         source: hatchetTexture
       }
-    } satisfies BaseDefinition,
+    },
     pickmatic: {
       name: "Pickmatic",
       texture: {
         source: pickmaticTexture
       }
-    } satisfies BaseDefinition,
+    },
     pizza: {
       name: "Pizza",
       texture: {
         source: pizzaTexture,
         directional: false
       }
-    } satisfies BaseDefinition,
+    },
     spade: {
       name: "Spade",
       texture: {
         source: spadeTexture
       }
-    } satisfies BaseDefinition,
+    },
     spearsword: {
       name: "Spearsword",
       texture: {
         source: spearswordTexture
       }
-    } satisfies BaseDefinition
+    }
   };
 
 export const terrain: TerrainNameMap = {
@@ -152,13 +168,13 @@ export const terrain: TerrainNameMap = {
         source: groundTexture,
         pattern: null // ctx.createPattern(missingTextureSprite, "repeat")!
       }
-    } satisfies Ground,
+    },
     tree: {
       name: "Tree",
       texture: {
         source: treeTexture
       }
-    } satisfies BaseDefinition
+    }
   };
 
 export async function loadDefinitions(ctx: CanvasRenderingContext2D): Promise<void> {
