@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onMount } from "solid-js";
+import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
 import Game from "./Game.js";
 import "./App.scss";
 
@@ -7,6 +7,8 @@ export interface AppProps {
 }
 
 export default function App(props: AppProps) {
+  const cleanup = new AbortController();
+
   const [getTouchEnabled, setTouchEnabled] = createSignal<boolean>(false);
 
   const gamepads: number[] = [];
@@ -16,26 +18,26 @@ export default function App(props: AppProps) {
       if (!event.gamepad.mapping) return;
       gamepads.push(event.gamepad.index);
       //console.log("Connected!\n",navigator.getGamepads()[event.gamepad.index]);
-    });
+    }, { signal: cleanup.signal });
 
     window.addEventListener("gamepaddisconnected",event => {
       if (!event.gamepad.mapping) return;
       //console.log("Disconnected.\n",event.gamepad.index);
       gamepads.splice(gamepads.indexOf(event.gamepad.index));
-    });
+    }, { signal: cleanup.signal });
 
     document.addEventListener("keydown",event => {
       if (event.repeat || document.activeElement != document.body) return;
       setTouchEnabled(false);
-    });
+    }, { signal: cleanup.signal });
 
     document.addEventListener("touchstart",() => {
       setTouchEnabled(true);
-    });
+    }, { signal: cleanup.signal });
 
     document.addEventListener("contextmenu",event => {
       event.preventDefault();
-    });
+    }, { signal: cleanup.signal });
 
     if (props.isTouchDevice){
       setTouchEnabled(true);
@@ -50,6 +52,8 @@ export default function App(props: AppProps) {
       document.documentElement.classList.remove("touch");
     }
   });
+
+  onCleanup(() => cleanup.abort());
 
   return (
     <Game
