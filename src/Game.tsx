@@ -7,12 +7,13 @@ import { loadDefinitions, loadFeature, missingTextureSprite, terrain } from "./p
 import Tree from "./Tree.js";
 import "./Game.scss";
 
+import type { Accessor } from "solid-js";
 import type { HotbarSlotIndex } from "./Hotbar.js";
 import type { KeyState } from "./input.js";
 import type { ItemID } from "./properties.js";
 
 export interface GameProps {
-  gamepads: number[];
+  getGamepad: Accessor<Gamepad | null>;
 }
 
 export default function Game(props: GameProps) {
@@ -162,7 +163,7 @@ export default function Game(props: GameProps) {
     //for (let i = 0; i < 4; i++) treesArray.push(new Tree());
 
     // Player
-    player = new Player(getSlot, setSlot, treesArray, offsetX, offsetY, key, props.gamepads, ctx, getTick);
+    player = new Player(getSlot, setSlot, treesArray, offsetX, offsetY, key, props.getGamepad, ctx, getTick);
 
     setSlot0(player.hotbar.slots[0]);
     setSlot1(player.hotbar.slots[1]);

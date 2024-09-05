@@ -58,7 +58,7 @@ export default class Player extends EntityAbstract implements BaseDefinition, An
   };
   speed = 2;
 
-  constructor(private readonly getSlot: Accessor<HotbarSlotIndex>, private readonly setSlot: Setter<HotbarSlotIndex>, private readonly treesArray: Tree[], private readonly offsetX: () => number, private readonly offsetY: () => number, private readonly key: KeyState, private readonly gamepads: number[], private readonly ctx: CanvasRenderingContext2D, private readonly getTick: Accessor<number>) {
+  constructor(private readonly getSlot: Accessor<HotbarSlotIndex>, private readonly setSlot: Setter<HotbarSlotIndex>, private readonly treesArray: Tree[], private readonly offsetX: () => number, private readonly offsetY: () => number, private readonly key: KeyState, private readonly getGamepad: Accessor<Gamepad | null>, private readonly ctx: CanvasRenderingContext2D, private readonly getTick: Accessor<number>) {
     super();
 
     // Define properties only used internally by the game that don't need to be in the source file
@@ -85,7 +85,7 @@ export default class Player extends EntityAbstract implements BaseDefinition, An
   update(): void {
     this.getEntityOverlap();
     //// @ts-expect-error - this might be causing the gamepad crashes
-    const gamepad = navigator.getGamepads()[this.gamepads[0]!];
+    const gamepad: Gamepad | null = this.getGamepad();
 
     let [axisX,axisY] = (gamepad) ? gamepad.axes : [null,null,null,null];
     let [left1,right1] = (gamepad) ? [gamepad.buttons[4]!.value,gamepad.buttons[5]!.value] : [null,null];
