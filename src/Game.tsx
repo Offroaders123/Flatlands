@@ -232,7 +232,7 @@ export default function Game(props: GameProps) {
       Rounding the time origin because some browsers do that by default, and some don't.
       Thought it would make sense to ensure it is consistently an integer
     */
-    const timeOrigin = Math.round(performance.timeOrigin);
+    const timeOrigin: number = Math.round(performance.timeOrigin);
     let delta = 0;
     let lastFrameTime = 0;
 
@@ -243,7 +243,7 @@ export default function Game(props: GameProps) {
 
     function loop(): void {
       // Calculate the amount of time that hasn't been simulated since the last tick
-      const time = Date.now() - timeOrigin;
+      const time: number = Date.now() - timeOrigin;
       delta += time - lastFrameTime;
       lastFrameTime = time;
 
@@ -267,7 +267,7 @@ export default function Game(props: GameProps) {
   });
 
   createEffect(() => {
-    const slot = getSlot();
+    const slot: HotbarSlotIndex = getSlot();
     if (player === null) return;
     player.hotbar.active = slot;
   });

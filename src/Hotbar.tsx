@@ -29,7 +29,7 @@ export default function Hotbar(props: HotbarProps) {
     ref.addEventListener("touchstart", event => {
       if (!(event.target instanceof Element)) return;
       event.preventDefault();
-      const slot = event.target.closest<HTMLDivElement>(".ItemSlot");
+      const slot: HTMLDivElement | null = event.target.closest<HTMLDivElement>(".ItemSlot");
       if (slot === null) return;
       const index: HotbarSlotIndex = Number(slot.getAttribute("data-index")!) as HotbarSlotIndex;
       props.setActive(index);
@@ -44,7 +44,7 @@ export default function Hotbar(props: HotbarProps) {
       ref={hotbar => { props.ref(hotbar); ref = hotbar; }}>
       {
         Array.from({ length: 6 }).map((_, i) => {
-          const index = i as HotbarSlotIndex;
+          const index: HotbarSlotIndex = i as HotbarSlotIndex;
           const isActive = createMemo<boolean>(() => props.getActive() === index);
           return (
             <ItemSlot

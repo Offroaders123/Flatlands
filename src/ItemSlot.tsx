@@ -2,7 +2,7 @@ import { createEffect, createMemo } from "solid-js";
 import { item } from "./properties.js";
 
 import type { Accessor } from "solid-js";
-import type { ItemID, UnionToIntersection } from "./properties.js";
+import type { ItemID, ItemNameMap, UnionToIntersection } from "./properties.js";
 import type { HotbarSlotIndex } from "./Hotbar.js";
 
 export interface ItemSlotProps {
@@ -19,7 +19,7 @@ export default function ItemSlot(props: ItemSlotProps) {
 
   createEffect(() => {
     const id: ItemID = props.value()!;
-    const itemEntry = item[id];
+    const itemEntry: ItemNameMap[ItemID] = item[id];
     const { texture, animation } = itemEntry as UnionToIntersection<typeof item[typeof id]>;
     const { source, width = 16, height = 16 } = texture;
 
