@@ -3,7 +3,7 @@ import ItemSlot from "./ItemSlot.js";
 import "./Hotbar.css";
 
 import type { Accessor, Setter } from "solid-js";
-import type Player from "./Player.js";
+import type { Player } from "./Player.js";
 import type { ItemID } from "./properties.js";
 
 export type HotbarSlotIndex = Extract<keyof Player["hotbar"]["slots"], `${number}`> extends `${infer U extends number}` ? U : never;

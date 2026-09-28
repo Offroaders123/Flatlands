@@ -2,9 +2,9 @@ import { createEffect, createSignal, onMount } from "solid-js";
 import { version } from "../package.json";
 import Canvas from "./Canvas.js";
 import Hud from "./Hud.js";
-import Player from "./Player.js";
+import { createPlayer, drawPlayer, updatePlayer, type Player } from "./Player.js";
 import { loadDefinitions, loadFeature, missingTextureSprite, terrain } from "./properties.js";
-import Tree from "./Tree.js";
+import { createTree, drawTree, type Tree } from "./Tree.js";
 import "./Game.css";
 
 import type { HotbarSlotIndex } from "./Hotbar.js";
@@ -146,23 +146,23 @@ export default function Game(props: GameProps) {
       if (getTick() % 20 === 0) {
         if (canvas!.height / -2 - player.y - offsetX() < explored.top || canvas!.height - player.y - offsetY() > explored.bottom) {
           if (key.up && !key.down) {
-            treesArray.unshift(new Tree(player, explored, offsetX, offsetY, key, canvas!, ctx, getDebugEnabled));
+            treesArray.unshift(createTree(player, explored, offsetX, key, canvas!));
           }
           if (key.down && !key.up) {
-            treesArray.push(new Tree(player, explored, offsetX, offsetY, key, canvas!, ctx, getDebugEnabled));
+            treesArray.push(createTree(player, explored, offsetX, key, canvas!));
           }
         }
       }
 
       for (const tree of treesArray) {
-        tree.draw();
+        drawTree(tree, player, offsetX, offsetY, ctx, getDebugEnabled);
       }
     }
 
     //for (let i = 0; i < 4; i++) treesArray.push(new Tree());
 
     // Player
-    player = new Player(getSlot, setSlot, treesArray, offsetX, offsetY, key, props.gamepads, ctx, getTick);
+    player = createPlayer();
 
     setSlot0(player.hotbar.slots[0]);
     setSlot1(player.hotbar.slots[1]);
@@ -192,7 +192,7 @@ export default function Game(props: GameProps) {
 
     // Update Game State
     function update(): void {
-      player.update();
+      updatePlayer(player, getSlot, setSlot, treesArray, key, props.gamepads, getTick);
       setTick(previous => previous += 1);
     }
 
@@ -216,7 +216,7 @@ export default function Game(props: GameProps) {
       handleTrees();
 
       // Draw Player
-      player.draw();
+      drawPlayer(player, offsetX, offsetY, ctx, getTick);
 
       // Set HUD Content
       setTimeOrigin(timeOrigin);

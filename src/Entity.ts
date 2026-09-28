@@ -9,24 +9,24 @@ export interface BoundingClientRect {
   height: number;
 }
 
-export default abstract class EntityAbstract {
-  x = 0;
-  y = 0;
+export interface EntityAbstract {
+  x: number;
+  y: number;
 
-  abstract box: {
+  box: {
     width: number;
     height: number;
   };
 
-  abstract texture: {
+  texture: {
     source: string;
     image?: HTMLImageElement;
   };
+}
 
-  getBoundingClientRect(): BoundingClientRect {
-    const { x, y, x: left, y: top } = this;
-    const { width, height } = this.box;
-    const right = x + width, bottom = y + height;
-    return { left, top, right, bottom, x, y, width, height };
-  }
+export function getBoundingClientRect(entity: EntityAbstract): BoundingClientRect {
+  const { x, y, x: left, y: top } = entity;
+  const { width, height } = entity.box;
+  const right = x + width, bottom = y + height;
+  return { left, top, right, bottom, x, y, width, height };
 }
