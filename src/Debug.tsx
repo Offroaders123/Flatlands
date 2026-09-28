@@ -1,5 +1,5 @@
 import { createEffect, createMemo, createSignal, on } from "solid-js";
-import "./Debug.scss";
+import "./Debug.css";
 
 import type { Accessor } from "solid-js";
 

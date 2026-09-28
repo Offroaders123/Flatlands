@@ -1,5 +1,5 @@
 import { createEffect, onCleanup } from "solid-js";
-import "./DPad.scss";
+import "./DPad.css";
 
 import type { KeyState } from "./input.js";
 

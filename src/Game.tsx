@@ -5,7 +5,7 @@ import Hud from "./Hud.js";
 import Player from "./Player.js";
 import { loadDefinitions, loadFeature, missingTextureSprite, terrain } from "./properties.js";
 import Tree from "./Tree.js";
-import "./Game.scss";
+import "./Game.css";
 
 import type { HotbarSlotIndex } from "./Hotbar.js";
 import type { KeyState } from "./input.js";

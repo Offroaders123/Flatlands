@@ -1,6 +1,6 @@
 import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
 import Game from "./Game.js";
-import "./App.scss";
+import "./App.css";
 
 export interface AppProps {
   isTouchDevice: boolean;

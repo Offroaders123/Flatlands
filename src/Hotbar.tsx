@@ -1,6 +1,6 @@
 import { createEffect, createMemo, onCleanup } from "solid-js";
 import ItemSlot from "./ItemSlot.js";
-import "./Hotbar.scss";
+import "./Hotbar.css";
 
 import type { Accessor, Setter } from "solid-js";
 import type Player from "./Player.js";

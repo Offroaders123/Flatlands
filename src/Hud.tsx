@@ -3,7 +3,7 @@ import Coordinates from "./Coordinates.js";
 import Debug from "./Debug.js";
 import DPad from "./DPad.js";
 import Hotbar from "./Hotbar.js";
-import "./Hud.scss";
+import "./Hud.css";
 
 import type { Accessor, Ref, Setter } from "solid-js";
 import type { HotbarSlotIndex } from "./Hotbar.js";

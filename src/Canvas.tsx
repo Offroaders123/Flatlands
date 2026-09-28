@@ -1,4 +1,4 @@
-import "./Canvas.scss";
+import "./Canvas.css";
 
 import type { Ref } from "solid-js";
 

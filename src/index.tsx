@@ -1,7 +1,7 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
 import App from "./App.js";
-import "./index.scss";
+import "./index.css";
 
 const isTouchDevice: boolean = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
