@@ -1,5 +1,4 @@
 import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
-import { GamepadObserver } from "gamepad-state";
 import Game from "./Game.js";
 import "./App.scss";
 
@@ -11,23 +10,22 @@ export default function App(props: AppProps) {
   const cleanup = new AbortController();
 
   const [getTouchEnabled, setTouchEnabled] = createSignal<boolean>(false);
-  const [getGamepad, setGamepad] = createSignal<Gamepad | null>(null);
 
-  const observer = new GamepadObserver(record => {
-    if (!record.gamepad.mapping) return; // Also related to the Chrome bug below.
-
-    switch (record.type) {
-      case "connect":
-      case "input": return setGamepad(record.gamepad);
-      case "disconnect": return setGamepad(null);
-    }
-  });
-
-  // This is to account for a bug in Chrome macOS where my SteelSeries Nimbus shows up as two controllers.
-  observer.observe(0);
-  observer.observe(1);
-
+  const gamepads: number[] = [];
+  
   onMount(() => {
+    window.addEventListener("gamepadconnected",event => {
+      if (!event.gamepad.mapping) return;
+      gamepads.push(event.gamepad.index);
+      //console.log("Connected!\n",navigator.getGamepads()[event.gamepad.index]);
+    }, { signal: cleanup.signal });
+
+    window.addEventListener("gamepaddisconnected",event => {
+      if (!event.gamepad.mapping) return;
+      //console.log("Disconnected.\n",event.gamepad.index);
+      gamepads.splice(gamepads.indexOf(event.gamepad.index));
+    }, { signal: cleanup.signal });
+
     document.addEventListener("keydown",event => {
       if (event.repeat || document.activeElement != document.body) return;
       setTouchEnabled(false);
@@ -55,14 +53,11 @@ export default function App(props: AppProps) {
     }
   });
 
-  onCleanup(() => {
-    cleanup.abort();
-    observer.disconnect();
-  });
+  onCleanup(() => cleanup.abort());
 
   return (
     <Game
-      getGamepad={getGamepad}
+      gamepads={gamepads}
     />
   );
 }
