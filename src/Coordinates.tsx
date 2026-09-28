@@ -1,5 +1,4 @@
-import type { Accessor } from "solid-js";
-import { createMemo } from "solid-js";
+import { createMemo, type Accessor } from "solid-js";
 
 export interface CoordinatesProps {
   getPlayerX: Accessor<number>;

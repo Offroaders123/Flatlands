@@ -1,5 +1,4 @@
-import type { Accessor, Setter } from "solid-js";
-import { createEffect, createMemo, onCleanup } from "solid-js";
+import { createEffect, createMemo, onCleanup, type Accessor, type Setter } from "solid-js";
 import "./Hotbar.css";
 import ItemSlot from "./ItemSlot.tsx";
 import type { Player } from "./Player.ts";

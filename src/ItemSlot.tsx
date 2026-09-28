@@ -1,5 +1,4 @@
-import type { Accessor } from "solid-js";
-import { createEffect, createMemo } from "solid-js";
+import { createEffect, createMemo, type Accessor } from "solid-js";
 import type { HotbarSlotIndex } from "./Hotbar.tsx";
 import type { ItemID, ItemNameMap, UnionToIntersection } from "./properties.ts";
 import { item } from "./properties.ts";

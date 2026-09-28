@@ -1,5 +1,5 @@
 import type { Accessor, Setter } from "solid-js";
-import { type EntityAbstract, getBoundingClientRect } from "./Entity.ts";
+import { getBoundingClientRect, type EntityAbstract } from "./Entity.ts";
 import type { HotbarSlotIndex } from "./Hotbar.tsx";
 import type { Tree } from "./Tree.ts";
 import type { KeyState } from "./input.ts";

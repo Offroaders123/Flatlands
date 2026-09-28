@@ -1,5 +1,5 @@
 import type { Accessor } from "solid-js";
-import { type EntityAbstract } from "./Entity.ts";
+import type { EntityAbstract } from "./Entity.ts";
 import type { Player } from "./Player.ts";
 import type { KeyState } from "./input.ts";
 import { missingTextureSprite, terrain } from "./properties.ts";
