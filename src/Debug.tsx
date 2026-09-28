@@ -17,7 +17,7 @@ export default function Debug(props: DebugProps) {
   const [getTick, setTick] = createSignal<number>(props.getTick());
 
   createEffect(on(props.getTick, () => {
-    if (ref.matches(":hover")) return;
+    if (ref!.matches(":hover")) return;
     setTick(props.getTick);
   }));
 

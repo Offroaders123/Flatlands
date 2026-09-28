@@ -84,7 +84,7 @@ export default class Player extends EntityAbstract implements BaseDefinition, An
 
   update(): void {
     this.getEntityOverlap();
-    //// @ts-expect-error - this might be causing the gamepad crashes
+    // // @ts-expect-error - this might be causing the gamepad crashes
     const gamepad = navigator.getGamepads()[this.gamepads[0]!];
 
     let [axisX, axisY] = (gamepad) ? gamepad.axes : [null, null, null, null];

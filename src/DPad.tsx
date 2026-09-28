@@ -12,10 +12,10 @@ export default function DPad(props: DPadProps) {
   const cleanup = new AbortController();
 
   createEffect(() => {
-    ref.addEventListener("touchstart", event => dPadDown(event, props.key), { signal: cleanup.signal, passive: false });
-    ref.addEventListener("touchend", event => dPadUp(event, props.key), { signal: cleanup.signal });
-    ref.addEventListener("pointerdown", event => dPadDown(event, props.key), { signal: cleanup.signal });
-    ref.addEventListener("pointerup", event => dPadUp(event, props.key), { signal: cleanup.signal });
+    ref!.addEventListener("touchstart", event => dPadDown(event, props.key), { signal: cleanup.signal, passive: false });
+    ref!.addEventListener("touchend", event => dPadUp(event, props.key), { signal: cleanup.signal });
+    ref!.addEventListener("pointerdown", event => dPadDown(event, props.key), { signal: cleanup.signal });
+    ref!.addEventListener("pointerup", event => dPadUp(event, props.key), { signal: cleanup.signal });
   });
 
   onCleanup(() => cleanup.abort());

@@ -23,14 +23,14 @@ export default function ItemSlot(props: ItemSlotProps) {
     const { texture, animation } = itemEntry as UnionToIntersection<typeof item[typeof id]>;
     const { source, width = 16, height = 16 } = texture;
 
-    ref.setAttribute("data-sprite", id);
+    ref!.setAttribute("data-sprite", id);
 
     if (animation) {
-      ref.setAttribute("data-animate", "");
-      ref.style.setProperty("--width", `${width}px`);
-      ref.style.setProperty("--height", `${height}px`);
-      ref.style.setProperty("--duration", `${animation.duration}ms`);
-      ref.style.setProperty("--keyframes", `${animation.keyframes}`);
+      ref!.setAttribute("data-animate", "");
+      ref!.style.setProperty("--width", `${width}px`);
+      ref!.style.setProperty("--height", `${height}px`);
+      ref!.style.setProperty("--duration", `${animation.duration}ms`);
+      ref!.style.setProperty("--keyframes", `${animation.keyframes}`);
     }
 
     /*
@@ -44,7 +44,7 @@ export default function ItemSlot(props: ItemSlotProps) {
       Then you could update all item slots for an item to have a certain texture *edit: Almost there!
       This comment used to be in `properties.js`, but now all of the slot rendering logic is part of the slot element itself :)
     */
-    itemRenderRef.style.setProperty("background-image", `url("${source}")`);
+    itemRenderRef!.style.setProperty("background-image", `url("${source}")`);
   });
 
   return (

@@ -58,7 +58,7 @@ export default function Game(props: GameProps) {
   onMount(() => {
     setVersion(version);
 
-    ctx = canvas.getContext("2d", { alpha: false })!;
+    ctx = canvas!.getContext("2d", { alpha: false })!;
     loadDefinitions(ctx);
 
     document.addEventListener("keydown", event => {
@@ -124,19 +124,19 @@ export default function Game(props: GameProps) {
     let scaling: number;
 
     new ResizeObserver(() => {
-      const { offsetWidth: width, offsetHeight: height } = canvas;
-      canvas.width = width / scaling;
-      canvas.height = height / scaling;
+      const { offsetWidth: width, offsetHeight: height } = canvas!;
+      canvas!.width = width / scaling;
+      canvas!.height = height / scaling;
       ctx.imageSmoothingEnabled = false;
       draw();
-    }).observe(canvas);
+    }).observe(canvas!);
 
     // Environment
     const explored = {
       left: 0,
-      right: canvas.width,
+      right: canvas!.width,
       top: 0,
-      bottom: canvas.height
+      bottom: canvas!.height
     };
 
     // Trees
@@ -144,12 +144,12 @@ export default function Game(props: GameProps) {
 
     function handleTrees(): void {
       if (getTick() % 20 === 0) {
-        if (canvas.height / -2 - player.y - offsetX() < explored.top || canvas.height - player.y - offsetY() > explored.bottom) {
+        if (canvas!.height / -2 - player.y - offsetX() < explored.top || canvas!.height - player.y - offsetY() > explored.bottom) {
           if (key.up && !key.down) {
-            treesArray.unshift(new Tree(player, explored, offsetX, offsetY, key, canvas, ctx, getDebugEnabled));
+            treesArray.unshift(new Tree(player, explored, offsetX, offsetY, key, canvas!, ctx, getDebugEnabled));
           }
           if (key.down && !key.up) {
-            treesArray.push(new Tree(player, explored, offsetX, offsetY, key, canvas, ctx, getDebugEnabled));
+            treesArray.push(new Tree(player, explored, offsetX, offsetY, key, canvas!, ctx, getDebugEnabled));
           }
         }
       }
@@ -180,12 +180,12 @@ export default function Game(props: GameProps) {
     scaling = 4;
 
     function offsetX(): number {
-      return Math.round(canvas.width / 2);
+      return Math.round(canvas!.width / 2);
     }
 
     function offsetY(): number {
       return Math.round(
-        (canvas.offsetHeight + coordinates.offsetHeight - hotbar.offsetHeight - parseInt(getComputedStyle(hud).paddingBottom))
+        (canvas!.offsetHeight + coordinates.offsetHeight - hotbar.offsetHeight - parseInt(getComputedStyle(hud!).paddingBottom))
         / scaling / 2
       );
     }
@@ -198,7 +198,7 @@ export default function Game(props: GameProps) {
 
     // Draw Game State to the renderer
     function draw(): void {
-      const { width, height } = canvas;
+      const { width, height } = canvas!;
 
       // Reset for next frame
       ctx.clearRect(0, 0, width, height);
