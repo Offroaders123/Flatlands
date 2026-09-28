@@ -1,14 +1,14 @@
 import { createEffect, createSignal, onMount } from "solid-js";
-import { version } from "../package.json";
-import Canvas from "./Canvas.js";
+import meta from "../package.json" with { type: "json" };
+import Canvas from "./Canvas.tsx";
 import "./Game.css";
-import type { HotbarSlotIndex } from "./Hotbar.js";
-import Hud from "./Hud.js";
-import type { KeyState } from "./input.js";
-import { createPlayer, drawPlayer, updatePlayer, type Player } from "./Player.js";
-import type { ItemID } from "./properties.js";
-import { loadDefinitions, loadFeature, missingTextureSprite, terrain } from "./properties.js";
-import { createTree, drawTree, type Tree } from "./Tree.js";
+import type { HotbarSlotIndex } from "./Hotbar.tsx";
+import Hud from "./Hud.tsx";
+import type { KeyState } from "./input.ts";
+import { createPlayer, drawPlayer, updatePlayer, type Player } from "./Player.ts";
+import type { ItemID } from "./properties.ts";
+import { loadDefinitions, loadFeature, missingTextureSprite, terrain } from "./properties.ts";
+import { createTree, drawTree, type Tree } from "./Tree.ts";
 
 export interface GameProps {
   gamepads: number[];
@@ -55,7 +55,7 @@ export default function Game(props: GameProps) {
   const [getSlot5, setSlot5] = createSignal<ItemID | null>(null);
 
   onMount(() => {
-    setVersion(version);
+    setVersion(meta.version);
 
     ctx = canvas!.getContext("2d", { alpha: false })!;
     loadDefinitions(ctx);

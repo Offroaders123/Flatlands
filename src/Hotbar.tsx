@@ -1,9 +1,9 @@
 import type { Accessor, Setter } from "solid-js";
 import { createEffect, createMemo, onCleanup } from "solid-js";
 import "./Hotbar.css";
-import ItemSlot from "./ItemSlot.js";
-import type { Player } from "./Player.js";
-import type { ItemID } from "./properties.js";
+import ItemSlot from "./ItemSlot.tsx";
+import type { Player } from "./Player.ts";
+import type { ItemID } from "./properties.ts";
 
 export type HotbarSlotIndex = Extract<keyof Player["hotbar"]["slots"], `${number}`> extends `${infer U extends number}` ? U : never;
 

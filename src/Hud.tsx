@@ -1,13 +1,13 @@
 import type { Accessor, Ref, Setter } from "solid-js";
 import { Show } from "solid-js";
-import Coordinates from "./Coordinates.js";
-import Debug from "./Debug.js";
-import DPad from "./DPad.js";
-import type { HotbarSlotIndex } from "./Hotbar.js";
-import Hotbar from "./Hotbar.js";
+import Coordinates from "./Coordinates.tsx";
+import Debug from "./Debug.tsx";
+import DPad from "./DPad.tsx";
+import type { HotbarSlotIndex } from "./Hotbar.tsx";
+import Hotbar from "./Hotbar.tsx";
 import "./Hud.css";
-import type { KeyState } from "./input.js";
-import type { ItemID } from "./properties.js";
+import type { KeyState } from "./input.ts";
+import type { ItemID } from "./properties.ts";
 
 export interface HudProps {
   getDebugEnabled: Accessor<boolean>;

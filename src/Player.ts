@@ -1,10 +1,10 @@
 import type { Accessor, Setter } from "solid-js";
-import { type EntityAbstract, getBoundingClientRect } from "./Entity.js";
-import type { HotbarSlotIndex } from "./Hotbar.js";
-import type { Tree } from "./Tree.js";
-import type { KeyState } from "./input.js";
-import type { AnimatedDefinition, ItemID, ReactiveAnimation, UnionToIntersection } from "./properties.js";
-import { entity, item, missingTextureSprite } from "./properties.js";
+import { type EntityAbstract, getBoundingClientRect } from "./Entity.ts";
+import type { HotbarSlotIndex } from "./Hotbar.tsx";
+import type { Tree } from "./Tree.ts";
+import type { KeyState } from "./input.ts";
+import type { AnimatedDefinition, ItemID, ReactiveAnimation, UnionToIntersection } from "./properties.ts";
+import { entity, item, missingTextureSprite } from "./properties.ts";
 
 export interface PlayerDirection {
   horizontal: PlayerHorizontal;

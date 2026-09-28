@@ -1,10 +1,10 @@
-import { version as VERSION } from "../../package.json";
+import meta from "../../package.json" with { type: "json" };
 
 declare var self: ServiceWorkerGlobalScope;
 declare const clients: Clients;
 
 const NAME = "Flatlands";
-const CACHE_NAME = `${NAME} v${VERSION}` as const;
+const CACHE_NAME = `${NAME} v${meta.version}` as const;
 
 self.addEventListener("activate", event => {
   event.waitUntil(removeOutdatedVersions());
