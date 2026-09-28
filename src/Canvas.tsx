@@ -1,6 +1,5 @@
-import "./Canvas.css";
-
 import type { Ref } from "solid-js";
+import "./Canvas.css";
 
 export interface CanvasProps {
   ref: Ref<HTMLCanvasElement>;

@@ -1,6 +1,5 @@
 import { createEffect, onCleanup } from "solid-js";
 import "./DPad.css";
-
 import type { KeyState } from "./input.js";
 
 export interface DPadProps {

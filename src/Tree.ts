@@ -1,9 +1,8 @@
-import { type EntityAbstract } from "./Entity.js";
-import { missingTextureSprite, terrain } from "./properties.js";
-
 import type { Accessor } from "solid-js";
+import { type EntityAbstract } from "./Entity.js";
 import type { Player } from "./Player.js";
 import type { KeyState } from "./input.js";
+import { missingTextureSprite, terrain } from "./properties.js";
 
 export interface Tree extends EntityAbstract {
   name: string;

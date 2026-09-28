@@ -1,15 +1,14 @@
 import { createEffect, createSignal, onMount } from "solid-js";
 import { version } from "../package.json";
 import Canvas from "./Canvas.js";
+import "./Game.css";
+import type { HotbarSlotIndex } from "./Hotbar.js";
 import Hud from "./Hud.js";
+import type { KeyState } from "./input.js";
 import { createPlayer, drawPlayer, updatePlayer, type Player } from "./Player.js";
+import type { ItemID } from "./properties.js";
 import { loadDefinitions, loadFeature, missingTextureSprite, terrain } from "./properties.js";
 import { createTree, drawTree, type Tree } from "./Tree.js";
-import "./Game.css";
-
-import type { HotbarSlotIndex } from "./Hotbar.js";
-import type { KeyState } from "./input.js";
-import type { ItemID } from "./properties.js";
 
 export interface GameProps {
   gamepads: number[];
