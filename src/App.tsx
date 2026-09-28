@@ -12,41 +12,41 @@ export default function App(props: AppProps) {
   const [getTouchEnabled, setTouchEnabled] = createSignal<boolean>(false);
 
   const gamepads: number[] = [];
-  
+
   onMount(() => {
-    window.addEventListener("gamepadconnected",event => {
+    window.addEventListener("gamepadconnected", event => {
       if (!event.gamepad.mapping) return;
       gamepads.push(event.gamepad.index);
       //console.log("Connected!\n",navigator.getGamepads()[event.gamepad.index]);
     }, { signal: cleanup.signal });
 
-    window.addEventListener("gamepaddisconnected",event => {
+    window.addEventListener("gamepaddisconnected", event => {
       if (!event.gamepad.mapping) return;
       //console.log("Disconnected.\n",event.gamepad.index);
       gamepads.splice(gamepads.indexOf(event.gamepad.index));
     }, { signal: cleanup.signal });
 
-    document.addEventListener("keydown",event => {
+    document.addEventListener("keydown", event => {
       if (event.repeat || document.activeElement != document.body) return;
       setTouchEnabled(false);
     }, { signal: cleanup.signal });
 
-    document.addEventListener("touchstart",() => {
+    document.addEventListener("touchstart", () => {
       setTouchEnabled(true);
     }, { signal: cleanup.signal });
 
-    document.addEventListener("contextmenu",event => {
+    document.addEventListener("contextmenu", event => {
       event.preventDefault();
     }, { signal: cleanup.signal });
 
-    if (props.isTouchDevice){
+    if (props.isTouchDevice) {
       setTouchEnabled(true);
     }
   });
 
   createEffect(() => {
     const touchEnabled: boolean = getTouchEnabled();
-    if (touchEnabled){
+    if (touchEnabled) {
       document.documentElement.classList.add("touch");
     } else {
       document.documentElement.classList.remove("touch");

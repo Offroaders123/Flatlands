@@ -27,7 +27,7 @@ export default function Debug(props: DebugProps) {
   const getMilliseconds = createMemo<number>(() => Math.floor(getTick() / 60 * 1000));
   const getFrames = createMemo<number>(on(getTick, props.getFrames));
   const getDroppedFrames = createMemo<number>(on(getTick, props.getDroppedFrames));
-  const getFrameDelta = createMemo<string>(on(getTick, () => Math.floor(props.getDelta()).toString().padStart(2,"0")));
+  const getFrameDelta = createMemo<string>(on(getTick, () => Math.floor(props.getDelta()).toString().padStart(2, "0")));
 
   return (
     <div

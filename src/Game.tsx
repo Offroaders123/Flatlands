@@ -54,69 +54,69 @@ export default function Game(props: GameProps) {
   const [getSlot3, setSlot3] = createSignal<ItemID | null>(null);
   const [getSlot4, setSlot4] = createSignal<ItemID | null>(null);
   const [getSlot5, setSlot5] = createSignal<ItemID | null>(null);
-  
+
   onMount(() => {
     setVersion(version);
 
-    ctx = canvas.getContext("2d",{ alpha: false })!;
+    ctx = canvas.getContext("2d", { alpha: false })!;
     loadDefinitions(ctx);
 
-    document.addEventListener("keydown",event => {
+    document.addEventListener("keydown", event => {
       if (event.ctrlKey || event.metaKey || event.altKey) return;
 
-      if (event.shiftKey && event.code === "KeyD"){
+      if (event.shiftKey && event.code === "KeyD") {
         event.preventDefault();
         setDebugEnabled(previous => !previous);
       }
 
-      if (event.shiftKey && event.code === "KeyF"){
+      if (event.shiftKey && event.code === "KeyF") {
         event.preventDefault();
-        if (document.webkitFullscreenEnabled && !document.fullscreenEnabled){
+        if (document.webkitFullscreenEnabled && !document.fullscreenEnabled) {
           (!document.webkitFullscreenElement) ? document.documentElement.webkitRequestFullscreen() : document.webkitExitFullscreen();
         }
-        if (document.fullscreenEnabled){
+        if (document.fullscreenEnabled) {
           (!document.fullscreenElement) ? document.documentElement.requestFullscreen() : document.exitFullscreen();
         }
       }
 
       if (event.shiftKey) return;
 
-      if (["Digit1","Digit2","Digit3","Digit4","Digit5","Digit6"].includes(event.code)){
+      if (["Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6"].includes(event.code)) {
         event.preventDefault();
-        setSlot(Number(event.code.replace(/Digit/,"")) - 1 as HotbarSlotIndex);
+        setSlot(Number(event.code.replace(/Digit/, "")) - 1 as HotbarSlotIndex);
       }
 
-      if (["ArrowLeft" as const, "KeyA" as const].includes(event.code)){
+      if (["ArrowLeft" as const, "KeyA" as const].includes(event.code)) {
         event.preventDefault();
         key.left = event.code;
       }
-      if (["ArrowRight" as const, "KeyD" as const].includes(event.code)){
+      if (["ArrowRight" as const, "KeyD" as const].includes(event.code)) {
         event.preventDefault();
         key.right = event.code;
       }
-      if (["ArrowUp" as const, "KeyW" as const].includes(event.code)){
+      if (["ArrowUp" as const, "KeyW" as const].includes(event.code)) {
         event.preventDefault();
         key.up = event.code;
       }
-      if (["ArrowDown" as const, "KeyS" as const].includes(event.code)){
+      if (["ArrowDown" as const, "KeyS" as const].includes(event.code)) {
         event.preventDefault();
         key.down = event.code;
       }
     });
 
-    document.addEventListener("keyup",event => {
+    document.addEventListener("keyup", event => {
       if (document.activeElement != document.body) return;
 
-      if (["ArrowLeft","KeyA"].includes(event.code)){
+      if (["ArrowLeft", "KeyA"].includes(event.code)) {
         key.left = false;
       }
-      if (["ArrowRight","KeyD"].includes(event.code)){
+      if (["ArrowRight", "KeyD"].includes(event.code)) {
         key.right = false;
       }
-      if (["ArrowUp","KeyW"].includes(event.code)){
+      if (["ArrowUp", "KeyW"].includes(event.code)) {
         key.up = false;
       }
-      if (["ArrowDown","KeyS"].includes(event.code)){
+      if (["ArrowDown", "KeyS"].includes(event.code)) {
         key.down = false;
       }
     });
@@ -143,18 +143,18 @@ export default function Game(props: GameProps) {
     const treesArray: Tree[] = [];
 
     function handleTrees(): void {
-      if (getTick() % 20 === 0){
-        if (canvas.height / -2 - player.y - offsetX() < explored.top || canvas.height - player.y - offsetY() > explored.bottom){
-          if (key.up && !key.down){
+      if (getTick() % 20 === 0) {
+        if (canvas.height / -2 - player.y - offsetX() < explored.top || canvas.height - player.y - offsetY() > explored.bottom) {
+          if (key.up && !key.down) {
             treesArray.unshift(new Tree(player, explored, offsetX, offsetY, key, canvas, ctx, getDebugEnabled));
           }
-          if (key.down && !key.up){
+          if (key.down && !key.up) {
             treesArray.push(new Tree(player, explored, offsetX, offsetY, key, canvas, ctx, getDebugEnabled));
           }
         }
       }
 
-      for (const tree of treesArray){
+      for (const tree of treesArray) {
         tree.draw();
       }
     }
@@ -201,27 +201,27 @@ export default function Game(props: GameProps) {
       const { width, height } = canvas;
 
       // Reset for next frame
-      ctx.clearRect(0,0,width,height);
+      ctx.clearRect(0, 0, width, height);
 
       // Draw Grass
       ctx.fillStyle = terrain.ground.texture.pattern!;
       // ctx.fillStyle = "#779c43";
       ctx.beginPath();
-      ctx.rect(0,0,width,height);
-      ctx.setTransform(1,0,0,1,offsetX() + player.x,offsetY() + player.y);
+      ctx.rect(0, 0, width, height);
+      ctx.setTransform(1, 0, 0, 1, offsetX() + player.x, offsetY() + player.y);
       ctx.fill();
 
       // Draw Trees
-      ctx.setTransform(1,0,0,1,0,0);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       handleTrees();
 
       // Draw Player
       player.draw();
 
       // Set HUD Content
-        setTimeOrigin(timeOrigin);
-        setTick(getTick);
-        setDelta(delta);
+      setTimeOrigin(timeOrigin);
+      setTick(getTick);
+      setDelta(delta);
 
       setPlayerX(player.x);
       setPlayerY(player.y);
@@ -248,10 +248,10 @@ export default function Game(props: GameProps) {
       lastFrameTime = time;
 
       // Update Game State
-      while (delta >= timestep){
+      while (delta >= timestep) {
         update();
         delta -= timestep;
-        if (delta > timestep){
+        if (delta > timestep) {
           setDroppedFrames(previous => previous + 1);
         }
       }

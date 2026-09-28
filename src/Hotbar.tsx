@@ -6,7 +6,7 @@ import type { Accessor, Setter } from "solid-js";
 import type Player from "./Player.js";
 import type { ItemID } from "./properties.js";
 
-export type HotbarSlotIndex = Extract<keyof Player["hotbar"]["slots"],`${number}`> extends `${infer U extends number}` ? U : never;
+export type HotbarSlotIndex = Extract<keyof Player["hotbar"]["slots"], `${number}`> extends `${infer U extends number}` ? U : never;
 
 export interface HotbarProps {
   getSlot: Accessor<HotbarSlotIndex>;
@@ -26,14 +26,14 @@ export default function Hotbar(props: HotbarProps) {
   const cleanup = new AbortController();
 
   createEffect(() => {
-    ref.addEventListener("touchstart",event => {
+    ref.addEventListener("touchstart", event => {
       if (!(event.target instanceof Element)) return;
       event.preventDefault();
       const slot = event.target.closest<HTMLDivElement>(".ItemSlot");
       if (slot === null) return;
       const index: HotbarSlotIndex = Number(slot.getAttribute("data-index")!) as HotbarSlotIndex;
       props.setActive(index);
-    },{ signal: cleanup.signal, passive: false });
+    }, { signal: cleanup.signal, passive: false });
   });
 
   onCleanup(() => cleanup.abort());

@@ -44,9 +44,9 @@ export interface RepeatAnimation {
   keyframes: number;
 }
 
-export interface Player extends BaseDefinition {}
+export interface Player extends BaseDefinition { }
 
-export interface Shadow extends BaseDefinition {}
+export interface Shadow extends BaseDefinition { }
 
 export interface Fire extends BaseDefinition, AnimatedDefinition<RepeatAnimation> {
   texture: Texture & {
@@ -54,15 +54,15 @@ export interface Fire extends BaseDefinition, AnimatedDefinition<RepeatAnimation
   };
 }
 
-export interface Hatchet extends BaseDefinition {}
+export interface Hatchet extends BaseDefinition { }
 
-export interface Pickmatic extends BaseDefinition {}
+export interface Pickmatic extends BaseDefinition { }
 
-export interface Pizza extends BaseDefinition {}
+export interface Pizza extends BaseDefinition { }
 
-export interface Spade extends BaseDefinition {}
+export interface Spade extends BaseDefinition { }
 
-export interface Spearsword extends BaseDefinition {}
+export interface Spearsword extends BaseDefinition { }
 
 export interface Ground extends BaseDefinition {
   texture: Texture & {
@@ -70,7 +70,7 @@ export interface Ground extends BaseDefinition {
   };
 }
 
-export interface Tree extends BaseDefinition {}
+export interface Tree extends BaseDefinition { }
 
 export interface EntityNameMap {
   player: Player;
@@ -101,81 +101,81 @@ missingTextureSprite.src = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAA
 AAALEwAACxMBAJqcGAAAAAZQTFRF+QD/AAAASf/37wAAAAxJREFUeJxjcGBoAAABRADBOnocVgAAAABJRU5ErkJggg==`;
 
 export const entity: EntityNameMap = {
-    player: {
-      name: "Player",
-      texture: {
-        source: playerTexture
-      }
-    },
-    shadow: {
-      name: "Shadow",
-      texture: {
-        source: shadowTexture
-      }
+  player: {
+    name: "Player",
+    texture: {
+      source: playerTexture
     }
-  };
+  },
+  shadow: {
+    name: "Shadow",
+    texture: {
+      source: shadowTexture
+    }
+  }
+};
 
 export const item: ItemNameMap = {
-    fire: {
-      name: "Fire",
-      texture: {
-        source: fireTexture,
-        directional: false
-      },
-      animation: {
-        type: "repeat",
-        duration: 750,
-        keyframes: 4
-      }
+  fire: {
+    name: "Fire",
+    texture: {
+      source: fireTexture,
+      directional: false
     },
-    hatchet: {
-      name: "Hatchet",
-      texture: {
-        source: hatchetTexture
-      }
-    },
-    pickmatic: {
-      name: "Pickmatic",
-      texture: {
-        source: pickmaticTexture
-      }
-    },
-    pizza: {
-      name: "Pizza",
-      texture: {
-        source: pizzaTexture,
-        directional: false
-      }
-    },
-    spade: {
-      name: "Spade",
-      texture: {
-        source: spadeTexture
-      }
-    },
-    spearsword: {
-      name: "Spearsword",
-      texture: {
-        source: spearswordTexture
-      }
+    animation: {
+      type: "repeat",
+      duration: 750,
+      keyframes: 4
     }
-  };
+  },
+  hatchet: {
+    name: "Hatchet",
+    texture: {
+      source: hatchetTexture
+    }
+  },
+  pickmatic: {
+    name: "Pickmatic",
+    texture: {
+      source: pickmaticTexture
+    }
+  },
+  pizza: {
+    name: "Pizza",
+    texture: {
+      source: pizzaTexture,
+      directional: false
+    }
+  },
+  spade: {
+    name: "Spade",
+    texture: {
+      source: spadeTexture
+    }
+  },
+  spearsword: {
+    name: "Spearsword",
+    texture: {
+      source: spearswordTexture
+    }
+  }
+};
 
 export const terrain: TerrainNameMap = {
-    ground: {
-      name: "Ground",
-      texture: {
-        source: groundTexture,
-        pattern: null // ctx.createPattern(missingTextureSprite, "repeat")!
-      }
-    },
-    tree: {
-      name: "Tree",
-      texture: {
-        source: treeTexture
-      }
+  ground: {
+    name: "Ground",
+    texture: {
+      source: groundTexture,
+      pattern: null // ctx.createPattern(missingTextureSprite, "repeat")!
     }
-  };
+  },
+  tree: {
+    name: "Tree",
+    texture: {
+      source: treeTexture
+    }
+  }
+};
 
 export async function loadDefinitions(ctx: CanvasRenderingContext2D): Promise<void> {
   await Promise.all<void[]>(
@@ -200,8 +200,8 @@ export async function loadFeature(feature: BaseDefinition, ctx: CanvasRenderingC
 export async function loadSprite(source: string): Promise<HTMLImageElement | null> {
   return new Promise<HTMLImageElement | null>(resolve => {
     const sprite = new Image();
-    sprite.addEventListener("load",() => resolve(sprite));
-    sprite.addEventListener("error",() => resolve(null));
+    sprite.addEventListener("load", () => resolve(sprite));
+    sprite.addEventListener("error", () => resolve(null));
     sprite.src = source;
   });
 }
