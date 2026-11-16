@@ -6,7 +6,7 @@ export interface DPadProps {
   key: KeyState;
 }
 
-export default function DPad(props: DPadProps) {
+export function DPad(props: DPadProps) {
   let ref: HTMLDivElement;
   const cleanup = new AbortController();
 

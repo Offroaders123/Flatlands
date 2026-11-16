@@ -1,6 +1,6 @@
 import { createEffect, createMemo, onCleanup, type Accessor, type Setter } from "solid-js";
 import "./Hotbar.css";
-import ItemSlot from "./ItemSlot.tsx";
+import { ItemSlot } from "./ItemSlot.tsx";
 import type { Player } from "./Player.ts";
 import type { ItemID } from "./properties.ts";
 
@@ -19,7 +19,7 @@ export interface HotbarProps {
   ref: (value: HTMLDivElement) => void;
 }
 
-export default function Hotbar(props: HotbarProps) {
+export function Hotbar(props: HotbarProps) {
   let ref: HTMLDivElement;
   const cleanup = new AbortController();
 

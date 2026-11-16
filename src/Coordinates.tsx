@@ -6,7 +6,7 @@ export interface CoordinatesProps {
   ref: (value: HTMLDivElement) => void;
 }
 
-export default function Coordinates(props: CoordinatesProps) {
+export function Coordinates(props: CoordinatesProps) {
   const displayX = createMemo<number>(() => Math.round(props.getPlayerX() / 16) * -1);
   const displayY = createMemo<number>(() => Math.round(props.getPlayerY() / 16));
 

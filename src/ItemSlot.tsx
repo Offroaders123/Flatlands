@@ -10,7 +10,7 @@ export interface ItemSlotProps {
   getSlot: Accessor<HotbarSlotIndex>;
 }
 
-export default function ItemSlot(props: ItemSlotProps) {
+export function ItemSlot(props: ItemSlotProps) {
   let ref: HTMLDivElement;
   let itemRenderRef: HTMLDivElement;
   const isActive = createMemo<boolean>(() => props.getSlot() === props.index);

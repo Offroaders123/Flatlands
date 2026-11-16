@@ -5,7 +5,7 @@ export interface CanvasProps {
   ref: Ref<HTMLCanvasElement>;
 }
 
-export default function Canvas(props: CanvasProps) {
+export function Canvas(props: CanvasProps) {
   return (
     <canvas
       class="Canvas"

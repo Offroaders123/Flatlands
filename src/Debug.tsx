@@ -11,7 +11,7 @@ export interface DebugProps {
   getDelta: Accessor<number>;
 }
 
-export default function Debug(props: DebugProps) {
+export function Debug(props: DebugProps) {
   let ref: HTMLDivElement;
   const [getTick, setTick] = createSignal<number>(props.getTick());
 

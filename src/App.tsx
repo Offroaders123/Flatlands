@@ -1,12 +1,12 @@
 import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
 import "./App.css";
-import Game from "./Game.tsx";
+import { Game } from "./Game.tsx";
 
 export interface AppProps {
   isTouchDevice: boolean;
 }
 
-export default function App(props: AppProps) {
+export function App(props: AppProps) {
   const cleanup = new AbortController();
 
   const [getTouchEnabled, setTouchEnabled] = createSignal<boolean>(false);
