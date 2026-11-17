@@ -3,8 +3,7 @@ import { getBoundingClientRect, type EntityAbstract } from "./Entity.ts";
 import type { HotbarSlotIndex } from "./Hotbar.tsx";
 import type { Tree } from "./Tree.ts";
 import type { KeyState } from "./input.ts";
-import type { AnimatedDefinition, ItemID, ReactiveAnimation, UnionToIntersection } from "./properties.ts";
-import { entity, item, missingTextureSprite } from "./properties.ts";
+import { entity, item, missingTextureSprite, type AnimatedDefinition, type ItemID, type ReactiveAnimation, type UnionToIntersection } from "./properties.ts";
 
 export interface PlayerDirection {
   horizontal: PlayerHorizontal;

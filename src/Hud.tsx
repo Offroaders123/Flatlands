@@ -1,10 +1,8 @@
-import type { Accessor, Ref, Setter } from "solid-js";
-import { Show } from "solid-js";
+import { Show, type Accessor, type Ref, type Setter } from "solid-js";
 import { Coordinates } from "./Coordinates.tsx";
 import { Debug } from "./Debug.tsx";
 import { DPad } from "./DPad.tsx";
-import type { HotbarSlotIndex } from "./Hotbar.tsx";
-import { Hotbar } from "./Hotbar.tsx";
+import { Hotbar, type HotbarSlotIndex } from "./Hotbar.tsx";
 import "./Hud.css";
 import type { KeyState } from "./input.ts";
 import type { ItemID } from "./properties.ts";

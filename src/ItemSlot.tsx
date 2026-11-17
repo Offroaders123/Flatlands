@@ -1,7 +1,6 @@
 import { createEffect, createMemo, type Accessor } from "solid-js";
 import type { HotbarSlotIndex } from "./Hotbar.tsx";
-import type { ItemID, ItemNameMap, UnionToIntersection } from "./properties.ts";
-import { item } from "./properties.ts";
+import { item, type ItemID, type ItemNameMap, type UnionToIntersection } from "./properties.ts";
 
 export interface ItemSlotProps {
   value: Accessor<ItemID | null>;

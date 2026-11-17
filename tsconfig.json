@@ -3,6 +3,7 @@
     "module": "nodenext",
     "target": "esnext",
     "isolatedModules": true,
+    "verbatimModuleSyntax": true,
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "jsx": "preserve",

@@ -1,5 +1,4 @@
-import type { Accessor } from "solid-js";
-import { createEffect, createMemo, createSignal, on } from "solid-js";
+import { type Accessor, createEffect, createMemo, createSignal, on } from "solid-js";
 import "./Debug.css";
 
 export interface DebugProps {
