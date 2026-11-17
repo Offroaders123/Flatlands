@@ -1,13 +1,27 @@
-import { onMount } from "solid-js";
+import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
+import { MusicManager } from "./MusicManager.ts";
 import "./Start.css";
+import { tracks } from "./music.ts";
 import bandcamp from "/bandcamp.png";
 import icon from "/icon-16.png";
 
 export function Start() {
   let ref: HTMLDialogElement;
+  const [musicPlaying, setMusicPlaying] = createSignal<boolean>(false);
+
+  const musicManager = new MusicManager(tracks);
 
   onMount(() => {
     ref!.showModal();
+  });
+
+  onCleanup(() => {
+    musicManager.dispose();
+  });
+
+  createEffect(() => {
+    if (musicPlaying() === false) return;
+    musicManager.start();
   });
 
   return (
@@ -36,7 +50,10 @@ export function Start() {
         </p>
         <button
           type="submit"
-          autofocus>
+          autofocus
+          on:click={() => {
+            setMusicPlaying(true);
+          }}>
           Play
         </button>
       </form>
