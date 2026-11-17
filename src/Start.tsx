@@ -27,6 +27,11 @@ export function Start() {
   return (
     <dialog
       class="Start"
+      on:close={() => {
+        if (document.activeElement instanceof HTMLElement) {
+          document.activeElement.blur();
+        }
+      }}
       ref={ref!}>
       <form method="dialog">
         <h1>
