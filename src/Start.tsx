@@ -1,7 +1,7 @@
 import { onMount } from "solid-js";
 import "./Start.css";
 import bandcamp from "/bandcamp.png";
-import spearswordTexture from "/textures/item/spearsword.png";
+import icon from "/icon-16.png";
 
 export function Start() {
   let ref: HTMLDialogElement;
@@ -17,8 +17,8 @@ export function Start() {
       <form method="dialog">
         <h1>
           <img
-            alt="Spearsword icon"
-            src={spearswordTexture}
+            alt="Flatlands icon"
+            src={icon}
           />
           Flatlands
         </h1>
