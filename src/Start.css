@@ -17,7 +17,7 @@ dialog {
   text-shadow: 0.175ch 0.175ch 0 #000000;
   white-space: pre;
   border: 1em solid;
-  border-image-source: url("/public/textures/interface/slot.png");
+  border-image-source: url("/textures/interface/slot.png");
   border-image-slice: 2 fill;
   border-image-width: 1em;
   border-image-repeat: stretch;
@@ -55,7 +55,7 @@ dialog {
     text-shadow: inherit;
     background-color: #83aa9e;
     border: 0.5em solid;
-    border-image-source: url("/public/textures/interface/slot_active.png");
+    border-image-source: url("/textures/interface/slot_active.png");
     border-image-slice: 2 fill;
     border-image-width: 0.5em;
     border-image-repeat: stretch;
@@ -66,7 +66,7 @@ dialog {
   }
 
   &::backdrop {
-    background-image: url("/public/textures/terrain/ground.png");
+    background-image: url("/textures/terrain/ground.png");
     background-size: 128px;
     background-position: center;
   }
