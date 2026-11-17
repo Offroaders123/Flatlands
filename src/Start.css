@@ -7,17 +7,25 @@ dialog {
 }
 
 dialog {
-  padding: 2em;
+  padding: 1.5em;
   color-scheme: dark;
   display: flex;
   flex-direction: column;
   gap: 1.5em;
   color: #ffffff;
-  font-size: 1.1em;
+  font-size: 1.2em;
   text-shadow: 0.175ch 0.175ch 0 #000000;
   white-space: pre;
-  background-color: #8888;
-  backdrop-filter: blur(8px);
+  border: 1em solid;
+  border-image-source: url("/public/textures/interface/slot.png");
+  border-image-slice: 2 fill;
+  border-image-width: 1em;
+  border-image-repeat: stretch;
+
+  &:focus-visible,
+  :focus-visible {
+    outline: 4px solid #d3ff11;
+  }
 
   form {
     display: contents;
@@ -45,6 +53,12 @@ dialog {
   button {
     padding: 0.5em;
     text-shadow: inherit;
+    background-color: #83aa9e;
+    border: 0.5em solid;
+    border-image-source: url("/public/textures/interface/slot_active.png");
+    border-image-slice: 2 fill;
+    border-image-width: 0.5em;
+    border-image-repeat: stretch;
 
     &:hover {
       cursor: pointer;
