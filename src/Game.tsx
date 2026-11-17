@@ -8,6 +8,7 @@ import type { KeyState } from "./input.ts";
 import { createPlayer, drawPlayer, updatePlayer, type Player } from "./Player.ts";
 import type { ItemID } from "./properties.ts";
 import { loadDefinitions, loadFeature, missingTextureSprite, terrain } from "./properties.ts";
+import { Start } from "./Start.tsx";
 import { createTree, drawTree, type Tree } from "./Tree.ts";
 
 export interface GameProps {
@@ -280,6 +281,7 @@ export function Game(props: GameProps) {
 
   return (
     <div class="Game">
+      <Start />
       <Canvas
         ref={canvas!}
       />

@@ -1,0 +1,59 @@
+/* This is because of my defaults reset */
+/* Ideally I will find a better solution to things than this. */
+/* Scoped default styles? hmm */
+dialog {
+  margin: auto;
+  padding: 1em;
+}
+
+dialog {
+  padding: 2em;
+  color-scheme: dark;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
+  color: #ffffff;
+  font-size: 1.1em;
+  text-shadow: 0.175ch 0.175ch 0 #000000;
+  white-space: pre;
+  background-color: #8888;
+  backdrop-filter: blur(8px);
+
+  form {
+    display: contents;
+  }
+
+  h1 {
+    display: flex;
+    gap: 0.5em;
+    align-items: center;
+
+    img {
+      width: 2em;
+      height: 2em;
+    }
+  }
+
+  a {
+    color: unset;
+
+    img {
+      margin-right: 0.25em;
+    }
+  }
+
+  button {
+    padding: 0.5em;
+    text-shadow: inherit;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  &::backdrop {
+    background-image: url("/public/textures/terrain/ground.png");
+    background-size: 128px;
+    background-position: center;
+  }
+}
