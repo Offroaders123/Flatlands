@@ -8,6 +8,7 @@ export class MusicManager {
     this.tracks = tracks;
     this.audio = new Audio();
 
+    this.audio.volume = 0.5;
     this.audio.addEventListener("ended", this.playRandom.bind(this));
   }
 
