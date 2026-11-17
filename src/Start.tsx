@@ -9,7 +9,7 @@ export function Start() {
   let ref: HTMLDialogElement;
   const [musicPlaying, setMusicPlaying] = createSignal<boolean>(false);
 
-  const musicManager = new MusicManager(tracks);
+  const musicManager = new MusicManager(tracks, tracks[2]!);
 
   onMount(() => {
     ref!.showModal();

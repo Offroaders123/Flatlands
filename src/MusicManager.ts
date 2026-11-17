@@ -1,11 +1,13 @@
 export class MusicManager {
   private readonly tracks: string[];
+  private readonly firstTrack: string;
   private readonly audio: HTMLAudioElement;
 
   private currentTrack: string | null = null;
 
-  constructor(tracks: string[]) {
+  constructor(tracks: string[], firstTrack: string) {
     this.tracks = tracks;
+    this.firstTrack = firstTrack;
     this.audio = new Audio();
 
     this.audio.volume = 0.5;
@@ -13,7 +15,14 @@ export class MusicManager {
   }
 
   async start(): Promise<void> {
-    await this.playRandom();
+    this.currentTrack = this.firstTrack;
+    this.audio.src = this.firstTrack;
+
+    try {
+      await this.audio.play();
+    } catch (error) {
+      console.warn("Unable to play music:", error);
+    }
   }
 
   async playRandom(): Promise<void> {
